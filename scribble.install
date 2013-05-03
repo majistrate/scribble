@@ -1,0 +1,29 @@
+<?php
+
+/**
+ * @file
+ * Installation related functions for the scribble module.
+ */
+
+/**
+ * Checks if the jqscribble library is in the libraries folder.
+ *
+ * @param $phase
+ *   The phase in which requirements are checked.
+ * @return array
+ */
+function hook_requirements($phase) {
+  $requirements = array();
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  if (in_array($phase, array('install', 'runtime')) && !file_exists(libraries_get_path('jqscribble') . '/jquery.jqscribble.js')) {
+  // Check if the jqscribble library is available.
+    $requirements['jqscribble'] = array(
+      'title' => $t('JQScribble Library'),
+      'severity' => REQUIREMENT_WARNING,
+      'description' => $t('The JQScribble library was not found in the libraries folder. Please place the jquery.jqscribble.js file in sites/all/libraries/jqscribble.');
+    );
+  }
+  return $requirements;
+}
