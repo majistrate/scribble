@@ -17,6 +17,7 @@ function scribble_menu() {
     'page arguments' => array('scribble_blackboard_form'),
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
+    'file' => 'scribble.pages.inc',
   );
   /*
   $items['admin/config/user-interface/scribble'] = array(
@@ -30,23 +31,11 @@ function scribble_menu() {
   return $items;
 }
 
-/**
- * Page callback that contains the blackboard.
- */
-function scribble_blackboard_form($form, $form_state) {
-  $form['#attached']['library'][] = array('scribble', 'jqscribble');
-
-  $form['canvas'] = array(
-    '#markup' => '<canvas class="scribble-canvas"></canvas>',
-  );
-
-  return $form;
-}
-
 /*
  * Implements hook_library().
  */
 function scribble_library() {
+  // @todo add canvas bgimage path and add saveurl as settings
   $libraries['jqscribble'] = array(
     'title' => t('JQScribble'),
     'website' => 'https://github.com/jimdoescode/jqScribble',
@@ -55,7 +44,7 @@ function scribble_library() {
       libraries_get_path('jqscribble') . '/jquery.jqscribble.js' => array(
         'type' => 'file',
       ),
-      libraries_get_path('jqscribble') . '/jquery.extrabrushes.js' => array(
+      libraries_get_path('jqscribble') . '/jqscribble.extrabrushes.js' => array(
         'type' => 'file',
       ),
       drupal_get_path('module', 'scribble') . '/scribble.js' => array(
@@ -71,3 +60,4 @@ function scribble_library() {
   );
   return $libraries;
 }
+
