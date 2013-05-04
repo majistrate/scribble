@@ -13,14 +13,19 @@
 
     $('.scribble-save').click(function () {
       $(".scribble-canvas").data("jqScribble").save(function (imageData) {
+        console.log(Drupal.settings.scribble.saveURL);
         if(confirm("You're about to save ur changes. Is that cool with you?")) {
           $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
             // @todo print some message and reload the canvas with the new backgroundimage
-            console.log('RETURND FROM AJAX');
+            console.log('RETURNED FROM AJAX');
+            var options = {
+              backgroundImage: Drupal.settings.scribble.bgImagePath + '/scribble.png'
+            };
+            $('.scribble-canvas').data('jqScribble').update(options);
           });
         }
       });
-      return FALSE;
+      return false;
     });
   }
 
