@@ -1,4 +1,0 @@
-scribble
-========
-
-drupal scribble module

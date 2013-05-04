@@ -11,13 +11,11 @@
 function scribble_blackboard_form($form, $form_state) {
   $form['#attached']['library'][] = array('scribble', 'jqscribble');
 
-  $form['canvas'] = array(
-    '#markup' => '<canvas class="scribble-canvas"></canvas>',
+  $form['board'] = array(
+    '#markup' => theme('scribble_blackboard', array()),
   );
 
-  $form['save'] = array(
-    '#markup' => '<a href="#" class="scribble-save">' .  t('Save') . '</a>',
-  );
+  // @todo add element for the entity id
 /*
   $form['save'] = array(
     '#type' => 'button',
