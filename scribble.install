@@ -6,6 +6,8 @@
  */
 
 /**
+ * Implements hook_requirements().
+ *
  * Checks if the jqscribble library is in the libraries folder.
  *
  * @param $phase
@@ -26,4 +28,17 @@ function scribble_requirements($phase) {
     );
   }
   return $requirements;
+}
+
+/**
+ * Implements hook_enable().
+ *
+ * Creates a directory in the public files directory if it doesn't exists yet.
+ */
+function scribble_enable() {
+  $path = variable_get('file_public_path', 'sites/default/files') . '/scribble';
+  if (!file_exists($path)) {
+    drupal_mkdir($path);
+  }
+  variable_set('scribble_files_directory', $path);
 }
