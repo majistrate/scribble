@@ -8,7 +8,7 @@
 /**
  * Implements hook_menu().
  *
- * @return mixed
+ * @return array
  */
 function scribble_menu() {
   $items['scribble/blackboard'] = array(
@@ -21,7 +21,6 @@ function scribble_menu() {
   );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',
-    'page arguments' => array(),
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
@@ -45,7 +44,7 @@ function scribble_library() {
   $settings = array(
     'scribble' => array(
       'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
-      'saveURL' => 'scribble/save',
+      'saveURL' => url('scribble/save', array('absolute' => TRUE)),
      ),
   );
   $libraries['jqscribble'] = array(
@@ -76,4 +75,3 @@ function scribble_library() {
   );
   return $libraries;
 }
-

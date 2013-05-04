@@ -38,7 +38,7 @@ function scribble_requirements($phase) {
 function scribble_enable() {
   $path = variable_get('file_public_path', 'sites/default/files') . '/scribble';
   if (!file_exists($path)) {
-    drupal_mkdir($path);
+    drupal_mkdir($path, 0777);
   }
   variable_set('scribble_files_directory', $path);
 }

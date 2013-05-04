@@ -16,11 +16,39 @@ function scribble_blackboard_form($form, $form_state) {
   );
 
   $form['save'] = array(
+    '#markup' => '<a href="#" class="scribble-save">' .  t('Save') . '</a>',
+  );
+/*
+  $form['save'] = array(
     '#type' => 'button',
     '#value' => t('Save'),
     '#attributes' => array(
       'class' => array('scribble-save'),
     ),
   );
+*/
   return $form;
+}
+
+/**
+ * AJAX callback for the "Save" button.
+ *
+ * Creates an image from the data passed by via post request.
+ */
+function scribble_save_ajax() {
+  if (!empty($_POST['imagedata'])) {
+    $data = $_POST['imagedata'];
+    // @todo create a folder for every scribble entity and save it there
+    $path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/scribble.png';
+    // Need to remove the stuff at the beginning of the string.
+    $data = substr($data, strpos($data, ",")+1);
+    // Create an image resource and save and image.
+    $data = base64_decode($data);
+    $img_resource = imagecreatefromstring($data);
+    if (!empty($img_resource)) {
+      imagepng($img_resource, $path);
+    }
+    imagedestroy($img_resource);
+    drupal_exit();
+  }
 }
