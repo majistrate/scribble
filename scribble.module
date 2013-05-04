@@ -11,10 +11,17 @@
  * @return mixed
  */
 function scribble_menu() {
-  $items['blackboard'] = array(
+  $items['scribble/blackboard'] = array(
     'title' => 'Scribble blackboard',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('scribble_blackboard_form'),
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'scribble.pages.inc',
+  );
+  $items['scribble/save'] = array(
+    'page callback' => 'scribble_save_ajax',
+    'page arguments' => array(),
     'access arguments' => array('access content'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
@@ -35,7 +42,12 @@ function scribble_menu() {
  * Implements hook_library().
  */
 function scribble_library() {
-  // @todo add canvas bgimage path and add saveurl as settings
+  $settings = array(
+    'scribble' => array(
+      'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
+      'saveURL' => 'scribble/save',
+     ),
+  );
   $libraries['jqscribble'] = array(
     'title' => t('JQScribble'),
     'website' => 'https://github.com/jimdoescode/jqScribble',
@@ -49,6 +61,10 @@ function scribble_library() {
       ),
       drupal_get_path('module', 'scribble') . '/scribble.js' => array(
         'type' => 'file',
+      ),
+      array(
+        'type' => 'setting',
+        'data' => $settings,
       ),
     ),
     'css' => array(

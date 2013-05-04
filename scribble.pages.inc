@@ -12,13 +12,15 @@ function scribble_blackboard_form($form, $form_state) {
   $form['#attached']['library'][] = array('scribble', 'jqscribble');
 
   $form['canvas'] = array(
-    '#markup' => '<canvas id="scribble-canvas"></canvas>',
+    '#markup' => '<canvas class="scribble-canvas"></canvas>',
   );
 
   $form['save'] = array(
     '#type' => 'button',
     '#value' => t('Save'),
-    '#id' => 'scribble-save',
+    '#attributes' => array(
+      'class' => array('scribble-save'),
+    ),
   );
   return $form;
 }
