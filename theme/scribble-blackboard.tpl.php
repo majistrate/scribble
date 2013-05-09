@@ -12,8 +12,8 @@
   </div>
   <div class="scribble-brushes">
     <strong>BRUSHES:</strong>
-    <a href="#" onclick='$("#test").data("jqScribble").update({brush: BasicBrush});'>Basic</a>
-    <a href="#" onclick='$("#test").data("jqScribble").update({brush: LineBrush});'>Line</a>
-    <a href="#" onclick='$("#test").data("jqScribble").update({brush: CrossBrush});'>Cross</a>
+    <a href="#" class="scribble-brush-btn" rel="basic">Basic</a>
+    <a href="#" class="scribble-brush-btn" rel="line">Line</a>
+    <a href="#" class="scribble-brush-btn" rel="cross">Cross</a>
   </div>
 </div>
