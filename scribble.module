@@ -23,6 +23,12 @@ function scribble_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
+  $items['scribble/add'] = array(
+    'page callback' => 'scribble_add_ajax',
+    'access arguments' => array('access content'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'scribble.pages.inc',
+  );
   /*
   $items['admin/config/user-interface/scribble'] = array(
     'title' => 'Example RSS feed',
@@ -43,6 +49,7 @@ function scribble_library() {
     'scribble' => array(
       'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
+      'addURL' =>  url('scribble/add', array('absolute' => TRUE)),
      ),
   );
   $libraries['jqscribble'] = array(
