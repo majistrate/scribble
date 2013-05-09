@@ -7,8 +7,6 @@
 
 /**
  * Implements hook_menu().
- *
- * @return array
  */
 function scribble_menu() {
   $items['scribble/blackboard'] = array(
@@ -78,12 +76,6 @@ function scribble_library() {
 
 /**
  * Implements hook_theme().
- *
- * @param $existing
- * @param $type
- * @param $theme
- * @param $path
- * @return array
  */
 function scribble_theme($existing, $type, $theme, $path) {
   return array(
