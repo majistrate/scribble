@@ -65,6 +65,7 @@ function scribble_save_ajax() {
  */
 function scribble_add_ajax() {
   dd($_POST, 'POST');
+  // @todo just return an image, don't save right here.
   // @todo check more post values
   if (!empty($_POST['img_url'])) {
     // Get the image resource of the image that gets added.

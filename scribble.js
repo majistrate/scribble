@@ -57,7 +57,7 @@ console.log('RETURNED FROM SAVE AJAX');
     // Handle image add action.
     $('.scribble-add').click(function () {
       console.log(event);
-      var img_src = prompt(Drupal.t('Enter the URL of the image.');
+      var img_src = prompt(Drupal.t('Enter the URL of the image.'));
       if(img_src !== '') {
         var $info = $('<div>' + Drupal.t('Drag the image on the blackboard in order to add it.') + '</div>');
         $('.scribble-add-img-container').html($info);
