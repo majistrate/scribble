@@ -35,14 +35,20 @@
     };
 
     // Register brush handlers
-    $('.scribble-brush-btn').each(function () {
-      $(this).click(function () {
-        var brush = $(this).attr('rel');
-        var brush_name = brush_map[brush];
-        console.log(brush_name);
-        $(".scribble-canvas").data("jqScribble").update({brush: brush_name});
-        return false;
-      });
+    $('.scribble-brush-btn').click(function () {
+      var brush = $(this).attr('rel');
+      var brush_name = brush_map[brush];
+      $(".scribble-canvas").data("jqScribble").update({brush: brush_name});
+      return false;
+    });
+
+    // Reset to last saved background image.
+    $('.scribble-clear').click(function () {
+      var options = {
+        backgroundImage: Drupal.settings.scribble.bgImagePath + '/scribble.png'
+      };
+      $('.scribble-canvas').data('jqScribble').update(options);
+      return false;
     });
   }
 
