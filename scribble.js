@@ -13,14 +13,30 @@
     };
     $('.scribble-canvas').jqScribble(options);
 
+    // Add the color picker.
+    $('.scribble-color-picker').farbtastic(function (color) {
+      var rgb = hexToRgb(color);
+      rgb_string = 'rgb(' + rgb.join(',') + ')';
+      $('.scribble-canvas').data("jqScribble").update({brushColor: rgb_string});
+    });
+
+    // Helper to convert hex to rgb codes.
+    function hexToRgb(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.toString());
+      return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+      ] : null;
+    }
+
     // Register the handler for the save action.
     $('.scribble-save').click(function () {
       $(".scribble-canvas").data("jqScribble").save(function (imageData) {
         if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?'))) {
           $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
-console.log('RETURNED FROM SAVE AJAX');
             var options = {
-              backgroundImage: Drupal.settings.scribble.bgImagePath + '/scribble.png'
+              backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
             };
             $('.scribble-canvas').data('jqScribble').update(options);
           });
@@ -90,7 +106,7 @@ console.log('RETURNED FROM SAVE AJAX');
       };
       $.post(Drupal.settings.scribble.addURL, data, function(response) {
         var options = {
-          backgroundImage: Drupal.settings.scribble.bgImagePath + '/scribble.png'
+          backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
         };
         $('.scribble-canvas').data('jqScribble').update(options);
       });
