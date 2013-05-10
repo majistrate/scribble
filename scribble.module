@@ -93,3 +93,4 @@ function scribble_theme($existing, $type, $theme, $path) {
     ),
   );
 }
+
