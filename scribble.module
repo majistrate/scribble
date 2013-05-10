@@ -93,3 +93,45 @@ function scribble_theme($existing, $type, $theme, $path) {
     ),
   );
 }
+
+
+/**
+ * Implements hook_entity_info().
+ */
+function scribble_entity_info() {
+  $entities = array(
+    'scribble' => array(
+      'module' => 'scribble',
+      'label' => t('Scribble'),
+      'access callback' => 'scribble_access',
+      'entity class' => 'Scribble',
+      'controller class' => 'ScribbleController',
+      'metadata controller class' => 'ScribbleMetadataController',
+      'fieldable' => TRUE,
+      'exportable' => TRUE,
+      'base table' => 'scribble',
+      'entity keys' => array(
+        'id' => 'sid',
+        'label' => 'label',
+        'name' => 'name',
+      ),
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Full content'),
+          'custom settings' => FALSE,
+        ),
+        'img_only' => array(
+          'label' => t('Image only'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      'admin ui' => array(
+        'controller class' => 'ScribbleUIController',
+        'path' => 'admin/config/media/scribble',
+        'menu wildcard' => '%scribble',
+      ),
+    ),
+  );
+
+  return $entities;
+}
