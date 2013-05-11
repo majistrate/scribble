@@ -50,6 +50,7 @@ function scribble_library() {
       'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
       'addURL' =>  url('scribble/add', array('absolute' => TRUE)),
+      'newestScribble' => scribble_get_newest(),
      ),
   );
   $libraries['jqscribble'] = array(
@@ -94,3 +95,16 @@ function scribble_theme($existing, $type, $theme, $path) {
   );
 }
 
+/**
+ * Getter for the latest scribble image.
+ *
+ * @return
+ *   Filename of the newest file.
+ */
+function scribble_get_newest() {
+  $files = scandir(variable_get('scribble_files_directory', 'sites/default/files/scribble'), SCANDIR_SORT_DESCENDING);
+  if (!empty($files)) {
+    return $files[0];
+  }
+  return '';
+}
