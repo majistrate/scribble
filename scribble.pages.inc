@@ -89,10 +89,11 @@ function scribble_add_ajax() {
       variable_set('scribble_files_directory', $path);
     }
     $img_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/';
-    $file_name = 'scribble_' . date('d-m-Y_H-i-s') . '.png';
-    $img_resource = imagecreatefrompng($file_name);
+    $file_name = scribble_get_newest();
+    $img_resource = !empty($file_name) ? imagecreatefrompng($img_path . $file_name) : imagecreatetruecolor($_POST['canvas_width'], $_POST['canvas_height']);
     if (!empty($img_resource) && !empty($add_img_resource)) {
       imagecopy($img_resource, $add_img_resource, $_POST['dst_x'], $_POST['dst_y'], 0, 0, $_POST['img_width'], $_POST['img_height']);
+      $file_name = 'scribble_' . date('d-m-Y_H-i-s') . '.png';
       imagepng($img_resource, $img_path . $file_name);
     }
     imagedestroy($img_resource);

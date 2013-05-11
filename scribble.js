@@ -7,11 +7,25 @@
   Drupal.behaviors.createBlackboard = {};
   Drupal.behaviors.createBlackboard.attach = function (context, settings) {
 
-    // Load the default image.
-    var options = {
-      backgroundImage: Drupal.settings.scribble.bgImagePath + '/scribble.png'
+    var drag_img_offset_x;
+    var drag_img_offset_y;
+    // @todo get this from the server
+    var canvas_height = 199;
+    var canvas_width = 930;
+    var current_file = Drupal.settings.scribble.newestScribble;
+    var brush_map = {
+      'line': LineBrush,
+      'cross': CrossBrush,
+      'basic': BasicBrush
     };
-    $('.scribble-canvas').jqScribble(options);
+
+    if (current_file != '') {
+      // Load the newest image.
+      var options = {
+        backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
+      };
+      $('.scribble-canvas').jqScribble(options);
+    }
 
     // Add the color picker.
     $('.scribble-color-picker').farbtastic(function (color) {
@@ -33,25 +47,18 @@
     // Register the handler for the save action.
     $('.scribble-save').click(function () {
       $(".scribble-canvas").data("jqScribble").save(function (imageData) {
-        if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?'))) {
+        if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$('.scribble-canvas').data('jqScribble').blank) {
           $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
             var options = {
               backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
             };
             $('.scribble-canvas').data('jqScribble').update(options);
+            current_file = Drupal.settings.scribble.bgImagePath + '/' + response.file_name;
           });
         }
       });
       return false;
     });
-
-    var brush_map = {
-      'line': LineBrush,
-      'cross': CrossBrush,
-      'basic': BasicBrush
-    };
-
-    var add_image_dragged = false;
 
     // Register brush handlers
     $('.scribble-brush-btn').click(function () {
@@ -64,17 +71,17 @@
     // Reset to last saved background image.
     $('.scribble-clear').click(function () {
       var options = {
-        backgroundImage: Drupal.settings.scribble.bgImagePath + '/scribble.png'
+        backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
       };
       $('.scribble-canvas').data('jqScribble').update(options);
+      console.log($('.scribble-canvas').height());
       return false;
     });
 
     // Handle image add action.
     $('.scribble-add').click(function () {
-      console.log(event);
       var img_src = prompt(Drupal.t('Enter the URL of the image.'));
-      if(img_src !== '') {
+      if(img_src !== '' && img_src != null) {
         var $info = $('<div>' + Drupal.t('Drag the image on the blackboard in order to add it.') + '</div>');
         $('.scribble-add-img-container').html($info);
         var $img = $('<img />');
@@ -85,6 +92,10 @@
         $('.scribble-add-img-container').append($img);
         var options = {
           stop: addImgStopHandler,
+          start: function (event, ui) {
+            drag_img_offset_x = event.pageX - $('.scribble-add-image').position().left;
+            drag_img_offset_y = event.pageY - $('.scribble-add-image').position().top;
+          },
           revert: true
         };
         $img.draggable(options);
@@ -93,23 +104,44 @@
     });
 
     function addImgStopHandler(event, ui) {
+      console.log(event);
+      console.log(drag_img_offset_x, drag_img_offset_y);
       // @todo calculate mouse offset from dragged img into x and y
-      // @todo check if the img was dropped within the canvas dimensions
-      var x = event.pageX - $('.scribble-canvas').offset().left;
-      var y = event.pageY - $('.scribble-canvas').offset().top;
-      var data = {
-        img_url: $('.scribble-add-image').attr('src'),
-        img_width: $('.scribble-add-image').width(),
-        img_height: $('.scribble-add-image').height(),
-        dst_x: x,
-        dst_y: y
-      };
-      $.post(Drupal.settings.scribble.addURL, data, function(response) {
-        var options = {
-          backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
+      if (droppedOnCanvas(event.pageX, event.pageY)) {
+        var x = event.pageX - $('.scribble-canvas').offset().left - drag_img_offset_x;
+        var y = event.pageY - $('.scribble-canvas').offset().top - drag_img_offset_y;
+        var data = {
+          img_url: $('.scribble-add-image').attr('src'),
+          img_width: $('.scribble-add-image').width(),
+          img_height: $('.scribble-add-image').height(),
+          dst_x: x,
+          dst_y: y
         };
-        $('.scribble-canvas').data('jqScribble').update(options);
-      });
+        if (current_file == '') {
+          data.canvas_width = canvas_width;
+          data.canvas_height = canvas_height;
+        }
+        $.post(Drupal.settings.scribble.addURL, data, function(response) {
+          var options = {
+            backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
+          };
+          $('.scribble-canvas').data('jqScribble').update(options);
+          current_file = Drupal.settings.scribble.bgImagePath + '/' + response.file_name;
+        });
+      }
+    }
+
+    // Helper function to check if image was dropped within the canvas.
+    function droppedOnCanvas(x, y) {
+      $canvas = $('.scribble-canvas');
+      var border_left = $canvas.offset().left;
+      var border_top = $canvas.offset().top;
+      var border_right = $canvas.offset().left + $canvas.width();
+      var border_bottom = $canvas.offset().top + $canvas.height();
+      if (x > border_left && x < border_right && y > border_top && y < border_bottom) {
+        return true;
+      }
+      return false;
     }
   }
 
