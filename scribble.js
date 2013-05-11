@@ -18,20 +18,24 @@
       'cross': CrossBrush,
       'basic': BasicBrush
     };
+    var $draw_canvas = $('.scribble-canvas');
+    var $add_img_container = $('.scribble-add-img-container');
+    var $add_img = $('.scribble-add-img');
 
     if (current_file != '') {
       // Load the newest image.
       var options = {
         backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
       };
-      $('.scribble-canvas').jqScribble(options);
     }
+    // Initialize drawing canvas.
+    $draw_canvas.jqScribble(options);
 
     // Add the color picker.
     $('.scribble-color-picker').farbtastic(function (color) {
       var rgb = hexToRgb(color);
       rgb_string = 'rgb(' + rgb.join(',') + ')';
-      $('.scribble-canvas').data("jqScribble").update({brushColor: rgb_string});
+      $draw_canvas.data("jqScribble").update({brushColor: rgb_string});
     });
 
     // Helper to convert hex to rgb codes.
@@ -46,13 +50,13 @@
 
     // Register the handler for the save action.
     $('.scribble-save').click(function () {
-      $(".scribble-canvas").data("jqScribble").save(function (imageData) {
-        if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$('.scribble-canvas').data('jqScribble').blank) {
+      $draw_canvas.data("jqScribble").save(function (imageData) {
+        if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
           $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
             var options = {
               backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
             };
-            $('.scribble-canvas').data('jqScribble').update(options);
+            $draw_canvas.data('jqScribble').update(options);
             current_file = response.file_name;
           });
         }
@@ -64,7 +68,7 @@
     $('.scribble-brush-btn').click(function () {
       var brush = $(this).attr('rel');
       var brush_name = brush_map[brush];
-      $(".scribble-canvas").data("jqScribble").update({brush: brush_name});
+      $draw_canvas.data("jqScribble").update({brush: brush_name});
       return false;
     });
 
@@ -73,7 +77,7 @@
       var options = {
         backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
       };
-      $('.scribble-canvas').data('jqScribble').update(options);
+      $draw_canvas.data('jqScribble').update(options);
       return false;
     });
 
@@ -82,18 +86,18 @@
       var img_src = prompt(Drupal.t('Enter the URL of the image.'));
       if(img_src !== '' && img_src != null) {
         var $info = $('<div>' + Drupal.t('Drag the image on the blackboard in order to add it.') + '</div>');
-        $('.scribble-add-img-container').html($info);
+        $add_img_container.html($info);
         var $img = $('<img />');
         $img.attr({
           'src': img_src,
-          'class': 'scribble-add-image'
+          'class': 'scribble-add-img'
         });
-        $('.scribble-add-img-container').append($img);
+        $add_img_container.append($img);
         var options = {
           stop: addImgStopHandler,
           start: function (event, ui) {
-            drag_img_offset_x = event.pageX - $('.scribble-add-image').position().left;
-            drag_img_offset_y = event.pageY - $('.scribble-add-image').position().top;
+            drag_img_offset_x = event.pageX - $add_img.position().left;
+            drag_img_offset_y = event.pageY - $add_img.position().top;
           },
           revert: true
         };
@@ -102,14 +106,15 @@
       return false;
     });
 
+    // Fires once the dragged image is dropped on the draw canvas.
     function addImgStopHandler(event, ui) {
       if (droppedOnCanvas(event.pageX, event.pageY)) {
-        var x = event.pageX - $('.scribble-canvas').offset().left - drag_img_offset_x;
-        var y = event.pageY - $('.scribble-canvas').offset().top - drag_img_offset_y;
+        var x = event.pageX - $draw_canvas.offset().left - drag_img_offset_x;
+        var y = event.pageY - $draw_canvas.offset().top - drag_img_offset_y;
         var data = {
-          img_url: $('.scribble-add-image').attr('src'),
-          img_width: $('.scribble-add-image').width(),
-          img_height: $('.scribble-add-image').height(),
+          img_url: $add_img.attr('src'),
+          img_width: $add_img.width(),
+          img_height: $add_img.height(),
           dst_x: x,
           dst_y: y
         };
@@ -121,7 +126,7 @@
           var options = {
             backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
           };
-          $('.scribble-canvas').data('jqScribble').update(options);
+          $draw_canvas.data('jqScribble').update(options);
           current_file = response.file_name;
         });
       }
@@ -129,7 +134,7 @@
 
     // Helper function to check if image was dropped within the canvas.
     function droppedOnCanvas(x, y) {
-      $canvas = $('.scribble-canvas');
+      $canvas = $draw_canvas;
       var border_left = $canvas.offset().left;
       var border_top = $canvas.offset().top;
       var border_right = $canvas.offset().left + $canvas.width();
