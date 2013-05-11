@@ -53,7 +53,7 @@
               backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
             };
             $('.scribble-canvas').data('jqScribble').update(options);
-            current_file = Drupal.settings.scribble.bgImagePath + '/' + response.file_name;
+            current_file = response.file_name;
           });
         }
       });
@@ -74,7 +74,6 @@
         backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
       };
       $('.scribble-canvas').data('jqScribble').update(options);
-      console.log($('.scribble-canvas').height());
       return false;
     });
 
@@ -104,9 +103,6 @@
     });
 
     function addImgStopHandler(event, ui) {
-      console.log(event);
-      console.log(drag_img_offset_x, drag_img_offset_y);
-      // @todo calculate mouse offset from dragged img into x and y
       if (droppedOnCanvas(event.pageX, event.pageY)) {
         var x = event.pageX - $('.scribble-canvas').offset().left - drag_img_offset_x;
         var y = event.pageY - $('.scribble-canvas').offset().top - drag_img_offset_y;
@@ -126,7 +122,7 @@
             backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
           };
           $('.scribble-canvas').data('jqScribble').update(options);
-          current_file = Drupal.settings.scribble.bgImagePath + '/' + response.file_name;
+          current_file = response.file_name;
         });
       }
     }
