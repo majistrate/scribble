@@ -19,6 +19,7 @@
     <a href="#" class="scribble-brush-btn" rel="line"><?php print t('Line'); ?></a>
     <a href="#" class="scribble-brush-btn" rel="cross"><?php print t('Cross'); ?></a>
   </div>
+  <div class="scribble-brush-size"></div>
   <div class="scribble-color-picker"></div>
   <div class="scribble-add-img-container"></div>
 </div>

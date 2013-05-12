@@ -20,7 +20,7 @@
     };
     var $draw_canvas = $('.scribble-canvas');
     var $add_img_container = $('.scribble-add-img-container');
-    var $add_img = $('.scribble-add-img');
+    var $add_img;
 
     if (current_file != '') {
       // Load the newest image.
@@ -37,6 +37,14 @@
       rgb_string = 'rgb(' + rgb.join(',') + ')';
       $draw_canvas.data("jqScribble").update({brushColor: rgb_string});
     });
+
+    // Initialize brush size slider.
+    options = {
+      stop: function (event, ui) {
+        $draw_canvas.data("jqScribble").update({brushSize: ui.value});
+      }
+    };
+    $('.scribble-brush-size').slider(options);
 
     // Helper to convert hex to rgb codes.
     function hexToRgb(hex) {
@@ -96,6 +104,7 @@
         var options = {
           stop: addImgStopHandler,
           start: function (event, ui) {
+            $add_img = $('.scribble-add-img');
             drag_img_offset_x = event.pageX - $add_img.position().left;
             drag_img_offset_y = event.pageY - $add_img.position().top;
           },
