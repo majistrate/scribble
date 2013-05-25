@@ -51,6 +51,7 @@ function scribble_library() {
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
       'addURL' =>  url('scribble/add', array('absolute' => TRUE)),
       'newestScribble' => scribble_get_newest(),
+      'saveAfterDrop' => variable_get('scribble_save_dropped_img', FALSE),
      ),
   );
   $libraries['jqscribble'] = array(

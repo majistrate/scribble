@@ -118,6 +118,7 @@
     // Fires once the dragged image is dropped on the draw canvas.
     function addImgStopHandler(event, ui) {
       if (droppedOnCanvas(event.pageX, event.pageY)) {
+        // Gather data for image merge.
         var x = event.pageX - $draw_canvas.offset().left - drag_img_offset_x;
         var y = event.pageY - $draw_canvas.offset().top - drag_img_offset_y;
         var data = {
@@ -131,13 +132,21 @@
           data.canvas_width = canvas_width;
           data.canvas_height = canvas_height;
         }
-        $.post(Drupal.settings.scribble.addURL, data, function(response) {
-          var options = {
-            backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
-          };
-          $draw_canvas.data('jqScribble').update(options);
-          current_file = response.file_name;
-        });
+        if (Drupal.settings.scribble.saveAfterDrop) {
+          // Do AJAX post that merges the images and saves a new image.
+          $.post(Drupal.settings.scribble.addURL, data, function(response) {
+            var options = {
+              backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
+            };
+            $draw_canvas.data('jqScribble').update(options);
+            // Store the latest filename.
+            current_file = response.file_name;
+          });
+        }
+        else {
+          // Only draw the image on the canvas w/o saving.
+          $draw_canvas[0].getContext('2d').drawImage($add_img[0], data['dst_x'], data['dst_y']);
+        }
       }
     }
 
