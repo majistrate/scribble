@@ -21,6 +21,34 @@
     var $draw_canvas = $('.scribble-canvas');
     var $add_img_container = $('.scribble-add-img-container');
     var $add_img;
+    var $save_btn = $('.scribble-save');
+
+    // Initialize the toolbar
+    $('.scribble-save').button({
+      icons: {
+        primary: "ui-icon-disk"
+      }
+    });
+    $('.scribble-add').button({
+      icons: {
+        primary: "ui-icon-image"
+      }
+    });
+    $('.scribble-clear').button({
+      icons: {
+        primary: "ui-icon-trash"
+      }
+    });
+    $('.scribble-color-btn')
+      .button({
+        icons: {
+          primary: "ui-icon-pencil"
+        }
+      })
+      .click(function () {
+        $('.scribble-color-picker').dialog('open');
+      });
+    $('.scribble-brushes').buttonset();
 
     if (current_file != '') {
       // Load the newest image.
@@ -32,11 +60,20 @@
     $draw_canvas.jqScribble(options);
 
     // Add the color picker.
-    $('.scribble-color-picker').farbtastic(function (color) {
-      var rgb = hexToRgb(color);
-      rgb_string = 'rgb(' + rgb.join(',') + ')';
-      $draw_canvas.data("jqScribble").update({brushColor: rgb_string});
-    });
+    $('.scribble-color-picker')
+      .farbtastic(function (color) {
+        var rgb = hexToRgb(color);
+        rgb_string = 'rgb(' + rgb.join(',') + ')';
+        $draw_canvas.data("jqScribble").update({brushColor: rgb_string});
+        $('.scribble-color-display').css('background-color', color);
+      })
+      .dialog({
+        draggable: true,
+        title: Drupal.t('Choose your color'),
+        autoOpen: false,
+        resizable: false,
+        width: 220
+      });
 
     // Initialize brush size slider.
     options = {
@@ -57,7 +94,7 @@
     }
 
     // Register the handler for the save action.
-    $('.scribble-save').click(function () {
+    $save_btn.click(function () {
       $draw_canvas.data("jqScribble").save(function (imageData) {
         if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
           $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
@@ -74,7 +111,7 @@
 
     // Register brush handlers
     $('.scribble-brush-btn').click(function () {
-      var brush = $(this).attr('rel');
+      var brush = $(this).attr('id');
       var brush_name = brush_map[brush];
       $draw_canvas.data("jqScribble").update({brush: brush_name});
       return false;
