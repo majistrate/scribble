@@ -7,7 +7,23 @@
  *
  * @see www.htmldog.com/articles/suckerfish
  */
-.scribble-canvas,
-.scribble-brush {
+.scribble-canvas {
   border: 1px solid #000;
+}
+
+.scribble-color-display {
+  height: 20px;
+  width: 20px;
+  border: 1px solid #000;
+  background-color: #000;
+  display: inline-block;
+}
+
+.scribble-brushes {
+  display: inline-block;
+}
+
+.scribble-brush-size {
+  width: 200px;
+  display: inline-block;
 }

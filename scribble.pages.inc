@@ -12,6 +12,8 @@ function scribble_blackboard_form($form, $form_state) {
   $form['#attached']['library'][] = array('system', 'ui.draggable');
   $form['#attached']['library'][] = array('system', 'farbtastic');
   $form['#attached']['library'][] = array('system', 'ui.slider');
+  $form['#attached']['library'][] = array('system', 'ui.button');
+  $form['#attached']['library'][] = array('system', 'ui.dialog');
   $form['#attached']['library'][] = array('scribble', 'jqscribble');
 
   $form['board'] = array(
