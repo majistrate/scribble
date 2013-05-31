@@ -6,7 +6,9 @@
 
 ?>
 <div class="scribble-blackboard-wrapper">
-  <canvas class="scribble-canvas"></canvas>
+  <div class="scribble-canvas-wrapper">
+    <canvas class="scribble-canvas" />
+  </div>
   <div class="scribble-toolbar ui-widget-header ui-corner-all">
     <div class="scribble-actions">
       <div class="scribble-save"><?php print t('Save'); ?></div>
