@@ -20,8 +20,10 @@
     };
     var $draw_canvas = $('.scribble-canvas');
     var $add_img_container = $('.scribble-add-img-container');
-    var $add_img;
     var $save_btn = $('.scribble-save');
+    var $size_display = $('.scribble-brush-size-display');
+    var $add_img;
+    var unchanged = true;
 
     // Initialize the toolbar
     $('.scribble-save').button({
@@ -79,9 +81,14 @@
     options = {
       stop: function (event, ui) {
         $draw_canvas.data("jqScribble").update({brushSize: ui.value});
-      }
+      },
+      slide: function (event, ui) {
+        $size_display.text(ui.value);
+      },
+      min: 1
     };
     $('.scribble-brush-size').slider(options);
+    $size_display.text(1);
 
     // Helper to convert hex to rgb codes.
     function hexToRgb(hex) {
@@ -93,28 +100,33 @@
       ] : null;
     }
 
+    // Enable saving after only after first click.
+    $draw_canvas.click(function () {
+      unchanged = false;
+    });
+
     // Register the handler for the save action.
     $save_btn.click(function () {
-      $draw_canvas.data("jqScribble").save(function (imageData) {
-        if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
-          $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
-            var options = {
-              backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
-            };
-            $draw_canvas.data('jqScribble').update(options);
-            current_file = response.file_name;
-          });
-        }
-      });
-      return false;
+      if (!unchanged) {
+        $draw_canvas.data("jqScribble").save(function (imageData) {
+          if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
+            $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
+              var options = {
+                backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
+              };
+              $draw_canvas.data('jqScribble').update(options);
+              current_file = response.file_name;
+            });
+          }
+        });
+      }
     });
 
     // Register brush handlers
-    $('.scribble-brush-btn').click(function () {
+    $('.scribble-brushes input').click(function () {
       var brush = $(this).attr('id');
       var brush_name = brush_map[brush];
       $draw_canvas.data("jqScribble").update({brush: brush_name});
-      return false;
     });
 
     // Reset to last saved background image.
@@ -123,12 +135,12 @@
         backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
       };
       $draw_canvas.data('jqScribble').update(options);
-      return false;
+      unchanged = true;
     });
 
     // Handle image add action.
     $('.scribble-add').click(function () {
-      var img_src = prompt(Drupal.t('Enter the URL of the image.'));
+      var img_src = $('#img-src-txt').val();
       if(img_src !== '' && img_src != null) {
         var $info = $('<div>' + Drupal.t('Drag the image on the blackboard in order to add it.') + '</div>');
         $add_img_container.html($info);
@@ -149,7 +161,9 @@
         };
         $img.draggable(options);
       }
-      return false;
+      else {
+        $('#img-src-txt').addClass('ui-state-error');
+      }
     });
 
     // Fires once the dragged image is dropped on the draw canvas.
