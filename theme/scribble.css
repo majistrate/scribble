@@ -17,13 +17,45 @@
   border: 1px solid #000;
   background-color: #000;
   display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 5px;
+  margin-right: 10px;
 }
 
 .scribble-brushes {
   display: inline-block;
+  float: right;
 }
 
 .scribble-brush-size {
-  width: 200px;
+  width: 55%;
   display: inline-block;
+  margin-bottom: 3px;
+  vertical-align: middle;
+}
+
+hr.scribble-separator {
+  height: auto;
+  border: 1px inset;
+}
+
+.scribble-brush-size-display {
+  height: 20px;
+  width: 60px;
+  display: inline-block;
+  background-color: #FFF;
+  vertical-align: middle;
+  margin-bottom: 5px;
+}
+
+.scribble-brush-settings {
+  padding: 0px 7px 7px 7px;
+}
+
+.scribble-actions {
+  padding: 7px 7px 0px 7px;
+}
+
+#img-src-txt {
+  width: 65%;
 }
