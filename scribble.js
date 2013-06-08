@@ -141,33 +141,59 @@
     // Handle image add action.
     $('.scribble-add').click(function () {
       var img_src = $('#img-src-txt').val();
-      if(img_src !== '' && img_src != null) {
-        var $info = $('<div>' + Drupal.t('Drag the image on the blackboard in order to add it.') + '</div>');
-        $add_img_container.html($info);
-        var $img = $('<img />');
-        $img.attr({
-          'src': img_src,
-          'class': 'scribble-add-img'
-        });
-        $add_img_container.append($img);
-        var options = {
-          stop: addImgStopHandler,
-          start: function (event, ui) {
-            $add_img = $('.scribble-add-img');
-            drag_img_offset_x = event.pageX - $add_img.position().left;
-            drag_img_offset_y = event.pageY - $add_img.position().top;
-          },
-          revert: true
-        };
-        $img.draggable(options);
+      if(img_src !== '') {
+        validatedImageLoad(img_src);
       }
       else {
         $('#img-src-txt').addClass('ui-state-error');
       }
     });
 
+    function validatedImageLoad(URL) {
+      var $load_img = $(new Image());
+      $load_img.error(function() {
+        $('#img-src-txt').addClass('ui-state-error');
+        success = false;
+      })
+      .load(function() {
+        loadAddImageDialog($(this));
+      });
+      $load_img.attr('src', URL);
+    }
+
+    function loadAddImageDialog($img) {
+      $img.addClass('scribble-add-img');
+      $add_img_container.html($img);
+      $('#img-src-txt').removeClass('ui-state-error');
+      $add_img_container.dialog({
+        draggable: true,
+        title: Drupal.t('Drag the image on the blackboard in order to add it.'),
+        autoOpen: false,
+        resizable: false,
+        width: $img.width()
+      });
+      var options = {
+        stop: addImgDropHandler,
+        start: function (event, ui) {
+          // Set the image to be added in var to use it in the drop handler.
+          $add_img = $('.scribble-add-img');
+          // Set vars for mouse offset left upper corner of the image.
+          drag_img_offset_x = event.pageX - $add_img.offset().left;
+          drag_img_offset_y = event.pageY - $add_img.offset().top;
+          $add_img_container.dialog('close');
+        },
+        revert: true,
+        helper: 'clone',
+        appendTo: 'body',
+        scroll: false,
+        zIndex: 1500
+      };
+      $img.draggable(options);
+      $add_img_container.dialog('open');
+    }
+
     // Fires once the dragged image is dropped on the draw canvas.
-    function addImgStopHandler(event, ui) {
+    function addImgDropHandler(event, ui) {
       if (droppedOnCanvas(event.pageX, event.pageY)) {
         // Gather data for image merge.
         var x = event.pageX - $draw_canvas.offset().left - drag_img_offset_x;

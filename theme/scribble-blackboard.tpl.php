@@ -13,7 +13,7 @@
     <div class="scribble-actions">
       <div class="scribble-save"><?php print t('Save'); ?></div>
       <div class="scribble-clear"><?php print t('Clear'); ?></div>
-      <input type="text" class="ui-corner-all" id="img-src-txt" name="scribble-img-src" placeholder="<?php print t('Enter the URL of the image to add'); ?>" />
+      <input type="text" value="http://www.istos.it/sites/default/files/istoslogo.png" class="ui-corner-all" id="img-src-txt" name="scribble-img-src" placeholder="<?php print t('Enter the URL of the image to add'); ?>" />
       <div class="scribble-add"><?php print t('Add Image'); ?></div>
     </div>
     <hr class="scribble-separator" />

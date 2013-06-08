@@ -64,3 +64,7 @@ hr.scribble-separator {
 #img-src-txt {
   width: 65%;
 }
+
+.scribble-add-img-container.ui-dialog-content.ui-widget-content {
+  padding: 0px;
+}
