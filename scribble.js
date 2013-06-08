@@ -24,6 +24,9 @@
     var $size_display = $('.scribble-brush-size-display');
     var $add_img;
     var unchanged = true;
+    var img_dialog_width = 0;
+    var add_img_height;
+    var add_img_width;
 
     // Initialize the toolbar
     $('.scribble-save').button({
@@ -74,7 +77,8 @@
         title: Drupal.t('Choose your color'),
         autoOpen: false,
         resizable: false,
-        width: 220
+        width: 220,
+        hide: "explode"
       });
 
     // Initialize brush size slider.
@@ -165,12 +169,14 @@
       $img.addClass('scribble-add-img');
       $add_img_container.html($img);
       $('#img-src-txt').removeClass('ui-state-error');
+      img_dialog_width = (img_dialog_width != 0) ? img_dialog_width: $img.width();
       $add_img_container.dialog({
         draggable: true,
         title: Drupal.t('Drag the image on the blackboard in order to add it.'),
         autoOpen: false,
         resizable: false,
-        width: $img.width()
+        width: img_dialog_width,
+        hide: "explode"
       });
       var options = {
         stop: addImgDropHandler,
@@ -180,6 +186,8 @@
           // Set vars for mouse offset left upper corner of the image.
           drag_img_offset_x = event.pageX - $add_img.offset().left;
           drag_img_offset_y = event.pageY - $add_img.offset().top;
+          add_img_width = $add_img.width();
+          add_img_height = $add_img.height();
           $add_img_container.dialog('close');
         },
         revert: true,
@@ -200,8 +208,8 @@
         var y = event.pageY - $draw_canvas.offset().top - drag_img_offset_y;
         var data = {
           img_url: $add_img.attr('src'),
-          img_width: $add_img.width(),
-          img_height: $add_img.height(),
+          img_width: add_img_width,
+          img_height: add_img_height,
           dst_x: x,
           dst_y: y
         };
@@ -209,21 +217,15 @@
           data.canvas_width = canvas_width;
           data.canvas_height = canvas_height;
         }
-        if (Drupal.settings.scribble.saveAfterDrop) {
-          // Do AJAX post that merges the images and saves a new image.
-          $.post(Drupal.settings.scribble.addURL, data, function(response) {
-            var options = {
-              backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
-            };
-            $draw_canvas.data('jqScribble').update(options);
-            // Store the latest filename.
-            current_file = response.file_name;
-          });
-        }
-        else {
-          // Only draw the image on the canvas w/o saving.
-          $draw_canvas[0].getContext('2d').drawImage($add_img[0], data['dst_x'], data['dst_y']);
-        }
+        // Do AJAX post that merges the images and saves a new image.
+        $.post(Drupal.settings.scribble.addURL, data, function(response) {
+          var options = {
+            backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
+          };
+          $draw_canvas.data('jqScribble').update(options);
+          // Store the latest filename.
+          current_file = response.file_name;
+        });
       }
     }
 
