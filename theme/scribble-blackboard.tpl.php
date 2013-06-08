@@ -2,13 +2,11 @@
 /**
  * Template for the scribble blackboard.
  * @todo make brushes configurable and loop them.
+ * @todo apply width and height to .scribble-canvas-wrapper element
  */
 
 ?>
 <div class="scribble-blackboard-wrapper">
-  <div class="scribble-canvas-wrapper">
-    <canvas class="scribble-canvas" />
-  </div>
   <div class="scribble-toolbar ui-widget-header ui-corner-all">
     <div class="scribble-actions">
       <div class="scribble-save"><?php print t('Save'); ?></div>
@@ -30,5 +28,8 @@
       </div>
     </div>
     <div class="scribble-add-img-container"></div>
+  </div>
+  <div class="scribble-canvas-wrapper">
+    <canvas class="scribble-canvas" />
   </div>
 </div>
