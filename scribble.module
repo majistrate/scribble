@@ -43,6 +43,7 @@ function scribble_menu() {
 
 /*
  * Implements hook_library().
+ * variable_get('scribble_save_dropped_img', FALSE),
  */
 function scribble_library() {
   $settings = array(
@@ -51,7 +52,6 @@ function scribble_library() {
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
       'addURL' =>  url('scribble/add', array('absolute' => TRUE)),
       'newestScribble' => scribble_get_newest(),
-      'saveAfterDrop' => variable_get('scribble_save_dropped_img', FALSE),
      ),
   );
   $libraries['jqscribble'] = array(
@@ -103,9 +103,18 @@ function scribble_theme($existing, $type, $theme, $path) {
  *   Filename of the newest file.
  */
 function scribble_get_newest() {
-  $files = scandir(variable_get('scribble_files_directory', 'sites/default/files/scribble'), SCANDIR_SORT_DESCENDING);
+  $dir = variable_get('scribble_files_directory', 'sites/default/files/scribble');
+  $files = array();
+  $ignored = array('.', '..');
+  foreach (scandir($dir) as $file) {
+    if (!in_array($file, $ignored)) {
+      $files[filemtime($dir . '/' . $file)] = $file;
+    }
+  }
+
   if (!empty($files)) {
-    return $files[0];
+    krsort($files);
+    return array_shift($files);
   }
   return '';
 }
