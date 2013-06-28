@@ -10,6 +10,10 @@
  */
 function scribble_blackboard_form($form, $form_state) {
   $form['#attached']['library'][] = array('system', 'ui.draggable');
+  $form['#attached']['library'][] = array('system', 'farbtastic');
+  $form['#attached']['library'][] = array('system', 'ui.slider');
+  $form['#attached']['library'][] = array('system', 'ui.button');
+  $form['#attached']['library'][] = array('system', 'ui.dialog');
   $form['#attached']['library'][] = array('scribble', 'jqscribble');
 
   $form['board'] = array(
@@ -44,16 +48,18 @@ function scribble_save_ajax() {
       drupal_mkdir($path, 0777);
       variable_set('scribble_files_directory', $path);
     }
-    $file_name = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/scribble.png';
+    $img_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/';
+    $file_name = 'scribble_' . date('d-m-Y_H-i-s') . '.png';
     // Need to remove the stuff at the beginning of the string.
     $data = substr($data, strpos($data, ",")+1);
     // Create an image resource and save and image.
     $data = base64_decode($data);
     $img_resource = imagecreatefromstring($data);
     if (!empty($img_resource)) {
-      imagepng($img_resource, $file_name);
+      imagepng($img_resource, $img_path . $file_name);
     }
     imagedestroy($img_resource);
+    drupal_json_output(array('file_name' => $file_name));
     drupal_exit();
   }
 }
@@ -85,15 +91,17 @@ function scribble_add_ajax() {
       drupal_mkdir($path, 0777);
       variable_set('scribble_files_directory', $path);
     }
-    $file_name = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/scribble.png';
-    $img_resource = imagecreatefrompng($file_name);
+    $img_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/';
+    $file_name = scribble_get_newest();
+    $img_resource = !empty($file_name) ? imagecreatefrompng($img_path . $file_name) : imagecreatetruecolor($_POST['canvas_width'], $_POST['canvas_height']);
     if (!empty($img_resource) && !empty($add_img_resource)) {
       imagecopy($img_resource, $add_img_resource, $_POST['dst_x'], $_POST['dst_y'], 0, 0, $_POST['img_width'], $_POST['img_height']);
-      $success = imagepng($img_resource, $file_name);
-      dd($success, 'TEST');
+      $file_name = 'scribble_' . date('d-m-Y_H-i-s') . '.png';
+      imagepng($img_resource, $img_path . $file_name);
     }
     imagedestroy($img_resource);
     imagedestroy($add_img_resource);
+    drupal_json_output(array('file_name' => $file_name));
     drupal_exit();
   }
 }
