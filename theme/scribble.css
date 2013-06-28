@@ -1,12 +1,66 @@
 
 /**
  * @file
- * Administration menu.
- *
- * Implementation of Sons of Suckerfish Dropdowns.
- *
- * @see www.htmldog.com/articles/suckerfish
+ * Default styles for scribble toolbar.
  */
 .scribble-canvas {
   border: 1px solid #000;
+}
+
+.scribble-color-display {
+  height: 20px;
+  width: 20px;
+  border: 1px solid #000;
+  background-color: #000;
+  display: inline-block;
+  vertical-align: middle;
+  margin-bottom: 5px;
+  margin-right: 10px;
+}
+
+.scribble-brushes {
+  display: inline-block;
+  float: right;
+}
+
+.scribble-brush-size {
+  width: 56%;
+  display: inline-block;
+  margin-bottom: 3px;
+  vertical-align: middle;
+}
+
+hr.scribble-separator {
+  height: auto;
+  border: 1px inset;
+}
+
+.scribble-brush-size-display {
+  height: 20px;
+  width: 32px;
+  display: inline-block;
+  background-color: #FFF;
+  vertical-align: middle;
+  margin-bottom: 5px;
+  margin-left: 13px;
+  border: 1px solid #d2d2d2;
+  padding: 3px 5px;
+  padding-left: 5px;
+  text-align: center;
+}
+
+.scribble-brush-settings {
+  padding: 0px 7px 7px 7px;
+}
+
+.scribble-actions {
+  padding: 7px 7px 0px 7px;
+}
+
+#img-src-txt {
+  width: 65%;
+}
+
+.scribble-add-img-container.ui-dialog-content.ui-widget-content {
+  padding: 0px;
 }

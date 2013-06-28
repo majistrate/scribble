@@ -43,6 +43,7 @@ function scribble_menu() {
 
 /*
  * Implements hook_library().
+ * variable_get('scribble_save_dropped_img', FALSE),
  */
 function scribble_library() {
   $settings = array(
@@ -50,6 +51,7 @@ function scribble_library() {
       'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
       'addURL' =>  url('scribble/add', array('absolute' => TRUE)),
+      'newestScribble' => scribble_get_newest(),
      ),
   );
   $libraries['jqscribble'] = array(
@@ -94,7 +96,6 @@ function scribble_theme($existing, $type, $theme, $path) {
   );
 }
 
-
 /**
  * Implements hook_entity_info().
  */
@@ -128,10 +129,33 @@ function scribble_entity_info() {
       'admin ui' => array(
         'controller class' => 'ScribbleUIController',
         'path' => 'admin/config/media/scribble',
-        'menu wildcard' => '%scribble',
+        'menu wildcard' => '%entity-object',
       ),
     ),
   );
 
   return $entities;
+}
+
+/**
+ * Getter for the latest scribble image.
+ *
+ * @return
+ *   Filename of the newest file.
+ */
+function scribble_get_newest() {
+  $dir = variable_get('scribble_files_directory', 'sites/default/files/scribble');
+  $files = array();
+  $ignored = array('.', '..');
+  foreach (scandir($dir) as $file) {
+    if (!in_array($file, $ignored)) {
+      $files[filemtime($dir . '/' . $file)] = $file;
+    }
+  }
+
+  if (!empty($files)) {
+    krsort($files);
+    return array_shift($files);
+  }
+  return '';
 }
