@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Definition of ShareMessageMetadataController class.
+ * Definition of ScribbleMetadataController class.
  */
 
 
 /**
- * Metadata Controller class for the ShareMessage entity.
+ * Metadata Controller class for the Scribble entity.
  */
-class ShareMessageMetadataController extends EntityDefaultMetadataController {
+class ScribbleMetadataController extends EntityDefaultMetadataController {
 
 }

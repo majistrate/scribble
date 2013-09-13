@@ -9,7 +9,7 @@
 /**
  * Controller class for the ShareMessage entity.
  */
-class ShareMessageController extends EntityAPIControllerExportable {
+class ScribbleController extends EntityAPIControllerExportable {
   public function create(array $values = array()) {
     $values += array(
       'created' => REQUEST_TIME,
@@ -48,6 +48,6 @@ class ShareMessageController extends EntityAPIControllerExportable {
 /**
  * UI Controller class for the ShareMessage entity.
  */
-class ShareMessageUIController extends EntityDefaultUIController {
+class ScribbleUIController extends EntityDefaultUIController {
 
 }

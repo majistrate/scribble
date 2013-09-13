@@ -51,13 +51,6 @@ function scribble_schema() {
         'default' => '',
         'description' => 'Scribble Label.',
       ),
-      'title' => array(
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => FALSE,
-        'default' => '',
-        'description' => 'Path alias.',
-      ),
       'name' => array(
         'type' => 'varchar',
         'length' => 128,
@@ -104,25 +97,6 @@ function scribble_schema() {
         'default' => 0,
         'description' => 'Canvas height.',
       ),
-      'brush_basic' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Basic brush.',
-      ),
-      'brush_basic' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Basic brush.',
-      ),
-      'settings' => array(
-        'type' => 'blob',
-        'not null' => FALSE,
-        'size' => 'big',
-        'serialize' => TRUE,
-        'description' => 'A serialized array of additional settings.',
-      ),
     ),
     'primary key' => array('sid'),
     'unique keys' => array(
@@ -131,4 +105,107 @@ function scribble_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function scribble_install() {
+  // This module renders the field values in it's own theme function, fields do
+  // not to be displayed.
+  $display_hidden = array(
+    'display' => array(
+      'default' => array(
+        'type' => 'hidden',
+      ),
+    ),
+  );
+
+  // Check if sharemessage_title field is not already created.
+  if (!field_info_field('scribble_title')) {
+    $field = array(
+      'field_name' => 'scribble_title',
+      'type' => 'text',
+      'locked' => TRUE,
+      'translatable' => TRUE,
+    );
+    field_create_field($field);
+
+    // Create the instance on the bundle.
+    $instance = array(
+        'field_name' => 'scribble_title',
+        'entity_type' => 'scribble',
+        'label' => 'Scribble title',
+        'description' => 'Used as page title on any scribble',
+        'bundle' => 'scribble',
+        'widget' => array(
+          'type' => 'text_textfield',
+        ),
+      ) + $display_hidden;
+    field_create_instance($instance);
+  }
+
+  if (!field_info_field('field_scribble_brushes')) {
+    $field_info = array(
+      'field_name' => 'scribble_brushes',
+      'settings' => array(
+        'allowed_values' => array(),
+        'allowed_values_function' => 'scribble_get_brushes',
+      ),
+      'type' => 'list_text',
+      'locked' => TRUE,
+      'cardinality' => -1,
+    );
+    field_create_field($field_info);
+    $instance_info = array(
+      'label' => 'Brushes',
+      'widget' => array(
+        'type' => 'options_buttons',
+        'module' => 'options',
+      ),
+      'required' => 1,
+      'default_value' => array(
+        0 => array(
+          'value' => 'BasicBrush',
+        ),
+      ),
+      'field_name' => 'scribble_brushes',
+      'entity_type' => 'scribble',
+      'bundle' => 'scribble',
+      'description' => 'Choose the brushes that will be available on your scribble page',
+    ) + $display_hidden;
+    field_create_instance($instance_info);
+  }
+
+  // Check if field is not already created.
+  if (!field_info_field('scribble_image')) {
+    $field = array(
+      'field_name' => 'scribble_image',
+      'type' => 'image',
+      'locked' => TRUE,
+    );
+    field_create_field($field);
+
+    // Create the instance on the bundle.
+    $instance = array(
+        'field_name' => 'scribble_image',
+        'entity_type' => 'scribble',
+        'label' => 'Image',
+        'description' => 'This field will hold each snapshot image of the scribble',
+        'bundle' => 'scribble',
+        'widget' => array(
+          'type' => 'image_image',
+        ),
+      ) + $display_hidden;
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function scribble_uninstall() {
+  field_delete_field('scribble_title');
+  field_delete_field('scribble_image');
+  field_delete_field('scribble_brushes');
 }

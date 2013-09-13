@@ -13,19 +13,19 @@ function scribble_menu() {
     'title' => 'Scribble blackboard',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('scribble_blackboard_form'),
-    'access arguments' => array('access content'),
+    'access arguments' => array('view scribble entities'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',
-    'access arguments' => array('access content'),
+    'access arguments' => array('administer scribble entities'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/add'] = array(
     'page callback' => 'scribble_add_ajax',
-    'access arguments' => array('access content'),
+    'access arguments' => array('administer scribble entities'),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
@@ -138,6 +138,32 @@ function scribble_entity_info() {
 }
 
 /**
+ * Implements hook_permission().
+ */
+function sharemessage_permission() {
+  return array(
+    'view scribble entities' => array(
+      'title' => t('View Scribble blackboards.'),
+    ),
+    'administer scribble entities' => array(
+      'title' => t('Administer Scribble entities.'),
+    ),
+  );
+}
+
+/**
+ * Access callback for scribble.
+ */
+function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NULL) {
+  switch ($op) {
+    case 'view':
+      return user_access('view sscribble entities', $account);
+    default:
+      return user_access('administer scribble entities', $account);
+  }
+}
+
+/**
  * Getter for the latest scribble image.
  *
  * @return
@@ -158,4 +184,57 @@ function scribble_get_newest() {
     return array_shift($files);
   }
   return '';
+}
+
+/**
+ * Getter for brushes.
+ *
+ * @return array
+ *   The list of available brushes.
+ */
+function scribble_get_brushes() {
+  return array(
+    'BasicBrush' => 'Basic',
+    'LineBrush' => 'Line',
+    'CrossBrush' => 'Cross',
+  );
+}
+
+
+/**
+ * Share message form.
+ */
+function scribble_form($form, &$form_state, $scribble) {
+  global $language;
+
+  $form_state['scribble'] = $scribble;
+  $sid = entity_id('scribble', $scribble);
+
+  $form['label'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Label'),
+    '#required' => TRUE,
+    '#default_value' => isset($sharemessage->label) ? $sharemessage->label : '',
+    '#weight' => -3,
+  );
+
+  if (empty($sid)) {
+    $form['name'] = array(
+      '#type' => 'machine_name',
+      '#title' => t('Machine Name'),
+      '#machine_name' => array(
+        'exists' => 'sharemessage_check_machine_name_if_exist',
+        'source' => array('label'),
+      ),
+      '#required' => TRUE,
+      '#weight' => -2,
+    );
+  }
+
+  field_attach_form('scribble', $scribble, $form, $form_state);
+  // Don't display the image field, it should not be editable because it's only
+  // a backend container for the scribble snapshots.
+  $form['scribble_image']['#access'] = FALSE;
+
+  return $form;
 }

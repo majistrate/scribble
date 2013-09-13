@@ -5,5 +5,9 @@ core = 7.x
 configure = admin/config/user-interface/scribble
 
 dependencies[] = libraries
-;files[] = tests/admin_menu.test
+
+files[] = includes/scribble.entity.inc
+files[] = includes/scribble.info.inc
+files[] = includes/scribble.ui.inc
+;files[] = tests/sharemessage.test
 

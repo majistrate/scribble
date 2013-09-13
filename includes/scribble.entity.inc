@@ -9,7 +9,7 @@
 /*
  * Entity class for the ShareMessage entity.
  */
-class ShareMessage extends Entity {
+class Scribble extends Entity {
 
   /**
    * Overrides Entity::buildContent().
