@@ -205,8 +205,6 @@ function scribble_get_brushes() {
  * Share message form.
  */
 function scribble_form($form, &$form_state, $scribble) {
-  global $language;
-
   $form_state['scribble'] = $scribble;
   $sid = entity_id('scribble', $scribble);
 
@@ -214,8 +212,8 @@ function scribble_form($form, &$form_state, $scribble) {
     '#type' => 'textfield',
     '#title' => t('Label'),
     '#required' => TRUE,
-    '#default_value' => isset($sharemessage->label) ? $sharemessage->label : '',
-    '#weight' => -3,
+    '#default_value' => isset($scribble->label) ? $scribble->label : '',
+    '#weight' => 0,
   );
 
   if (empty($sid)) {
@@ -223,18 +221,114 @@ function scribble_form($form, &$form_state, $scribble) {
       '#type' => 'machine_name',
       '#title' => t('Machine Name'),
       '#machine_name' => array(
-        'exists' => 'sharemessage_check_machine_name_if_exist',
+        'exists' => 'scribble_check_existing_machine_name',
         'source' => array('label'),
       ),
       '#required' => TRUE,
-      '#weight' => -2,
+      '#weight' => 1,
     );
   }
 
   field_attach_form('scribble', $scribble, $form, $form_state);
+
+  $form['width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Width'),
+    '#required' => TRUE,
+    '#default_value' => isset($scribble->width) ? $scribble->width : '',
+    '#weight' => 2,
+    '#description' => t('Width of the blackboard canvas in pixel.'),
+    '#size' => 10,
+    '#maxlength' => 5,
+  );
+
+  $form['height'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Height'),
+    '#required' => TRUE,
+    '#default_value' => isset($scribble->width) ? $scribble->width : '',
+    '#weight' => 3,
+    '#description' => t('Width of the blackboard canvas in pixel.'),
+    '#size' => 10,
+    '#maxlength' => 5,
+  );
+
   // Don't display the image field, it should not be editable because it's only
   // a backend container for the scribble snapshots.
   $form['scribble_image']['#access'] = FALSE;
 
+  $submit = array();
+  if (!empty($form['#submit'])) {
+    $submit += $form['#submit'];
+  }
+
+  $form['actions'] = array(
+    '#weight' => 105,
+  );
+
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save scribble'),
+    '#submit' => $submit + array('scribble_form_submit'),
+  );
+
   return $form;
+}
+
+/**
+ * Returns whether a machine name already exists.
+ */
+function scribble_check_existing_machine_name($value) {
+  return db_query_range('SELECT 1 FROM {scribble} WHERE name = :name', 0, 1, array(':name' => $value))->fetchField();
+}
+
+/**
+ * Share message form submit.
+ */
+function scribble_form_submit($form, &$form_state) {
+  $scribble = $form_state['scribble'];
+
+  entity_form_submit_build_entity('scribble', $scribble, $form, $form_state);
+  scribble_save($scribble);
+
+  $info = entity_get_info('scribble');
+  $form_state['redirect'] = $info['admin ui']['path'];
+
+  drupal_set_message(t('Scribble %title saved.', array('%title' => entity_label('sharemessage', $scribble))));
+}
+
+/**
+ * Saves a scribble entity.
+ */
+function scribble_save($scribble) {
+  entity_save('scribble', $scribble);
+}
+
+/**
+ * Deletes a single scribble entity.
+ */
+function scribble_delete($scribble) {
+  entity_delete('scribble', entity_id('scribble', $scribble));
+}
+
+/**
+ * Delete multiple scribble entities.
+ */
+function scribble_delete_multiple($scribble_ids) {
+  entity_delete_multiple('scribble', $scribble_ids);
+}
+
+/**
+ * Load a scribble.
+ */
+function scribble_load($sid, $reset = FALSE) {
+  $scribble = scribble_load_multiple(array($sid), array(), $reset);
+  return $scribble ? reset($scribble) : FALSE;
+}
+
+/**
+ * Load multiple scribbles based on certain conditions.
+ */
+function scribble_load_multiple($sids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('scribble', $sids, $conditions, $reset);
 }
