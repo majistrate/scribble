@@ -58,7 +58,7 @@ function scribble_schema() {
         'default' => '',
         'description' => 'Scribble (machine name).',
       ),
-      /*'status' => array(
+      'status' => array(
         'type' => 'int',
         'not null' => TRUE,
         // Set the default to ENTITY_CUSTOM without using the constant as it is
@@ -67,12 +67,6 @@ function scribble_schema() {
         'size' => 'tiny',
         'description' => 'The exportable status of the entity.',
       ),
-      'module' => array(
-        'description' => 'The name of the providing module if the entity has been defined in code.',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => FALSE,
-      ),*/
       'changed' => array(
         'type' => 'int',
         'not null' => TRUE,
@@ -208,4 +202,6 @@ function scribble_uninstall() {
   field_delete_field('scribble_title');
   field_delete_field('scribble_image');
   field_delete_field('scribble_brushes');
+  // @todo
+  // field_delete_instance(),
 }
