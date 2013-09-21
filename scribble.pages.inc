@@ -7,6 +7,7 @@
 
 /**
  * Form callback that contains the blackboard.
+ * // @todo remove this.
  */
 function scribble_blackboard_form($form, $form_state) {
   $form['#attached']['library'][] = array('system', 'ui.draggable');
@@ -34,35 +35,26 @@ function scribble_blackboard_form($form, $form_state) {
 }
 
 /**
+ * System configuration form for the scribble module.
+ */
+function scribble_configuration_form($form, &$form_state) {
+  $form['scribble_allow_image_injection'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow adding images'),
+    '#description' => t("Do only allow this if your scribbles aren't public accessible. This might cause legal issues otherwise if images with copyrights get added."),
+    '#default_value' => variable_get('scribble_allow_image_injection', 0),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
  * Form callback that contains the blackboard.
  */
 function scribble_page($scribble) {
-  $form['#attached']['library'][] = array('system', 'ui.draggable');
-  $form['#attached']['library'][] = array('system', 'farbtastic');
-  $form['#attached']['library'][] = array('system', 'ui.slider');
-  $form['#attached']['library'][] = array('system', 'ui.button');
-  $form['#attached']['library'][] = array('system', 'ui.dialog');
-  $form['#attached']['library'][] = array('scribble', 'jqscribble');
 dpm($scribble);
   dpm(entity_get_info('scribble'));
   return entity_view('scribble', array($scribble));
-  /*
-  $form['board'] = array(
-    '#markup' => theme('scribble_blackboard', array()),
-  );
-  */
-
-  // @todo add element for the entity id
-  /*
-    $form['save'] = array(
-      '#type' => 'button',
-      '#value' => t('Save'),
-      '#attributes' => array(
-        'class' => array('scribble-save'),
-      ),
-    );
-  */
-  return $form;
 }
 
 /**
