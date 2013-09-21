@@ -17,6 +17,15 @@ function scribble_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
+  $items['scribble/%scribble/blackboard'] = array(
+    'title' => 'Scribble blackboard',
+    // @todo 'title callback' => '',
+    'page callback' => 'scribble_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view scribble entities'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'scribble.pages.inc',
+  );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',
     'access arguments' => array('administer scribble entities'),
@@ -29,6 +38,7 @@ function scribble_menu() {
     'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
+
   /*
   $items['admin/config/user-interface/scribble'] = array(
     'title' => 'Example RSS feed',
@@ -105,6 +115,7 @@ function scribble_entity_info() {
       'module' => 'scribble',
       'label' => t('Scribble'),
       'access callback' => 'scribble_access',
+      'view callback' => 'scribble_view',
       'entity class' => 'Scribble',
       'controller class' => 'ScribbleController',
       'metadata controller class' => 'ScribbleMetadataController',
@@ -121,7 +132,7 @@ function scribble_entity_info() {
           'label' => t('Full content'),
           'custom settings' => FALSE,
         ),
-        'img_only' => array(
+        'images_only' => array(
           'label' => t('Image only'),
           'custom settings' => FALSE,
         ),
@@ -129,7 +140,7 @@ function scribble_entity_info() {
       'admin ui' => array(
         'controller class' => 'ScribbleUIController',
         'path' => 'admin/config/media/scribble',
-        'menu wildcard' => '%entity-object',
+        'menu wildcard' => '%scribble',
       ),
     ),
   );
@@ -140,7 +151,7 @@ function scribble_entity_info() {
 /**
  * Implements hook_permission().
  */
-function sharemessage_permission() {
+function scribble_permission() {
   return array(
     'view scribble entities' => array(
       'title' => t('View Scribble blackboards.'),
@@ -331,4 +342,16 @@ function scribble_load($sid, $reset = FALSE) {
  */
 function scribble_load_multiple($sids = array(), $conditions = array(), $reset = FALSE) {
   return entity_load('scribble', $sids, $conditions, $reset);
+}
+
+/**
+ * View callback for scribble entities
+ */
+function scribble_view($entities, $view_mode, $langcode, $entity_type) {
+  $output = '';
+  foreach ($entities as $scribble) {
+      $content = $scribble->buildContent();
+    $output .= drupal_render($content);
+  }
+  return $output;
 }
