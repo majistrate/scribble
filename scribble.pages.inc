@@ -34,6 +34,38 @@ function scribble_blackboard_form($form, $form_state) {
 }
 
 /**
+ * Form callback that contains the blackboard.
+ */
+function scribble_page($scribble) {
+  $form['#attached']['library'][] = array('system', 'ui.draggable');
+  $form['#attached']['library'][] = array('system', 'farbtastic');
+  $form['#attached']['library'][] = array('system', 'ui.slider');
+  $form['#attached']['library'][] = array('system', 'ui.button');
+  $form['#attached']['library'][] = array('system', 'ui.dialog');
+  $form['#attached']['library'][] = array('scribble', 'jqscribble');
+dpm($scribble);
+  dpm(entity_get_info('scribble'));
+  return entity_view('scribble', array($scribble));
+  /*
+  $form['board'] = array(
+    '#markup' => theme('scribble_blackboard', array()),
+  );
+  */
+
+  // @todo add element for the entity id
+  /*
+    $form['save'] = array(
+      '#type' => 'button',
+      '#value' => t('Save'),
+      '#attributes' => array(
+        'class' => array('scribble-save'),
+      ),
+    );
+  */
+  return $form;
+}
+
+/**
  * AJAX callback for the "Save" button.
  *
  * Creates an image from the data passed by via post request.
