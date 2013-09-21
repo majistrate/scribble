@@ -14,7 +14,6 @@ function scribble_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('scribble_blackboard_form'),
     'access arguments' => array('view scribble entities'),
-    'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/%scribble/blackboard'] = array(
@@ -23,30 +22,26 @@ function scribble_menu() {
     'page callback' => 'scribble_page',
     'page arguments' => array(1),
     'access arguments' => array('view scribble entities'),
-    'type' => MENU_NORMAL_ITEM,
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',
-    'access arguments' => array('administer scribble entities'),
-    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('view scribble entities'),
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/add'] = array(
     'page callback' => 'scribble_add_ajax',
-    'access arguments' => array('administer scribble entities'),
-    'type' => MENU_NORMAL_ITEM,
+    'access arguments' => array('view scribble entities'),
     'file' => 'scribble.pages.inc',
   );
-
-  /*
-  $items['admin/config/user-interface/scribble'] = array(
-    'title' => 'Example RSS feed',
-    'page callback' => 'example_feed',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
+  $items['admin/config/media/scribble/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('scribble_configuration_form'),
+    'access arguments' => array('administer scribble entities'),
+    'file' => 'scribble.pages.inc',
+    'type' => MENU_LOCAL_TASK,
   );
-  */
 
   return $items;
 }
@@ -99,7 +94,12 @@ function scribble_library() {
 function scribble_theme($existing, $type, $theme, $path) {
   return array(
     'scribble_blackboard' => array(
-      'variables' => array(),
+      'variables' => array(
+        'width' => 900,
+        'height' => 300,
+        'brushes' => array(),
+        'scribble_id' => NULL,
+      ),
       'template' => 'scribble-blackboard',
       'path' => drupal_get_path('module', 'scribble') . '/theme',
     ),
@@ -210,7 +210,6 @@ function scribble_get_brushes() {
     'CrossBrush' => 'Cross',
   );
 }
-
 
 /**
  * Share message form.

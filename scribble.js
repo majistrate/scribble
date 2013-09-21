@@ -128,9 +128,9 @@
 
     // Register brush handlers
     $('.scribble-brushes input').click(function () {
-      var brush = $(this).attr('id');
-      var brush_name = brush_map[brush];
-      $draw_canvas.data("jqScribble").update({brush: brush_name});
+      // Update the scribble to use the selected brush, the buttons id attribute
+      // is the JS brush class name.
+      $draw_canvas.data("jqScribble").update({brush: eval($(this).attr('id'))});
     });
 
     // Reset to last saved background image.

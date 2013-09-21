@@ -2,12 +2,12 @@
 
 /**
  * @file
- * Definition of ShareMessage entity class.
+ * Definition of Scribble entity class.
  */
 
 
 /*
- * Entity class for the ShareMessage entity.
+ * Entity class for the Scribble entity.
  */
 class Scribble extends Entity {
 
@@ -20,12 +20,15 @@ class Scribble extends Entity {
       $content['blackboard'] = array(
         '#type' => 'container',
         '#attributes' => array(
-          'height' => $this->height,
-          'width' => $this->width,
           'class' => array('scribble-blackboard-wrapper'),
         ),
         'blackboard' => array(
-          '#markup' => theme('scribble_blackboard', array()),
+          '#markup' => theme('scribble_blackboard', array(
+            'width' => $this->width,
+            'height' => $this->height,
+            'brushes' => $this->prepareBrushes(),
+            'scribble_id' => $this->sid,
+          )),
         ),
         'scribble_libraries' => array(
           '#attached' => array(
@@ -41,12 +44,28 @@ class Scribble extends Entity {
         ),
       );
     }
-    /* @todo
+    /* @todo implement images list with delete links.
     elseif ($view_mode == 'images_only') {
 
     }
     */
 
     return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
+  }
+
+  /**
+   * Returns the enabled brushes.
+   *
+   * @return array
+   *   Brush labels indexed by brush JS class name.
+   */
+  protected function prepareBrushes() {
+    $items = field_get_items('scribble', $this, 'scribble_brushes');
+    $brushes = scribble_get_brushes();
+    $return = array();
+    foreach ($items as $item) {
+      $return[$item['value']] = $brushes[$item['value']];
+    }
+    return $return;
   }
 }
