@@ -27,7 +27,6 @@ class Scribble extends Entity {
             'width' => $this->width,
             'height' => $this->height,
             'brushes' => $this->prepareBrushes(),
-            'scribble_id' => $this->sid,
           )),
         ),
         'scribble_libraries' => array(
@@ -39,6 +38,12 @@ class Scribble extends Entity {
               array('system', 'ui.button'),
               array('system', 'ui.dialog'),
               array('scribble', 'jqscribble'),
+            ),
+            'js' => array(
+              array(
+                'data' => array('scribble_id' => $this->sid),
+                'type' => 'setting',
+              ),
             ),
           ),
         ),

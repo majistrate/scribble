@@ -13,11 +13,6 @@
     var canvas_height = 199;
     var canvas_width = 930;
     var current_file = Drupal.settings.scribble.newestScribble;
-    var brush_map = {
-      'line': LineBrush,
-      'cross': CrossBrush,
-      'basic': BasicBrush
-    };
     var $draw_canvas = $('.scribble-canvas');
     var $add_img_container = $('.scribble-add-img-container');
     var $save_btn = $('.scribble-save');
