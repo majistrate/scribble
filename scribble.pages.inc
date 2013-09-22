@@ -63,25 +63,51 @@ dpm($scribble);
  * Creates an image from the data passed by via post request.
  */
 function scribble_save_ajax() {
-  if (!empty($_POST['imagedata'])) {
+  $scribble_id = $_POST['scribble_id'];
+  if (!empty($_POST['imagedata']) && !empty($scribble_id)) {
     $data = $_POST['imagedata'];
-    // @todo create a folder for every scribble entity and save it there
+
     // Create directory on runtime if it doesn't exists.
     $path = variable_get('file_public_path', 'sites/default/files') . '/scribble';
     if (!file_exists($path)) {
       drupal_mkdir($path, 0777);
       variable_set('scribble_files_directory', $path);
     }
-    $img_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/';
-    $file_name = 'scribble_' . date('d-m-Y_H-i-s') . '.png';
-    // Need to remove the stuff at the beginning of the string.
+
+    // Create a separate folder for the entity if it doesn't exist.
+    $path = $path . '/' . $scribble_id;
+    if (!file_exists($path)) {
+      drupal_mkdir($path, 0777);
+    }
+    $img_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $scribble_id . '/';
+    $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
+
+    // Need to remove the stuff at the beginning of the image data string.
     $data = substr($data, strpos($data, ",")+1);
-    // Create an image resource and save and image.
+
+    // Decode the data, create an image resource and save image.
     $data = base64_decode($data);
     $img_resource = imagecreatefromstring($data);
     if (!empty($img_resource)) {
       imagepng($img_resource, $img_path . $file_name);
     }
+
+    // Prepare filedata.
+    $file_temp = file_get_contents($img_path . $file_name);
+    $file_temp = file_save_data($file_temp, 'public://scribble/' . $scribble_id . '/' . $file_name, FILE_EXISTS_REPLACE);
+
+    // Load the scribble and add image to image field of the scribble entity.
+    $scribble = entity_load_single('scribble', $scribble_id);
+    $scribble->scribble_image[LANGUAGE_NONE][] = array(
+      'fid' => $file_temp->fid,
+      'filename' => $file_temp->filename,
+      'filemime' => $file_temp->filemime,
+      'uid' => 1,
+      'uri' => file_build_uri($img_path . $file_name),//$file_temp->uri,
+      'status' => 1,
+    );
+    $scribble->save();
+
     imagedestroy($img_resource);
     drupal_json_output(array('file_name' => $file_name));
     drupal_exit();
