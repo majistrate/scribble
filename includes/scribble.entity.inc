@@ -40,7 +40,12 @@ class Scribble extends Entity {
             ),
             'js' => array(
               array(
-                'data' => array('scribble_id' => $this->sid),
+                'data' => array(
+                  'scribble_info' => array(
+                    'scribbleId' => $this->sid,
+                    'newestScribble' => scribble_get_newest($this->sid),
+                  ),
+                ),
                 'type' => 'setting',
               ),
             ),

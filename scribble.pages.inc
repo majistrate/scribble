@@ -61,6 +61,7 @@ dpm($scribble);
  * AJAX callback for the "Save" button.
  *
  * Creates an image from the data passed by via post request.
+ * // @todo make the folder /scribble configurable on the settings form.
  */
 function scribble_save_ajax() {
   $scribble_id = $_POST['scribble_id'];
@@ -75,11 +76,10 @@ function scribble_save_ajax() {
     }
 
     // Create a separate folder for the entity if it doesn't exist.
-    $path = $path . '/' . $scribble_id;
+    $path = $path . '/' . $scribble_id . '/';
     if (!file_exists($path)) {
       drupal_mkdir($path, 0777);
     }
-    $img_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $scribble_id . '/';
     $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
 
     // Need to remove the stuff at the beginning of the image data string.
@@ -89,11 +89,11 @@ function scribble_save_ajax() {
     $data = base64_decode($data);
     $img_resource = imagecreatefromstring($data);
     if (!empty($img_resource)) {
-      imagepng($img_resource, $img_path . $file_name);
+      imagepng($img_resource, $path . $file_name);
     }
 
     // Prepare filedata.
-    $file_temp = file_get_contents($img_path . $file_name);
+    $file_temp = file_get_contents($path . $file_name);
     $file_temp = file_save_data($file_temp, 'public://scribble/' . $scribble_id . '/' . $file_name, FILE_EXISTS_REPLACE);
 
     // Load the scribble and add image to image field of the scribble entity.
@@ -103,11 +103,12 @@ function scribble_save_ajax() {
       'filename' => $file_temp->filename,
       'filemime' => $file_temp->filemime,
       'uid' => 1,
-      'uri' => file_build_uri($img_path . $file_name),//$file_temp->uri,
+      'uri' => $file_temp->uri,
       'status' => 1,
     );
     $scribble->save();
 
+    // Destroy resource and print new filename as JSON.
     imagedestroy($img_resource);
     drupal_json_output(array('file_name' => $file_name));
     drupal_exit();
