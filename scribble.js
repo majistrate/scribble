@@ -12,7 +12,8 @@
     // @todo get this from the server
     var canvas_height = 199;
     var canvas_width = 930;
-    var current_file = Drupal.settings.scribble.newestScribble;
+    var current_file = Drupal.settings.scribble_info.newestScribble;
+    var dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
     var $draw_canvas = $('.scribble-canvas');
     var $add_img_container = $('.scribble-add-img-container');
     var $save_btn = $('.scribble-save');
@@ -53,7 +54,7 @@
     if (current_file != '') {
       // Load the newest image.
       var options = {
-        backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
+        backgroundImage: dir_path + '/' + current_file
       };
     }
     // Initialize drawing canvas.
@@ -111,11 +112,11 @@
           if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
             var post_data = {
               imagedata: imageData,
-              scribble_id: Drupal.settings.scribble_id
+              scribble_id: Drupal.settings.scribble_info.scribbleId
             };
             $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
               var options = {
-                backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
+                backgroundImage: dir_path + '/' + response.file_name
               };
               $draw_canvas.data('jqScribble').update(options);
               current_file = response.file_name;
@@ -135,7 +136,7 @@
     // Reset to last saved background image.
     $('.scribble-clear').click(function () {
       var options = {
-        backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + current_file
+        backgroundImage: dir_path + '/' + current_file
       };
       $draw_canvas.data('jqScribble').update(options);
       unchanged = true;
@@ -219,7 +220,7 @@
         // Do AJAX post that merges the images and saves a new image.
         $.post(Drupal.settings.scribble.addURL, data, function(response) {
           var options = {
-            backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
+            backgroundImage: dir_path + '/' + response.file_name
           };
           $draw_canvas.data('jqScribble').update(options);
           // Store the latest filename.

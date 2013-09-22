@@ -56,7 +56,6 @@ function scribble_library() {
       'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
       'addURL' =>  url('scribble/add', array('absolute' => TRUE)),
-      'newestScribble' => scribble_get_newest(),
      ),
   );
   $libraries['jqscribble'] = array(
@@ -180,8 +179,8 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
  * @return
  *   Filename of the newest file.
  */
-function scribble_get_newest() {
-  $dir = variable_get('scribble_files_directory', 'sites/default/files/scribble');
+function scribble_get_newest($sid) {
+  $dir = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $sid;
   $files = array();
   $ignored = array('.', '..');
   foreach (scandir($dir) as $file) {
