@@ -109,7 +109,11 @@
       if (!unchanged) {
         $draw_canvas.data("jqScribble").save(function (imageData) {
           if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
-            $.post(Drupal.settings.scribble.saveURL, {imagedata: imageData}, function(response) {
+            var post_data = {
+              imagedata: imageData,
+              scribble_id: Drupal.settings.scribble_id
+            };
+            $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
               var options = {
                 backgroundImage: Drupal.settings.scribble.bgImagePath + '/' + response.file_name
               };

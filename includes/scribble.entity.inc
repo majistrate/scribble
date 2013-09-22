@@ -5,7 +5,6 @@
  * Definition of Scribble entity class.
  */
 
-
 /*
  * Entity class for the Scribble entity.
  */

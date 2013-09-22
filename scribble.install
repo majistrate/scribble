@@ -140,7 +140,7 @@ function scribble_install() {
   }
 
   if (!field_info_field('field_scribble_brushes')) {
-    $field_info = array(
+    $field = array(
       'field_name' => 'scribble_brushes',
       'settings' => array(
         'allowed_values' => array(),
@@ -150,8 +150,8 @@ function scribble_install() {
       'locked' => TRUE,
       'cardinality' => -1,
     );
-    field_create_field($field_info);
-    $instance_info = array(
+    field_create_field($field);
+    $instance = array(
       'label' => 'Brushes',
       'widget' => array(
         'type' => 'options_buttons',
@@ -168,7 +168,7 @@ function scribble_install() {
       'bundle' => 'scribble',
       'description' => 'Choose the brushes that will be available on your scribble page',
     ) + $display_hidden;
-    field_create_instance($instance_info);
+    field_create_instance($instance);
   }
 
   // Check if field is not already created.
@@ -177,6 +177,7 @@ function scribble_install() {
       'field_name' => 'scribble_image',
       'type' => 'image',
       'locked' => TRUE,
+      'cardinality' => -1,
     );
     field_create_field($field);
 
