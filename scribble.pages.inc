@@ -57,6 +57,11 @@ dpm($scribble);
   return entity_view('scribble', array($scribble));
 }
 
+function scribble_image_list_page($scribble) {
+  dpm($scribble);
+  return array();
+}
+
 /**
  * AJAX callback for the "Save" button.
  *

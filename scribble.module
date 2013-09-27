@@ -24,6 +24,14 @@ function scribble_menu() {
     'access arguments' => array('view scribble entities'),
     'file' => 'scribble.pages.inc',
   );
+  $items['scribble/%scribble/image-list'] = array(
+    'title' => 'Manage scribble images',
+    // @todo 'title callback' => '',
+    'page callback' => 'scribble_image_list_page',
+    'page arguments' => array(1),
+    'access arguments' => array('administer scribble entities'),
+    'file' => 'scribble.pages.inc',
+  );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',
     'access arguments' => array('view scribble entities'),
