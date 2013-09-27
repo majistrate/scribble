@@ -177,23 +177,16 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
  * Getter for the latest scribble image.
  *
  * @return
- *   Filename of the newest file.
+ *   Filename of the newest file or NULL if none was found.
  */
 function scribble_get_newest($sid) {
-  $dir = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $sid;
-  $files = array();
-  $ignored = array('.', '..');
-  foreach (scandir($dir) as $file) {
-    if (!in_array($file, $ignored)) {
-      $files[filemtime($dir . '/' . $file)] = $file;
-    }
+  $results = db_query('SELECT scribble_image_fid FROM {field_data_scribble_image} WHERE entity_id = :sid ORDER BY delta DESC', array(':sid' => $sid))
+    ->fetchAssoc();
+  if (!empty($results['scribble_image_fid'])) {
+    $file = file_load($results['scribble_image_fid']);
+    return $file->filename;
   }
-
-  if (!empty($files)) {
-    krsort($files);
-    return array_shift($files);
-  }
-  return '';
+  return NULL;
 }
 
 /**
