@@ -89,11 +89,18 @@ function scribble_save_ajax() {
 
     // Need to remove the stuff at the beginning of the image data string.
     $data = substr($data, strpos($data, ",")+1);
-
+    // @todo load the latest image and merge with posted image data, then save that image in the field
+    // @todo merge that transparent image with a white background and store it in another field.
+    // @todo make the background color configurable.
     // Decode the data, create an image resource and save image.
     $data = base64_decode($data);
     $img_resource = imagecreatefromstring($data);
     if (!empty($img_resource)) {
+      // Make the background transparent.
+      $white = imagecolorallocate($img_resource, 255, 255, 255);
+      imagecolortransparent($img_resource, $white);
+
+      // Write the image file.
       imagepng($img_resource, $path . $file_name);
     }
 
