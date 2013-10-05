@@ -352,9 +352,12 @@ function scribble_view($entities, $view_mode, $langcode, $entity_type) {
 /**
  * Adds a given image to a given scribble entity.
  *
- * @param $path
- * @param $file_name
- * @param $scribble_id
+ * @param string $file_path
+ *   The filepath of the image to save.
+ * @param $scribble
+ *   The scribble entity to save the image into.
+ * @param $field_name
+ *   The field on the entity that the image gets saved into.
  */
 function scribble_add_image_to_scribble_field($file_path, $scribble, $field_name) {
 // Prepare filedata.
