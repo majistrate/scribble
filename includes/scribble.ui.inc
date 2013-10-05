@@ -50,15 +50,22 @@ class ScribbleController extends EntityAPIControllerExportable {
  */
 class ScribbleUIController extends EntityDefaultUIController {
 
+  /**
+   * Overrides EntityDefaultUIController::overviewTableRow().
+   */
   protected function overviewTableRow($conditions, $id, $entity, $additional_cols = array()) {
     $row = parent::overviewTableRow($conditions, $id, $entity, $additional_cols);
-    $row[] =  l(t('Image list'), 'scribble/' . $id . '/image-list');
+    $row[] =  l(t('Image list'), $this->path . '/' . $id . '/image-list');
     return $row;
   }
 
+  /**
+   * Overrides EntityDefaultUIController::overviewTableHeaders().
+   */
   protected function overviewTableHeaders($conditions, $rows, $additional_header = array()) {
     $headers = parent::overviewTableHeaders($conditions, $rows, $additional_header);
     $headers[] = t('Manage images');
     return $headers;
   }
+
 }

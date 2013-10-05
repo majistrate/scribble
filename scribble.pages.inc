@@ -27,9 +27,17 @@ dpm($scribble);
   return entity_view('scribble', array($scribble));
 }
 
+/**
+ * Page callback for the snapshot administration.
+ *
+ * @param object $scribble
+ *   The loaded scribble entity.
+ *
+ * @return bool
+ *
+ */
 function scribble_image_list_page($scribble) {
-  dpm($scribble);
-  return array();
+  return $scribble->buildContent('snapshot_administration');
 }
 
 /**

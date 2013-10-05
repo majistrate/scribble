@@ -17,11 +17,11 @@ function scribble_menu() {
     'access arguments' => array('view scribble entities'),
     'file' => 'scribble.pages.inc',
   );
-  $items['scribble/%scribble/image-list'] = array(
+  $items['admin/config/media/scribble/%scribble/image-list'] = array(
     'title' => 'Manage scribble images',
     // @todo 'title callback' => '',
     'page callback' => 'scribble_image_list_page',
-    'page arguments' => array(1),
+    'page arguments' => array(4),
     'access arguments' => array('administer scribble entities'),
     'file' => 'scribble.pages.inc',
   );
@@ -132,7 +132,11 @@ function scribble_entity_info() {
           'label' => t('Full content'),
           'custom settings' => FALSE,
         ),
-        'images_only' => array(
+        'snapshot_administration' => array(
+          'label' => t('Administer images'),
+          'custom settings' => FALSE,
+        ),
+        'snapshot_slideshow' => array(
           'label' => t('Image only'),
           'custom settings' => FALSE,
         ),
@@ -343,7 +347,7 @@ function scribble_load_multiple($sids = array(), $conditions = array(), $reset =
 function scribble_view($entities, $view_mode, $langcode, $entity_type) {
   $output = '';
   foreach ($entities as $scribble) {
-      $content = $scribble->buildContent();
+    $content = $scribble->buildContent();
     $output .= drupal_render($content);
   }
   return $output;
@@ -360,7 +364,7 @@ function scribble_view($entities, $view_mode, $langcode, $entity_type) {
  *   The field on the entity that the image gets saved into.
  */
 function scribble_add_image_to_scribble_field($file_path, $scribble, $field_name) {
-// Prepare filedata.
+  // Prepare filedata.
   $file_temp = file_get_contents($file_path);
   $file_temp = file_save_data($file_temp, $file_path, FILE_EXISTS_REPLACE);
 
