@@ -33,11 +33,11 @@ dpm($scribble);
  * @param object $scribble
  *   The loaded scribble entity.
  *
- * @return bool
- *
+ * @return array
+ *   The render content array of the snapshot administration.
  */
 function scribble_image_list_page($scribble) {
-  return $scribble->buildContent('snapshot_administration');
+  return entity_view('scribble', array($scribble), 'snapshot_administration');
 }
 
 /**
