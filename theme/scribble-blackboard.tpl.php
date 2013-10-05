@@ -39,6 +39,6 @@
   </div>
   <div class="scribble-add-img-container"></div>
 </div>
-<div class="scribble-canvas-wrapper" style="width:<?php print $width; ?>px;height: <?php print $height; ?>px;">
-  <canvas class="scribble-canvas" />
+<div class="scribble-canvas-wrapper" style="width: <?php print $width; ?>px;height: <?php print $height; ?>px;">
+  <canvas class="scribble-canvas"></canvas>
 </div>

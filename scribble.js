@@ -1,6 +1,5 @@
 (function($) {
 //@todo make the canvas class configurable in the UI and it add as var to JS settings
-//@todo make the filename dynamic and save it in the form as hidden element, adapt filename 'scribble.png' here accordingly
   /**
    * Behavior for scribble module.
    */
@@ -49,16 +48,21 @@
       .click(function () {
         $('.scribble-color-picker').dialog('open');
       });
+
+    $('.scribble-color-display').click(function () {
+      $('.scribble-color-picker').dialog('open');
+    });
     $('.scribble-brushes').buttonset();
 
     if (current_file != '') {
-      // Load the newest image.
-      var options = {
-        backgroundImage: dir_path + '/' + current_file
-      };
+      // Load the newest image as background in the wrapper element.
+      $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
     }
     // Initialize drawing canvas.
-    $draw_canvas.jqScribble(options);
+    $draw_canvas.jqScribble();
+    // Set the default color (can't be black) because black parts are made
+    // transparent upon saving.
+    $draw_canvas.data("jqScribble").update({brushColor: 'rgb(0,0,15)'});
 
     // Add the color picker.
     $('.scribble-color-picker')
@@ -92,6 +96,13 @@
 
     // Helper to convert hex to rgb codes.
     function hexToRgb(hex) {
+      // Black (#000000) will be erased upon save because the image data that
+      // isn't set is posted as black. All black parts will be made transparent.
+      // before saving the snapshot image.
+      if (hex === '#000000') {
+        hex = '#00000F';
+      }
+      // Convert the hex string into an RGB value array.
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.toString());
       return result ? [
         parseInt(result[1], 16),
@@ -115,11 +126,9 @@
               scribble_id: Drupal.settings.scribble_info.scribbleId
             };
             $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
-              var options = {
-                backgroundImage: dir_path + '/' + response.file_name
-              };
-              $draw_canvas.data('jqScribble').update(options);
               current_file = response.file_name;
+              $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
+              $draw_canvas.data("jqScribble").clear();
             });
           }
         });

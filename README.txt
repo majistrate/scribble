@@ -13,5 +13,13 @@
 
 -- CONTACT --
 
+ROADMAP
+
+- Add background color configuration setting.
+- Fix toolbar width
+- Close the color selection when the user clicks outside the dialog
+- Don't allow selecting the bg color in color picker
+- fix @todos
+
 Current maintainers:
 
