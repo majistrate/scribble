@@ -186,7 +186,31 @@ function scribble_install() {
         'field_name' => 'scribble_image',
         'entity_type' => 'scribble',
         'label' => 'Image',
-        'description' => 'This field will hold each snapshot image of the scribble',
+        'description' => 'This field will hold each snapshot image on a background of the scribble',
+        'bundle' => 'scribble',
+        'widget' => array(
+          'type' => 'image_image',
+        ),
+      ) + $display_hidden;
+    field_create_instance($instance);
+  }
+
+  // Check if field is not already created.
+  if (!field_info_field('scribble_image_snapshots')) {
+    $field = array(
+      'field_name' => 'scribble_image_snapshots',
+      'type' => 'image',
+      'locked' => TRUE,
+      'cardinality' => -1,
+    );
+    field_create_field($field);
+
+    // Create the instance on the bundle.
+    $instance = array(
+        'field_name' => 'scribble_image_snapshots',
+        'entity_type' => 'scribble',
+        'label' => 'Image',
+        'description' => 'This field will hold each partial tranparent snapshot image of the scribble',
         'bundle' => 'scribble',
         'widget' => array(
           'type' => 'image_image',

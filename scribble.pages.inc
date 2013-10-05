@@ -74,54 +74,66 @@ function scribble_save_ajax() {
     $data = $_POST['imagedata'];
 
     // Create directory on runtime if it doesn't exists.
-    $path = variable_get('file_public_path', 'sites/default/files') . '/scribble';
+    $path = variable_get('file_public_path', 'sites/default/files') . DIRECTORY_SEPARATOR . 'scribble';
     if (!file_exists($path)) {
       drupal_mkdir($path, 0777);
       variable_set('scribble_files_directory', $path);
     }
 
     // Create a separate folder for the entity if it doesn't exist.
-    $path = $path . '/' . $scribble_id . '/';
+    $path = $path . DIRECTORY_SEPARATOR . $scribble_id . DIRECTORY_SEPARATOR;
     if (!file_exists($path)) {
       drupal_mkdir($path, 0777);
     }
+    $snapshot_path = $path . DIRECTORY_SEPARATOR . 'snapshots' . DIRECTORY_SEPARATOR;
+    if (!file_exists($snapshot_path)) {
+      drupal_mkdir($snapshot_path, 0777);
+    }
     $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
+    $snapshot_file_name = 'scribble_snapshot_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
 
     // Load the scribble entity.
     $scribble = entity_load_single('scribble', $scribble_id);
 
     // Need to remove the stuff at the beginning of the image data string.
-    $data = substr($data, strpos($data, ",")+1);
+    $data = substr($data, strpos($data, ",") + 1);
 
-    // @todo load the latest image and merge with posted image data, then save that image in the field
-    // @todo merge that transparent image with a white background and store it in another field.
-    // @todo make the background color configurable.
     // Decode the data, create an image resource and save image.
     $data = base64_decode($data);
-    $img_resource = imagecreatefromstring($data);
-    if (!empty($img_resource)) {
-      // Make the background transparent, the transparent canvas will send other
-      // transparent parts as #000 (black).
-      $black = imagecolorallocate($img_resource, 0, 0, 0);
-      imagecolortransparent($img_resource, $black);
+    $snapshot_resource = imagecreatefromstring($data);
+    if (!empty($snapshot_resource)) {
+      // Make the background transparent.
+      imagesavealpha($snapshot_resource, TRUE);
+      // Write the snapshot file.
+      imagepng($snapshot_resource, $snapshot_path . $snapshot_file_name);
+      imagedestroy($snapshot_resource);
 
-      // Merge the created image with the latest image. This is necessary
+      // Merge the created snapshot with the latest image. This is necessary
       // because there might be a newer image saved than the loaded background
       // on the scribble. That way, overwriting the latest image is prevented.
+      $snapshot_resource = imagecreatefrompng($snapshot_path . $snapshot_file_name);
       if ($latest_file_name = scribble_get_newest($scribble_id)) {
-        $latest_img_resource = imagecreatefrompng($path . $latest_file_name);
-        imagecopy($latest_img_resource, $img_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
+        $background_resource = imagecreatefrompng($path . $latest_file_name);
       }
-      imagepng($latest_img_resource, $path . 'test.png');
-      // Write the image file.
-      imagepng($img_resource, $path . $file_name);
+      else {
+        $background_resource = imagecreatetruecolor($scribble->width, $scribble->height);
+        // @todo change the allocated color once background color is configurable.
+        $white = imagecolorallocate($background_resource, 255, 255, 255);
+        imagefill($background_resource, 0, 0, $white);
+      }
+      imagecopy($background_resource, $snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
+
+      // Write the new scribble image file and destroy resources.
+      imagepng($background_resource, $path . $file_name, 0);
+      imagedestroy($background_resource);
+      imagedestroy($snapshot_resource);
+
+      // Add the images and snapshot to the fields of the scribble entity.
+      scribble_add_image_to_scribble_field('public://scribble/' . $scribble_id . '/snapshots/' . $snapshot_file_name, $scribble, 'scribble_image_snapshots');
+      scribble_add_image_to_scribble_field('public://scribble/' . $scribble_id . DIRECTORY_SEPARATOR . $file_name, $scribble, 'scribble_image');
     }
 
-    // Add the image to the image field of the scribble entity.
-    scribble_add_image_to_scribble($path, $file_name, $scribble);
-
-    // Destroy resource and print new filename as JSON.
-    imagedestroy($img_resource);
+    // Print new filename as JSON to update the div behind the canvas.
     drupal_json_output(array('file_name' => $file_name));
     drupal_exit();
   }
