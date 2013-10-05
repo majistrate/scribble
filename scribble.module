@@ -347,7 +347,7 @@ function scribble_load_multiple($sids = array(), $conditions = array(), $reset =
 function scribble_view($entities, $view_mode, $langcode, $entity_type) {
   $output = '';
   foreach ($entities as $scribble) {
-    $content = $scribble->buildContent();
+    $content = $scribble->buildContent($view_mode, $langcode);
     $output .= drupal_render($content);
   }
   return $output;
