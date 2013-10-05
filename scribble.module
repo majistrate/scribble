@@ -9,13 +9,6 @@
  * Implements hook_menu().
  */
 function scribble_menu() {
-  $items['scribble/blackboard'] = array(
-    'title' => 'Scribble blackboard',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('scribble_blackboard_form'),
-    'access arguments' => array('view scribble entities'),
-    'file' => 'scribble.pages.inc',
-  );
   $items['scribble/%scribble/blackboard'] = array(
     'title' => 'Scribble blackboard',
     // @todo 'title callback' => '',
