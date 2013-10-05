@@ -87,8 +87,12 @@ function scribble_save_ajax() {
     }
     $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
 
+    // Load the scribble entity.
+    $scribble = entity_load_single('scribble', $scribble_id);
+
     // Need to remove the stuff at the beginning of the image data string.
     $data = substr($data, strpos($data, ",")+1);
+
     // @todo load the latest image and merge with posted image data, then save that image in the field
     // @todo merge that transparent image with a white background and store it in another field.
     // @todo make the background color configurable.
@@ -96,29 +100,25 @@ function scribble_save_ajax() {
     $data = base64_decode($data);
     $img_resource = imagecreatefromstring($data);
     if (!empty($img_resource)) {
-      // Make the background transparent.
-      $white = imagecolorallocate($img_resource, 255, 255, 255);
-      imagecolortransparent($img_resource, $white);
+      // Make the background transparent, the transparent canvas will send other
+      // transparent parts as #000 (black).
+      $black = imagecolorallocate($img_resource, 0, 0, 0);
+      imagecolortransparent($img_resource, $black);
 
+      // Merge the created image with the latest image. This is necessary
+      // because there might be a newer image saved than the loaded background
+      // on the scribble. That way, overwriting the latest image is prevented.
+      if ($latest_file_name = scribble_get_newest($scribble_id)) {
+        $latest_img_resource = imagecreatefrompng($path . $latest_file_name);
+        imagecopy($latest_img_resource, $img_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
+      }
+      imagepng($latest_img_resource, $path . 'test.png');
       // Write the image file.
       imagepng($img_resource, $path . $file_name);
     }
 
-    // Prepare filedata.
-    $file_temp = file_get_contents($path . $file_name);
-    $file_temp = file_save_data($file_temp, 'public://scribble/' . $scribble_id . '/' . $file_name, FILE_EXISTS_REPLACE);
-
-    // Load the scribble and add image to image field of the scribble entity.
-    $scribble = entity_load_single('scribble', $scribble_id);
-    $scribble->scribble_image[LANGUAGE_NONE][] = array(
-      'fid' => $file_temp->fid,
-      'filename' => $file_temp->filename,
-      'filemime' => $file_temp->filemime,
-      'uid' => 1,
-      'uri' => $file_temp->uri,
-      'status' => 1,
-    );
-    $scribble->save();
+    // Add the image to the image field of the scribble entity.
+    scribble_add_image_to_scribble($path, $file_name, $scribble);
 
     // Destroy resource and print new filename as JSON.
     imagedestroy($img_resource);
