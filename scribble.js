@@ -54,7 +54,7 @@
     });
     $('.scribble-brushes').buttonset();
 
-    if (current_file != '') {
+    if (current_file != '' || current_file ==! undefined) {
       // Load the newest image as background in the wrapper element.
       $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
     }
@@ -96,12 +96,6 @@
 
     // Helper to convert hex to rgb codes.
     function hexToRgb(hex) {
-      // Black (#000000) will be erased upon save because the image data that
-      // isn't set is posted as black. All black parts will be made transparent.
-      // before saving the snapshot image.
-      if (hex === '#000000') {
-        hex = '#00000F';
-      }
       // Convert the hex string into an RGB value array.
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.toString());
       return result ? [

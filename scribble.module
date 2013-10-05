@@ -266,6 +266,7 @@ function scribble_form($form, &$form_state, $scribble) {
   // Don't display the image field, it should not be editable because it's only
   // a backend container for the scribble snapshots.
   $form['scribble_image']['#access'] = FALSE;
+  $form['scribble_image_snapshots']['#access'] = FALSE;
 
   $submit = array();
   if (!empty($form['#submit'])) {
@@ -362,13 +363,13 @@ function scribble_view($entities, $view_mode, $langcode, $entity_type) {
  * @param $file_name
  * @param $scribble_id
  */
-function scribble_add_image_to_scribble($path, $file_name, $scribble) {
+function scribble_add_image_to_scribble_field($file_path, $scribble, $field_name) {
 // Prepare filedata.
-  $file_temp = file_get_contents($path . $file_name);
-  $file_temp = file_save_data($file_temp, 'public://scribble/' . $scribble->sid . '/' . $file_name, FILE_EXISTS_REPLACE);
+  $file_temp = file_get_contents($file_path);
+  $file_temp = file_save_data($file_temp, $file_path, FILE_EXISTS_REPLACE);
 
   // Load the scribble and add image to image field of the scribble entity.
-  $scribble->scribble_image[LANGUAGE_NONE][] = array(
+  $scribble->{$field_name}[LANGUAGE_NONE][] = array(
     'fid' => $file_temp->fid,
     'filename' => $file_temp->filename,
     'filemime' => $file_temp->filemime,
