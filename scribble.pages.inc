@@ -158,3 +158,21 @@ function scribble_add_ajax() {
     drupal_exit();
   }
 }
+
+/**
+ * Confirm form to remove an image from a scribble.
+ *
+ * @param object $scribble
+ *   The loaded scribble entity.
+ * @param int $fid
+ *   The file id of the image to remove.
+ */
+function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
+  $file = file_load($fid);
+  $question =  t('Are you sure to remove image !image from scribble !scribble?', array(
+    '!image' => $file->filename,
+    '!scribble' => $scribble->label,
+  ));
+  $path = 'admin/config/media/scribble/' . $scribble->sid . '/image-list';
+  return confirm_form($form, $question, $path);
+}
