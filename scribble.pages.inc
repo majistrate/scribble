@@ -206,8 +206,27 @@ function scribble_remove_image_form_submit($form, &$form_state) {
     // Loop field values to find the file
     foreach ($items as $delta => $item) {
       if ($item['fid'] == $fid) {
+        // Save the id of the last clean file for later.
+        if ($field_name == 'scribble_image') {
+          if ($delta == (count($items) - 1)) {
+            // The deleted image is the last image of the scribble, set flag
+            // that indicates no need to recreate any merged images.
+            $merge_base_fid = FALSE;
+          }
+          elseif ($delta == 0) {
+            // The deleted image is the first image of the scribble, so the base
+            // image for recreation is the next image.
+            $merge_base_fid = $items[$delta + 1]['fid'];
+          }
+          else {
+            // The deleted image isn't the first nor the last image of the
+            // scribble, so the base image is the one before the deleted image.
+            $merge_base_fid = $items[$delta - 1]['fid'];
+          }
+        }
         // Load the file to remove.
         $removed_file = file_load($item['fid']);
+        dpm($removed_file);
         // Delete the file from the file_managed table and file system.
         file_delete($removed_file, TRUE);
         // Also remove the record in the field table.
@@ -219,12 +238,47 @@ function scribble_remove_image_form_submit($form, &$form_state) {
     }
   }
 
-  $items = field_get_items('scribble', $scribble, 'scribble_image');
-  foreach ($items as $delta => $item) {
-    
-  }
-
   $scribble->save();
+dpm($scribble);
+  if ($merge_base_fid !== FALSE) {
+    // Load the file of the image that will be used as base for the recreation of
+    // merged images that were created after the deleted one.
+    $merge_base_file = file_load($merge_base_fid);
+    $merge_base_resource = imagecreatefrompng($merge_base_file->uri);
+
+    $items = field_get_items('scribble', $scribble, 'scribble_image_snapshots');
+    foreach ($items as $item) {
+      // Start with merging from the snapshot that follows the snapshot which
+      // corresponds the merge base image.
+      if ($item['fid'] > ($merge_base_fid - 1)) {
+        $merge_snapshot_resource = imagecreatefrompng($item['uri']);
+        imagecopy($merge_base_resource, $merge_snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
+        $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] .  '_' . date('d-m-Y_H-i-s') . '.png';
+        $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') .  DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
+        imagepng($merge_base_resource, $file_path);
+
+        imagedestroy($merge_base_resource);
+        imagedestroy($merge_snapshot_resource);
+
+        // Update the file in the db.
+        $file = file_load($item['fid'] + 1);
+        // Delete the old file
+        unlink($file->uri);
+        // Save the file with the updated image name and uri.
+        $file->uri = 'public://scribble' . DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
+        $file->filename = $file_name;
+        file_save($file);
+
+        // Use the just created image as merge base for the next image.
+        $merge_base_resource = imagecreatefrompng($file->uri);
+
+        // Create image style derivate.
+        $derivative_uri = image_style_path('large', $file->uri);
+        $style = image_style_load('large');
+        image_style_create_derivative($style, $file->uri, $derivative_uri);
+      }
+    }
+  }
 
   // Redirect to the image list again.
   $form_state['redirect'] = 'admin/config/media/scribble/' . $scribble->sid . '/image-list';
