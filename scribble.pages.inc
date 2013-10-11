@@ -168,11 +168,64 @@ function scribble_add_ajax() {
  *   The file id of the image to remove.
  */
 function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
+  // Add file id and scribble id to load in submit handler.
+  $form['scribble'] = array(
+    '#type' => 'value',
+    '#value' => $scribble->sid,
+  );
+  $form['file_id'] = array(
+    '#type' => 'value',
+    '#value' => $fid,
+  );
+  // Load the file to display its name in the question.
   $file = file_load($fid);
   $question =  t('Are you sure to remove image !image from scribble !scribble?', array(
     '!image' => $file->filename,
     '!scribble' => $scribble->label,
   ));
+  // Redirect to image list if action get cancelled by the user.
   $path = 'admin/config/media/scribble/' . $scribble->sid . '/image-list';
   return confirm_form($form, $question, $path);
+}
+
+/**
+ * Submit handler for the remove image confirm form.
+ *
+ * @todo describe
+ */
+function scribble_remove_image_form_submit($form, &$form_state) {
+  // Load the scribble.
+  $scribble = entity_load_single('scribble', $form_state['values']['scribble']);
+  dpm($scribble);
+
+  $fid = $form_state['values']['file_id'];
+
+  // Delete the image and the transparent snapshot files and field items.
+  foreach (array('scribble_image', 'scribble_image_snapshots') as $field_name) {
+    $items = field_get_items('scribble', $scribble, $field_name);
+    // Loop field values to find the file
+    foreach ($items as $delta => $item) {
+      if ($item['fid'] == $fid) {
+        // Load the file to remove.
+        $removed_file = file_load($item['fid']);
+        // Delete the file from the file_managed table and file system.
+        file_delete($removed_file, TRUE);
+        // Also remove the record in the field table.
+        unset($scribble->{$field_name}[LANGUAGE_NONE][$delta]);
+        // The snapshot fid is always the image id - 1 so to remove the snapshot
+        // decrease the fid by 1.
+        $fid--;
+      }
+    }
+  }
+
+  $items = field_get_items('scribble', $scribble, 'scribble_image');
+  foreach ($items as $delta => $item) {
+    
+  }
+
+  $scribble->save();
+
+  // Redirect to the image list again.
+  $form_state['redirect'] = 'admin/config/media/scribble/' . $scribble->sid . '/image-list';
 }

@@ -17,14 +17,6 @@ function scribble_menu() {
     'access arguments' => array('view scribble entities'),
     'file' => 'scribble.pages.inc',
   );
-  $items['admin/config/media/scribble/%scribble/image-list'] = array(
-    'title' => 'Manage scribble images',
-    // @todo 'title callback' => '',
-    'page callback' => 'scribble_image_list_page',
-    'page arguments' => array(4),
-    'access arguments' => array('administer scribble entities'),
-    'file' => 'scribble.pages.inc',
-  );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',
     'access arguments' => array('view scribble entities'),
@@ -43,11 +35,19 @@ function scribble_menu() {
     'file' => 'scribble.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  $items['scribble/%scribble/delete-image/%'] = array(
+  $items['admin/config/media/scribble/%scribble/image-list'] = array(
+    'title' => 'Manage scribble images',
+    // @todo 'title callback' => '',
+    'page callback' => 'scribble_image_list_page',
+    'page arguments' => array(4),
+    'access arguments' => array('administer scribble entities'),
+    'file' => 'scribble.pages.inc',
+  );
+  $items['admin/config/media/scribble/%scribble/remove-image/%'] = array(
     'title' => 'Remove image',
     // @todo 'title callback' => '',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('scribble_remove_image_form', 1, 3),
+    'page arguments' => array('scribble_remove_image_form', 4, 6),
     'access arguments' => array('administer scribble entities'),
     'file' => 'scribble.pages.inc',
   );
