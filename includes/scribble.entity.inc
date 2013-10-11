@@ -75,7 +75,7 @@ class Scribble extends Entity {
             )),
           ),
           'delete_link' => array(
-            '#markup' => l(t('Delete'), 'scribble/' . $this->sid . '/delete-image/' . $item['fid']),
+            '#markup' => l(t('Delete'), 'admin/config/media/scribble/' . $this->sid . '/remove-image/' . $item['fid']),
           ),
         );
       }
