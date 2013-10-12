@@ -182,10 +182,11 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
 
   // @todo add link to download current scribble images once archive download is implemented.
   // Add info text and snapshot that will be removed.
+  $info_text = t('The snapshot below will be removed from all following scribble images of the images created after the deleted will be recreated.');
   $form['info_wrapper'] = array(
     '#type' => 'container',
     'info' => array(
-      '#markup' => '<span class="info-text">' . t('The snapshot below will be removed from all following scribble images.') . '</span><br />',
+      '#markup' => "<span class='scribble-info-text'>$info_text</span><br />",
     ),
     'snapshot' => array(
       '#markup' => theme('image', array('path' => image_style_url('large', $snapshot_file->uri))),
@@ -301,4 +302,58 @@ function scribble_remove_image_form_submit($form, &$form_state) {
 
   // Redirect to the image list again.
   $form_state['redirect'] = 'admin/config/media/scribble/' . $scribble->sid . '/image-list';
+}
+
+/**
+ * Page callback for the scribble image slideshow.
+ *
+ * Will display the images of the a given scribble rendered as slideshow using
+ * the formatter of the field_slideshow module.
+ *
+ * @param object $scribble
+ *   The scribble entity to display the images of.
+ *
+ * @return array
+ *   Renderable array of the scribble_image field.
+ */
+function scribble_snapshot_slideshow_page($scribble) {
+  $display = array(
+    'label' => 'hidden',
+    'type' => 'slideshow',
+    'weight' => '-1',
+    'settings' => array(
+      'slideshow_image_style' => '',
+      'slideshow_link' => '',
+      'slideshow_caption' => '',
+      'slideshow_caption_link' => '',
+      'slideshow_fx' => 'fade',
+      'slideshow_speed' => '1000',
+      'slideshow_timeout' => '2000',
+      'slideshow_order' => '',
+      'slideshow_controls' => 1,
+      'slideshow_controls_pause' => 1,
+      'slideshow_controls_position' => 'after',
+      'slideshow_pause' => 1,
+      'slideshow_start_on_hover' => 0,
+      'slideshow_pager' => 'image',
+      'slideshow_pager_position' => 'after',
+      'slideshow_pager_image_style' => 'thumbnail',
+      'slideshow_carousel_image_style' => '',
+      'slideshow_carousel_visible' => '3',
+      'slideshow_carousel_scroll' => '1',
+      'slideshow_carousel_speed' => '500',
+      'slideshow_carousel_skin' => '',
+      'slideshow_carousel_follow' => 0,
+      'slideshow_carousel_vertical' => 0,
+      'slideshow_carousel_circular' => 0,
+      'slideshow_colorbox_image_style' => '',
+      'slideshow_colorbox_slideshow' => '',
+      'slideshow_colorbox_slideshow_speed' => '4000',
+      'slideshow_colorbox_transition' => 'elastic',
+      'slideshow_colorbox_speed' => '350',
+      'slideshow_field_collection_image' => '',
+    ),
+    'module' => 'field_slideshow',
+  );
+  return field_view_field('scribble', $scribble, 'scribble_image', $display);
 }

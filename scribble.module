@@ -17,6 +17,14 @@ function scribble_menu() {
     'access arguments' => array('view scribble entities'),
     'file' => 'scribble.pages.inc',
   );
+  $items['scribble/%scribble/slideshow'] = array(
+    'title' => 'Scribble blackboard',
+    // @todo 'title callback' => '',
+    'page callback' => 'scribble_snapshot_slideshow_page',
+    'page arguments' => array(1),
+    'access arguments' => array('view scribble entities'),
+    'file' => 'scribble.pages.inc',
+  );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',
     'access arguments' => array('view scribble entities'),
@@ -142,10 +150,6 @@ function scribble_entity_info() {
         ),
         'snapshot_administration' => array(
           'label' => t('Administer images'),
-          'custom settings' => FALSE,
-        ),
-        'snapshot_slideshow' => array(
-          'label' => t('Image only'),
           'custom settings' => FALSE,
         ),
       ),

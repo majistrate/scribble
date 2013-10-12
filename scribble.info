@@ -4,7 +4,7 @@ package = JQuery
 core = 7.x
 configure = admin/config/user-interface/scribble
 
-dependencies[] = libraries
+dependencies[] = field_slideshow
 
 files[] = includes/scribble.entity.inc
 files[] = includes/scribble.info.inc
