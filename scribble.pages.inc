@@ -191,12 +191,13 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
 /**
  * Submit handler for the remove image confirm form.
  *
- * @todo describe
+ * Removes the image and the corresponding transparent snapshot from the
+ * scribble. Afterwards all following snapshots will be recreated and  the
+ * file_managed table as well as the entity get updated.
  */
 function scribble_remove_image_form_submit($form, &$form_state) {
   // Load the scribble.
   $scribble = entity_load_single('scribble', $form_state['values']['scribble']);
-  dpm($scribble);
 
   $fid = $form_state['values']['file_id'];
 
@@ -250,12 +251,16 @@ function scribble_remove_image_form_submit($form, &$form_state) {
       // Start with merging from the snapshot that follows the snapshot which
       // corresponds the merge base image.
       if ($item['fid'] > ($merge_base_fid - 1)) {
+        // Load the snapshot to merge the base with and merge images.
         $merge_snapshot_resource = imagecreatefrompng($item['uri']);
         imagecopy($merge_base_resource, $merge_snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
+
+        // imagepng can't deal with stream wrapper uris, create a path.
         $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] .  '_' . date('d-m-Y_H-i-s') . '.png';
         $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') .  DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
         imagepng($merge_base_resource, $file_path);
 
+        // Get rid of the resources in order to use the variables again.
         imagedestroy($merge_base_resource);
         imagedestroy($merge_snapshot_resource);
 
