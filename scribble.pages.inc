@@ -177,6 +177,21 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
     '#type' => 'value',
     '#value' => $fid,
   );
+
+  $snapshot_file = file_load($fid - 1);
+
+  // @todo add link to download current scribble images once archive download is implemented.
+  // Add info text and snapshot that will be removed.
+  $form['info_wrapper'] = array(
+    '#type' => 'container',
+    'info' => array(
+      '#markup' => '<span class="info-text">' . t('The snapshot below will be removed from all following scribble images.') . '</span><br />',
+    ),
+    'snapshot' => array(
+      '#markup' => theme('image', array('path' => image_style_url('large', $snapshot_file->uri))),
+    ),
+  );
+
   // Load the file to display its name in the question.
   $file = file_load($fid);
   $question =  t('Are you sure to remove image !image from scribble !scribble?', array(
