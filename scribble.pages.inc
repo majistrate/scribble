@@ -209,24 +209,28 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         // Save the id of the last clean file for later.
         if ($field_name == 'scribble_image') {
           if ($delta == (count($items) - 1)) {
-            // The deleted image is the last image of the scribble, set flag
-            // that indicates no need to recreate any merged images.
-            $merge_base_fid = FALSE;
+            // The deleted image is the last image of the scribble, don't set
+            // merge base image, there isn't any merging necessary at all.
+            $merge_base_resource = FALSE;
           }
           elseif ($delta == 0) {
             // The deleted image is the first image of the scribble, so the base
-            // image for recreation is the next image.
-            $merge_base_fid = $items[$delta + 1]['fid'];
+            // image for recreation is a blank image with background color.
+            $merge_base_resource = imagecreatetruecolor($scribble->width, $scribble->height);
+            // @todo change the allocated color once background color is configurable.
+            $white = imagecolorallocate($merge_base_resource, 255, 255, 255);
+            imagefill($merge_base_resource, 0, 0, $white);
+            $merge_base_fid = $items[$delta + 1]['uri'];
           }
           else {
             // The deleted image isn't the first nor the last image of the
             // scribble, so the base image is the one before the deleted image.
-            $merge_base_fid = $items[$delta - 1]['fid'];
+            $merge_base_resource = imagecreatefrompng($items[$delta - 1]['uri']);
+            $merge_base_fid = $items[$delta - 1]['uri'];
           }
         }
         // Load the file to remove.
         $removed_file = file_load($item['fid']);
-        dpm($removed_file);
         // Delete the file from the file_managed table and file system.
         file_delete($removed_file, TRUE);
         // Also remove the record in the field table.
@@ -239,13 +243,8 @@ function scribble_remove_image_form_submit($form, &$form_state) {
   }
 
   $scribble->save();
-dpm($scribble);
-  if ($merge_base_fid !== FALSE) {
-    // Load the file of the image that will be used as base for the recreation of
-    // merged images that were created after the deleted one.
-    $merge_base_file = file_load($merge_base_fid);
-    $merge_base_resource = imagecreatefrompng($merge_base_file->uri);
 
+  if ($merge_base_resource !== FALSE) {
     $items = field_get_items('scribble', $scribble, 'scribble_image_snapshots');
     foreach ($items as $item) {
       // Start with merging from the snapshot that follows the snapshot which
