@@ -18,7 +18,7 @@ function scribble_menu() {
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/%scribble/slideshow'] = array(
-    'title' => 'Scribble blackboard',
+    'title' => 'Scribble slideshow',
     // @todo 'title callback' => '',
     'page callback' => 'scribble_snapshot_slideshow_page',
     'page arguments' => array(1),

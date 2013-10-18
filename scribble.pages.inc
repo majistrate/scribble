@@ -308,7 +308,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
  * Page callback for the scribble image slideshow.
  *
  * Will display the images of the a given scribble rendered as slideshow using
- * the formatter of the field_slideshow module.
+ * the formatter of the field_slideshow module if there are any images drawn.
  *
  * @param object $scribble
  *   The scribble entity to display the images of.
@@ -319,6 +319,14 @@ function scribble_remove_image_form_submit($form, &$form_state) {
  * @todo make this configurable per entity.
  */
 function scribble_snapshot_slideshow_page($scribble) {
+  // Check if there are any images drawn on the scribble yet.
+  $items = field_get_items('scribble', $scribble, 'scribble_image');
+  if (!$items) {
+    return array(
+      '#markup' => t('No images were drawn on this scribble yet.'),
+    );
+  }
+
   $display = array(
     'label' => 'hidden',
     'type' => 'slideshow',
@@ -332,7 +340,7 @@ function scribble_snapshot_slideshow_page($scribble) {
       'slideshow_speed' => '1000',
       'slideshow_timeout' => '2000',
       'slideshow_order' => '',
-      'slideshow_controls' => 1,
+      'slideshow_controls' => 0,
       'slideshow_controls_pause' => 1,
       'slideshow_controls_position' => 'after',
       'slideshow_pause' => 1,
