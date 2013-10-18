@@ -280,7 +280,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         imagedestroy($merge_base_resource);
         imagedestroy($merge_snapshot_resource);
 
-        // Update the file in the db.
+        // Update the image file also in the db.
         $file = file_load($item['fid'] + 1);
         // Delete the old file
         unlink($file->uri);
@@ -315,6 +315,8 @@ function scribble_remove_image_form_submit($form, &$form_state) {
  *
  * @return array
  *   Renderable array of the scribble_image field.
+ *
+ * @todo make this configurable per entity.
  */
 function scribble_snapshot_slideshow_page($scribble) {
   $display = array(
