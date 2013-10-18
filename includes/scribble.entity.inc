@@ -54,32 +54,45 @@ class Scribble extends Entity {
       );
     }
     elseif ($view_mode == 'snapshot_administration') {
-      $items = field_get_items('scribble', $this, 'scribble_image');
+      $image_items = field_get_items('scribble', $this, 'scribble_image');
+      $snapshot_items = field_get_items('scribble', $this, 'scribble_image_snapshots');
+      /*
       if (empty($items)) {
         // No images found, display message.
         return array(
           '#markup' => t('No images were added to this scribble yet.'),
         );
       }
+      */
 
-      // Print a list of images and delete links.
-      foreach ($items as $delta => $item) {
-        $content['item_' . $delta . '_wrapper'] = array(
-          '#type' => 'container',
-          '#attributes' => array(
-            'class' => array('scribble-snapshot-admin-wrapper'),
-          ),
-          'image_' . $delta . '_container' => array(
-            '#markup' => theme('image', array(
-              'path' => image_style_url('large', $item['uri']),
-            )),
-          ),
-          'delete_link' => array(
-            '#markup' => l(t('Delete'), 'admin/config/media/scribble/' . $this->sid . '/remove-image/' . $item['fid']),
-          ),
+      $headers = array(
+        t('Image'),
+        t('Snapshot'),
+        t('Image link'),
+        t('Snapshot link'),
+        t('Delete'),
+      );
+
+      $rows = array();
+      // Collect table data of images, snapshots, paths and delete links.
+      foreach ($image_items as $delta => $item) {
+        // Load the corresponding snapshot file.
+        $image_style = variable_get('scribble_image_list_image_style', 'medium');
+        $rows[] = array(
+          theme('image', array('path' => image_style_url($image_style, $item['uri']))),
+          theme('image', array('path' => image_style_url($image_style, $snapshot_items[$delta]['uri']))),
+          l($item['filename'], file_create_url($item['uri'])),
+          l($snapshot_items[$delta]['filename'], file_create_url($snapshot_items[$delta]['uri'])),
+          l(t('Delete'), 'admin/config/media/scribble/' . $this->sid . '/remove-image/' . $item['fid']),
         );
       }
-      return $content;
+
+      return array(
+        '#theme' =>'table',
+        '#header' => $headers,
+        '#rows' => $rows,
+        '#empty' => t('No strings available.')
+      );
     }
 
     return entity_get_controller($this->entityType)->buildContent($this, $view_mode, $langcode, $content);
