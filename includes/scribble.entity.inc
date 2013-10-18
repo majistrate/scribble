@@ -66,22 +66,24 @@ class Scribble extends Entity {
       );
 
       $rows = array();
-      // Collect row data of images, snapshots, filenames and delete links.
-      foreach ($image_items as $delta => $item) {
-        // Used image style is configurable.
-        // @todo add selectbox with imagestyles to the settings form.
-        $image_style = variable_get('scribble_image_list_image_style', 'medium');
-        $rows[] = array(
-          theme('image', array('path' => image_style_url($image_style, $item['uri']))),
-          theme('image', array('path' => image_style_url($image_style, $snapshot_items[$delta]['uri']))),
-          l($item['filename'], file_create_url($item['uri'])),
-          l($snapshot_items[$delta]['filename'], file_create_url($snapshot_items[$delta]['uri'])),
-          l(t('Delete'), 'admin/config/media/scribble/' . $this->sid . '/remove-image/' . $item['fid']),
-        );
+      if (!empty($image_items)) {
+        // Collect row data of images, snapshots, filenames and delete links.
+        foreach ($image_items as $delta => $item) {
+          // Used image style is configurable.
+          // @todo add selectbox with imagestyles to the settings form.
+          $image_style = variable_get('scribble_image_list_image_style', 'medium');
+          $rows[] = array(
+            theme('image', array('path' => image_style_url($image_style, $item['uri']))),
+            theme('image', array('path' => image_style_url($image_style, $snapshot_items[$delta]['uri']))),
+            l($item['filename'], file_create_url($item['uri'])),
+            l($snapshot_items[$delta]['filename'], file_create_url($snapshot_items[$delta]['uri'])),
+            l(t('Delete'), 'admin/config/media/scribble/' . $this->sid . '/remove-image/' . $item['fid']),
+          );
+        }
       }
 
       // @todo add pager.
-      return array(
+      $content = array(
         '#theme' =>'table',
         '#header' => $headers,
         '#rows' => $rows,
