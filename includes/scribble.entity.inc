@@ -56,14 +56,6 @@ class Scribble extends Entity {
     elseif ($view_mode == 'snapshot_administration') {
       $image_items = field_get_items('scribble', $this, 'scribble_image');
       $snapshot_items = field_get_items('scribble', $this, 'scribble_image_snapshots');
-      /*
-      if (empty($items)) {
-        // No images found, display message.
-        return array(
-          '#markup' => t('No images were added to this scribble yet.'),
-        );
-      }
-      */
 
       $headers = array(
         t('Image'),
@@ -74,9 +66,10 @@ class Scribble extends Entity {
       );
 
       $rows = array();
-      // Collect table data of images, snapshots, paths and delete links.
+      // Collect row data of images, snapshots, filenames and delete links.
       foreach ($image_items as $delta => $item) {
-        // Load the corresponding snapshot file.
+        // Used image style is configurable.
+        // @todo add selectbox with imagestyles to the settings form.
         $image_style = variable_get('scribble_image_list_image_style', 'medium');
         $rows[] = array(
           theme('image', array('path' => image_style_url($image_style, $item['uri']))),
@@ -87,11 +80,12 @@ class Scribble extends Entity {
         );
       }
 
+      // @todo add pager.
       return array(
         '#theme' =>'table',
         '#header' => $headers,
         '#rows' => $rows,
-        '#empty' => t('No strings available.')
+        '#empty' => t('No images available.')
       );
     }
 
