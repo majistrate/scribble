@@ -367,3 +367,30 @@ function scribble_snapshot_slideshow_page($scribble) {
   );
   return field_view_field('scribble', $scribble, 'scribble_image', $display);
 }
+
+/**
+ *
+ *
+ * @param $scribble
+ */
+function scribble_get_images_archive($scribble) {
+  module_load_include('inc', 'system', 'zip_archive.class');
+  $archive = new ZipArchive();
+  $file_name = variable_get('file_temporary_path', '/tmp') . '/scribble_' . $scribble->name . '.zip';
+  $archive->open($file_name, ZIPARCHIVE::OVERWRITE);
+  $items = field_get_items('scribble', $scribble, 'scribble_image');
+  foreach ($items as $item) {
+    $archive->addFile(drupal_realpath($item['uri']));
+  }
+  $file_size = (string) filesize($file_name);
+  $archive->close();
+  $file_name = basename($file_name);
+  dd($file_name);
+  dd($file_size);
+  header('Content-Type: application/zip');
+  header('Content-Disposition: attachment; filename="' . $file_name . '"');
+  header('Content-Length: ' . $file_size);
+  readfile($file_name);
+  unlink($file_name);
+  drupal_exit();
+}
