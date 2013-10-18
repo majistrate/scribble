@@ -57,6 +57,7 @@ class ScribbleUIController extends EntityDefaultUIController {
     $row = parent::overviewTableRow($conditions, $id, $entity, $additional_cols);
     $row[] =  l(t('Image list'), $this->path . '/' . $id . '/image-list');
     $row[] =  l(t('Slideshow'), 'scribble/' . $id . '/slideshow');
+    $row[] =  l(t('Download'), 'scribble/' . $id . '/download');
     return $row;
   }
 
@@ -67,6 +68,7 @@ class ScribbleUIController extends EntityDefaultUIController {
     $headers = parent::overviewTableHeaders($conditions, $rows, $additional_header);
     $headers[] = t('Manage images');
     $headers[] = t('Slideshow');
+    $headers[] = t('Download images');
     return $headers;
   }
 
