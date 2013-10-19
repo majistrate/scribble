@@ -61,7 +61,7 @@
     });
     $('.scribble-brushes').buttonset();
 
-    if (current_file != '' || current_file ==! undefined) {
+    if (current_file != '' && current_file ==! undefined && current_file !== null) {
       // Load the newest image as background in the wrapper element of canvas.
       $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
     }
