@@ -87,7 +87,7 @@ class Scribble extends Entity {
         '#theme' =>'table',
         '#header' => $headers,
         '#rows' => $rows,
-        '#empty' => t('No images available.')
+        '#empty' => t('No images were drawn on this scribble yet.'),
       );
     }
 
