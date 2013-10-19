@@ -23,6 +23,12 @@
     var add_img_height;
     var add_img_width;
 
+    $('.scribble-blackboard-wrapper').mousedown(function () {
+      if ($('.scribble-color-picker').dialog('isOpen')) {
+        $('.scribble-color-picker').dialog('close');
+      }
+    });
+
     // Initialize the toolbar
     $('.scribble-save').button({
       icons: {
@@ -49,8 +55,9 @@
         $('.scribble-color-picker').dialog('open');
       });
 
-    $('.scribble-color-display').click(function () {
+    $('.scribble-color-display').click(function (event) {
       $('.scribble-color-picker').dialog('open');
+      event.stopPropagation();
     });
     $('.scribble-brushes').buttonset();
 
@@ -67,9 +74,7 @@
     // Add the color picker.
     $('.scribble-color-picker')
       .farbtastic(function (color) {
-        var rgb = hexToRgb(color);
-        rgb_string = 'rgb(' + rgb.join(',') + ')';
-        $draw_canvas.data("jqScribble").update({brushColor: rgb_string});
+        $draw_canvas.data("jqScribble").update({brushColor: color});
         $('.scribble-color-display').css('background-color', color);
       })
       .dialog({
@@ -93,17 +98,6 @@
     };
     $('.scribble-brush-size').slider(options);
     $size_display.text(1);
-
-    // Helper to convert hex to rgb codes.
-    function hexToRgb(hex) {
-      // Convert the hex string into an RGB value array.
-      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.toString());
-      return result ? [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16)
-      ] : null;
-    }
 
     // Enable saving after only after first click.
     $draw_canvas.click(function () {

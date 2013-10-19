@@ -1,6 +1,6 @@
 name = Scribble
 description = "Provides scribble pages on html canvas using the JQScribble library."
-package = JQuery
+package = Other
 core = 7.x
 configure = admin/config/user-interface/scribble
 
@@ -9,5 +9,5 @@ dependencies[] = field_slideshow
 files[] = includes/scribble.entity.inc
 files[] = includes/scribble.info.inc
 files[] = includes/scribble.ui.inc
-;files[] = tests/sharemessage.test
+
 

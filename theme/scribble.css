@@ -7,6 +7,10 @@
   border: 1px solid #000;
 }
 
+.scribble-toolbar {
+  margin-bottom: 20px;
+}
+
 .scribble-color-display {
   height: 20px;
   width: 20px;
