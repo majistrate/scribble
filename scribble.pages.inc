@@ -206,13 +206,13 @@ function scribble_remove_image_form_submit($form, &$form_state) {
             // @todo change the allocated color once background color is configurable.
             $white = imagecolorallocate($merge_base_resource, 255, 255, 255);
             imagefill($merge_base_resource, 0, 0, $white);
-            $merge_base_fid = $items[$delta + 1]['uri'];
+            $merge_base_fid = -1;
           }
           else {
             // The deleted image isn't the first nor the last image of the
             // scribble, so the base image is the one before the deleted image.
             $merge_base_resource = imagecreatefrompng($items[$delta - 1]['uri']);
-            $merge_base_fid = $items[$delta - 1]['uri'];
+            $merge_base_fid = $items[$delta - 1]['fid'];
           }
         }
         // Load the file to remove.
