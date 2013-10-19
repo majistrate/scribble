@@ -67,13 +67,12 @@ function scribble_save_ajax() {
     imagesavealpha($snapshot_resource, TRUE);
     // Write the snapshot file.
     imagepng($snapshot_resource, $snapshot_path . $snapshot_file_name);
-    imagedestroy($snapshot_resource);
 
     // Merge the created snapshot with the latest image. This is necessary
     // because there might be a newer image saved than the loaded background
     // on the scribble. That way, overwriting the latest image is prevented.
     $snapshot_resource = imagecreatefrompng($snapshot_path . $snapshot_file_name);
-    scribble_merge_snapshot_to_newest($scribble_id, $scribble, $path, $snapshot_resource, $file_name, $snapshot_file_name);
+    scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path, $file_name, $snapshot_file_name);
 
     // Print new filename as JSON to update the div behind the canvas.
     drupal_json_output(array('file_name' => $file_name));
@@ -96,8 +95,8 @@ function scribble_add_ajax() {
 
     // Create an image resource for the image that gets added.
     $url_parts = explode('/', $_POST['img_url']);
-    $file_name = array_pop($url_parts);
-    $extension = explode('.', $file_name);
+    $added_file_name = array_pop($url_parts);
+    $extension = explode('.', $added_file_name);
     $extension = str_replace('jpg', 'jpeg', $extension[1]);
     $function = 'imagecreatefrom' . $extension;
     if (!function_exists($function)) {
@@ -120,6 +119,7 @@ function scribble_add_ajax() {
     imagecopy($snapshot_resource, $add_img_resource, $_POST['dst_x'], $_POST['dst_y'], 0, 0, $_POST['img_width'], $_POST['img_height']);
     imagepng($snapshot_resource, $snapshot_path . $snapshot_file_name);
 
+    // Merge the snapshot file with the newest or a blank image.
     scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path, $file_name, $snapshot_file_name);
 
     imagedestroy($add_img_resource);
