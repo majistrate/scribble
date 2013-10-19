@@ -62,21 +62,18 @@
     $('.scribble-brushes').buttonset();
 
     if (current_file != '' || current_file ==! undefined) {
-      // Load the newest image as background in the wrapper element.
+      // Load the newest image as background in the wrapper element of canvas.
       $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
     }
     // Initialize drawing canvas.
-    $draw_canvas.jqScribble();
-    // Set the default color (can't be black) because black parts are made
-    // transparent upon saving.
-    $draw_canvas.data("jqScribble").update({brushColor: 'rgb(0,0,15)'});
+    $draw_canvas.jqScribble({fillOnClear: false});
 
     // Add the color picker.
     $('.scribble-color-picker')
       .farbtastic(function (color) {
         $draw_canvas.data("jqScribble").update({brushColor: color});
         $('.scribble-color-display').css('background-color', color);
-      })
+      }, '.scribble-color-display')
       .dialog({
         draggable: true,
         title: Drupal.t('Choose your color'),
@@ -132,10 +129,7 @@
 
     // Reset to last saved background image.
     $('.scribble-clear').click(function () {
-      var options = {
-        backgroundImage: dir_path + '/' + current_file
-      };
-      $draw_canvas.data('jqScribble').update(options);
+      $draw_canvas.data('jqScribble').clear();
       unchanged = true;
     });
 
