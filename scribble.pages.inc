@@ -149,13 +149,18 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
 
   $snapshot_file = file_load($fid - 1);
 
-  // @todo add link to download current scribble images once archive download is implemented.
   // Add info text and snapshot that will be removed.
   $info_text = t('The snapshot below will be removed from all following scribble images of the images created after the deleted will be recreated.');
+  $backup_text = t('You can backup your images by downloading them !link before you delete the images.', array(
+    '!link' => l('here', 'scribble/' . $scribble->sid . '/download'),
+  ));
   $form['info_wrapper'] = array(
     '#type' => 'container',
     'info' => array(
       '#markup' => "<span class='scribble-info-text'>$info_text</span><br />",
+    ),
+    'backup' => array(
+      '#markup' => "<span class='scribble-info-text'>$backup_text</span><br />",
     ),
     'snapshot' => array(
       '#markup' => theme('image', array('path' => image_style_url('large', $snapshot_file->uri))),
