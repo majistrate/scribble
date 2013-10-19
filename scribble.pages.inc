@@ -369,29 +369,40 @@ function scribble_snapshot_slideshow_page($scribble) {
 }
 
 /**
+ * Collects scribble images in a zip archive.
  *
+ * Sends the archive with the images to the browser for downloading.
  *
  * @param $scribble
+ *   The loaded scribble entity.
  */
 function scribble_get_images_archive($scribble) {
-  module_load_include('inc', 'system', 'zip_archive.class');
-  $archive = new ZipArchive();
-  $file_name = variable_get('file_temporary_path', '/tmp') . '/scribble_' . $scribble->name . '.zip';
-  $archive->open($file_name, ZIPARCHIVE::OVERWRITE);
-  $items = field_get_items('scribble', $scribble, 'scribble_image');
-  foreach ($items as $item) {
-    $archive->addFile(drupal_realpath($item['uri']));
+  // Check if there are any images.
+  if ($items = field_get_items('scribble', $scribble, 'scribble_image')) {
+
+    // Create filename, loop images and add them to the archive.
+    $file_name = variable_get('file_temporary_path', '/tmp') . '/scribble_' . $scribble->name . '.zip';
+    $archive = new ZipArchive();
+    $archive->open($file_name, ZIPARCHIVE::OVERWRITE);
+    foreach ($items as $item) {
+      $archive->addFile(drupal_realpath($item['uri']), $item['filename']);
+    }
+
+    // Get file size, filename and send headers.
+    $file_size = filesize($file_name);
+    $base_name = basename($file_name);
+    header('Content-Type: application/zip');
+    header('Content-Disposition: attachment; filename="' . $base_name . '"');
+    header('Content-Length: ' . $file_size);
+    readfile($file_name);
+
+    // Delete file and destroy resource.
+    unlink($file_name);
+    $archive->close();
+    return;
   }
-  dd(file_exists($file_name), 'EXISTS');
-  $file_size = (string) filesize($file_name);
-  $base_name = basename($file_name);
-  dd($file_name);
-  dd($file_size);
-  dd(file_exists($file_name), 'EXISTS');
-  header('Content-Type: application/zip');
-  header('Content-Disposition: attachment; filename="' . $base_name . '"');
-  header('Content-Length: ' . $file_size);
-  readfile($file_name);
-  unlink($file_name);
-  drupal_exit();
+  // In case there are no images yet go back to the image list.
+  return array(
+    '#markup' => t('No images were drawn on this scribble yet.'),
+  );
 }

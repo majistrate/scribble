@@ -26,7 +26,7 @@ function scribble_menu() {
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/%scribble/download'] = array(
-    'title' => 'Scribble slideshow',
+    'title' => 'Scribble download',
     // @todo 'title callback' => '',
     'page callback' => 'scribble_get_images_archive',
     'page arguments' => array(1),
