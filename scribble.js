@@ -202,7 +202,8 @@
           img_width: add_img_width,
           img_height: add_img_height,
           dst_x: x,
-          dst_y: y
+          dst_y: y,
+          scribble_id: Drupal.settings.scribble_info.scribbleId
         };
         if (current_file == '') {
           data.canvas_width = canvas_width;
@@ -210,12 +211,11 @@
         }
         // Do AJAX post that merges the images and saves a new image.
         $.post(Drupal.settings.scribble.addURL, data, function(response) {
-          var options = {
-            backgroundImage: dir_path + '/' + response.file_name
-          };
-          $draw_canvas.data('jqScribble').update(options);
           // Store the latest filename.
           current_file = response.file_name;
+          // Update the background of the canvas with the new image.
+          $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
+          $draw_canvas.data("jqScribble").clear();
         });
       }
     }

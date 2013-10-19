@@ -9,5 +9,3 @@ dependencies[] = field_slideshow
 files[] = includes/scribble.entity.inc
 files[] = includes/scribble.info.inc
 files[] = includes/scribble.ui.inc
-
-

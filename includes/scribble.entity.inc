@@ -70,7 +70,7 @@ class Scribble extends Entity {
         // Collect row data of images, snapshots, filenames and delete links.
         foreach ($image_items as $delta => $item) {
           // Used image style is configurable.
-          // @todo add selectbox with imagestyles to the settings form.
+          // @todo add selectbox with imagestyles for this to the settings form.
           $image_style = variable_get('scribble_image_list_image_style', 'medium');
           $rows[] = array(
             theme('image', array('path' => image_style_url($image_style, $item['uri']))),
