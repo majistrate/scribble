@@ -21,9 +21,7 @@ function scribble_configuration_form($form, &$form_state) {
 /**
  * Form callback that contains the blackboard.
  */
-function scribble_page($scribble) {
-dpm($scribble);
-  dpm(entity_get_info('scribble'));
+function scribble_blackboard_page($scribble) {
   return entity_view('scribble', array($scribble));
 }
 

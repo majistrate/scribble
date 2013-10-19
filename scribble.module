@@ -12,7 +12,7 @@ function scribble_menu() {
   $items['scribble/%scribble/blackboard'] = array(
     'title' => 'Scribble blackboard',
     // @todo 'title callback' => '',
-    'page callback' => 'scribble_page',
+    'page callback' => 'scribble_blackboard_page',
     'page arguments' => array(1),
     'access arguments' => array('view scribble entities'),
     'file' => 'scribble.pages.inc',
