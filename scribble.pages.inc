@@ -382,13 +382,14 @@ function scribble_get_images_archive($scribble) {
   foreach ($items as $item) {
     $archive->addFile(drupal_realpath($item['uri']));
   }
+  dd(file_exists($file_name), 'EXISTS');
   $file_size = (string) filesize($file_name);
-  $archive->close();
-  $file_name = basename($file_name);
+  $base_name = basename($file_name);
   dd($file_name);
   dd($file_size);
+  dd(file_exists($file_name), 'EXISTS');
   header('Content-Type: application/zip');
-  header('Content-Disposition: attachment; filename="' . $file_name . '"');
+  header('Content-Disposition: attachment; filename="' . $base_name . '"');
   header('Content-Length: ' . $file_size);
   readfile($file_name);
   unlink($file_name);
