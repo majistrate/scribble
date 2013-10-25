@@ -122,7 +122,7 @@ function scribble_theme($existing, $type, $theme, $path) {
         'width' => 900,
         'height' => 300,
         'brushes' => array(),
-        'scribble_id' => NULL,
+        'background_color' => 'FFFFFF',
       ),
       'template' => 'scribble-blackboard',
       'path' => drupal_get_path('module', 'scribble') . '/theme',
@@ -466,10 +466,7 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   // No image exists yet on the scribble, create a plain image with background
   // color as configured and use it that as base for the merge.
   else {
-    $background_resource = imagecreatetruecolor($scribble->width, $scribble->height);
-    // @todo change the allocated color once background color is configurable.
-    $white = imagecolorallocate($background_resource, 255, 255, 255);
-    imagefill($background_resource, 0, 0, $white);
+    $background_resource = scribble_create_blank_image_filled($scribble);
   }
   // Merge the snapshot to the determined base.
   imagecopy($background_resource, $snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
@@ -479,7 +476,53 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   imagedestroy($background_resource);
   imagedestroy($snapshot_resource);
 
-  // Add the images and snapshot to the fields of the scribble entity.
+  // Add the image and snapshot to the fields of the scribble entity.
   scribble_add_image_to_scribble_field('public://scribble/' . $scribble->sid . '/snapshots/' . $snapshot_file_name, $scribble, 'scribble_image_snapshots');
   scribble_add_image_to_scribble_field('public://scribble/' . $scribble->sid . DIRECTORY_SEPARATOR . $file_name, $scribble, 'scribble_image');
+}
+
+/**
+ * Creates a blank image and fills it with the scribbles background color.
+ *
+ * @param object $scribble
+ *   The scribble entity object.
+ *
+ * @return resource
+ *   The image resource of the filled image.
+ */
+function scribble_create_blank_image_filled($scribble) {
+  // Create base image.
+  $background_resource = imagecreatetruecolor($scribble->width, $scribble->height);
+  // Get background color, convert it and fill the create image with it.
+  $items = field_get_items('scribble', $scribble, 'scribble_background_color');
+  list($red, $green, $blue) = scribble_convert_hex_to_rgb($items[0]['jquery_colorpicker']);
+  $background_color = imagecolorallocate($background_resource, $red, $green, $blue);
+  imagefill($background_resource, 0, 0, $background_color);
+  return $background_resource;
+}
+
+/**
+ * Converts a hexadecimal color code into RGB values.
+ *
+ * @param $hex
+ *   The hexadecimal color code with or without leading #.
+ *
+ * @return array
+ *   The RGB values as array.
+ */
+function scribble_convert_hex_to_rgb($hex) {
+  $hex = str_replace("#", "", $hex);
+
+  if(strlen($hex) == 3) {
+    $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
+    $g = hexdec(str_repeat(substr($hex, 0, 1), 2));
+    $b = hexdec(str_repeat(substr($hex, 0, 1), 2));
+  }
+  else {
+    $r = hexdec(substr($hex, 0, 2));
+    $g = hexdec(substr($hex, 2, 2));
+    $b = hexdec(substr($hex, 4, 2));
+  }
+  $rgb = array($r, $g, $b);
+  return $rgb;
 }

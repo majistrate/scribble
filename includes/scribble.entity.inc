@@ -16,6 +16,7 @@ class Scribble extends Entity {
   public function buildContent($view_mode = 'full', $langcode = NULL) {
     $content = array();
     if ($view_mode == 'full') {
+      $items = field_get_items('scribble', $this, 'scribble_background_color');
       $content['blackboard'] = array(
         '#type' => 'container',
         '#attributes' => array(
@@ -26,6 +27,7 @@ class Scribble extends Entity {
             'width' => $this->width,
             'height' => $this->height,
             'brushes' => $this->prepareBrushes(),
+            'background_color' => $items[0]['jquery_colorpicker'],
           )),
         ),
         'scribble_libraries' => array(
@@ -44,6 +46,7 @@ class Scribble extends Entity {
                   'scribble_info' => array(
                     'scribbleId' => $this->sid,
                     'newestScribble' => scribble_get_newest($this->sid),
+                    'backgroundColor' => $items[0]['jquery_colorpicker'],
                   ),
                 ),
                 'type' => 'setting',

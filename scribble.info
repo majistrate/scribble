@@ -5,6 +5,7 @@ core = 7.x
 configure = admin/config/user-interface/scribble
 
 dependencies[] = field_slideshow
+dependencies[] = jquery_colorpicker
 
 files[] = includes/scribble.entity.inc
 files[] = includes/scribble.info.inc
