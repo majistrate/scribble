@@ -40,7 +40,7 @@
     </div>
     <div class="scribble-add-img-container"></div>
   </div>
-  <div class="scribble-canvas-wrapper" style="width: <?php print $width; ?>px;height: <?php print $height; ?>px;">
+  <div class="scribble-canvas-wrapper" style="width: <?php print $width; ?>px;height: <?php print $height; ?>px; background-color:#<?php print $background_color; ?>">
     <canvas class="scribble-canvas"></canvas>
   </div>
 </div>

@@ -24,12 +24,11 @@ function scribble_requirements($phase) {
     $requirements['jqscribble'] = array(
       'title' => $t('JQScribble Library'),
       'severity' => REQUIREMENT_ERROR,
-      'description' => $t('The JQScribble library was not found in the libraries folder. Please place the jquery.jqscribble.js file in sites/all/libraries/jqscribble.'),
+      'description' => $t('The JQScribble library was not found in the libraries folder. Please download the library from !link and place the jquery.jqscribble.js file in sites/all/libraries/jqscribble.', array('!link' => url('http://github.com/jimdoescode/jqScribble', array('external' => TRUE)))),
     );
   }
   return $requirements;
 }
-
 
 /**
  * Implements hook_schema().
@@ -127,15 +126,15 @@ function scribble_install() {
 
     // Create the instance on the bundle.
     $instance = array(
-        'field_name' => 'scribble_title',
-        'entity_type' => 'scribble',
-        'label' => 'Scribble title',
-        'description' => 'Used as page title on any scribble',
-        'bundle' => 'scribble',
-        'widget' => array(
-          'type' => 'text_textfield',
-        ),
-      ) + $display_hidden;
+      'field_name' => 'scribble_title',
+      'entity_type' => 'scribble',
+      'label' => 'Scribble title',
+      'description' => 'Used as page title on any scribble',
+      'bundle' => 'scribble',
+      'widget' => array(
+        'type' => 'text_textfield',
+      ),
+    ) + $display_hidden;
     field_create_instance($instance);
   }
 
@@ -183,15 +182,15 @@ function scribble_install() {
 
     // Create the instance on the bundle.
     $instance = array(
-        'field_name' => 'scribble_image',
-        'entity_type' => 'scribble',
-        'label' => 'Image',
-        'description' => 'This field will hold each snapshot image on a background of the scribble',
-        'bundle' => 'scribble',
-        'widget' => array(
-          'type' => 'image_image',
-        ),
-      ) + $display_hidden;
+      'field_name' => 'scribble_image',
+      'entity_type' => 'scribble',
+      'label' => 'Image',
+      'description' => 'This field will hold each snapshot image on a background of the scribble',
+      'bundle' => 'scribble',
+      'widget' => array(
+        'type' => 'image_image',
+      ),
+    ) + $display_hidden;
     field_create_instance($instance);
   }
 
@@ -207,15 +206,42 @@ function scribble_install() {
 
     // Create the instance on the bundle.
     $instance = array(
-        'field_name' => 'scribble_image_snapshots',
-        'entity_type' => 'scribble',
-        'label' => 'Image',
-        'description' => 'This field will hold each partial tranparent snapshot image of the scribble',
-        'bundle' => 'scribble',
-        'widget' => array(
-          'type' => 'image_image',
-        ),
-      ) + $display_hidden;
+      'field_name' => 'scribble_image_snapshots',
+      'entity_type' => 'scribble',
+      'label' => 'Image',
+      'description' => 'This field will hold each partial tranparent snapshot image of the scribble',
+      'bundle' => 'scribble',
+      'widget' => array(
+        'type' => 'image_image',
+      ),
+    ) + $display_hidden;
+    field_create_instance($instance);
+  }
+
+  if (!field_info_field('scribble_background_color')) {
+    $field = array(
+      'field_name' => 'scribble_background_color',
+      'type' => 'jquery_colorpicker',
+      'module' => 'jquery_colorpicker',
+      'cardinality' => 1,
+    );
+    field_create_field($field);
+
+    // Create the instance on the bundle.
+    $instance = array(
+      'field_name' => 'scribble_background_color',
+      'label' => 'Background color',
+      'widget' => array(
+        'type' => 'jquery_colorpicker',
+        'module' => 'jquery_colorpicker',
+      ),
+      'description' => 'The background color of the scribble images.',
+      'default_value' => array(
+        0 => array('jquery_colorpicker' => 'ffffff'),
+      ),
+      'entity_type' => 'scribble',
+      'bundle' => 'scribble',
+    ) + $display_hidden;
     field_create_instance($instance);
   }
 }

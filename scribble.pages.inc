@@ -207,10 +207,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
           elseif ($delta == 0) {
             // The deleted image is the first image of the scribble, so the base
             // image for recreation is a blank image with background color.
-            $merge_base_resource = imagecreatetruecolor($scribble->width, $scribble->height);
-            // @todo change the allocated color once background color is configurable.
-            $white = imagecolorallocate($merge_base_resource, 255, 255, 255);
-            imagefill($merge_base_resource, 0, 0, $white);
+            $merge_base_resource = scribble_create_blank_image_filled($scribble);
             $merge_base_fid = -1;
           }
           else {
@@ -311,8 +308,8 @@ function scribble_snapshot_slideshow_page($scribble) {
       'slideshow_caption' => '',
       'slideshow_caption_link' => '',
       'slideshow_fx' => 'fade',
-      'slideshow_speed' => '1000',
-      'slideshow_timeout' => '2000',
+      'slideshow_speed' => 11,
+      'slideshow_timeout' => 20,
       'slideshow_order' => '',
       'slideshow_controls' => 0,
       'slideshow_controls_pause' => 1,
