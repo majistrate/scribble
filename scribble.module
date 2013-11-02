@@ -127,6 +127,19 @@ function scribble_theme($existing, $type, $theme, $path) {
       'template' => 'scribble-blackboard',
       'path' => drupal_get_path('module', 'scribble') . '/theme',
     ),
+    'scribble_brush_options' => array(
+      'variables' => array(
+        'brushes' => array(),
+      ),
+    ),
+    'scribble_slideshow' => array(
+      'variables' => array(
+        'scribble' => NULL,
+        'slideshow' => '',
+      ),
+      'template' => 'scribble-slideshow',
+      'path' => drupal_get_path('module', 'scribble') . '/theme',
+    ),
   );
 }
 
@@ -280,24 +293,18 @@ function scribble_form($form, &$form_state, $scribble) {
     '#maxlength' => 5,
   );
 
+  $slideshow_defaults = !empty($scribble->scribble_slideshow_settings) ? $scribble->scribble_slideshow_settings : variable_get('scribble_slideshow_settings');
+  scribble_add_slideshow_settings_elements($form, $slideshow_defaults);
+
   // Don't display the image field, it should not be editable because it's only
   // a backend container for the scribble snapshots.
   $form['scribble_image']['#access'] = FALSE;
   $form['scribble_image_snapshots']['#access'] = FALSE;
 
-  $submit = array();
-  if (!empty($form['#submit'])) {
-    $submit += $form['#submit'];
-  }
-
-  $form['actions'] = array(
-    '#weight' => 105,
-  );
-
-  $form['actions']['submit'] = array(
+  $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save scribble'),
-    '#submit' => $submit + array('scribble_form_submit'),
+    '#weight' => 40,
   );
 
   return $form;
@@ -525,4 +532,368 @@ function scribble_convert_hex_to_rgb($hex) {
   }
   $rgb = array($r, $g, $b);
   return $rgb;
+}
+
+/**
+ * Adds slideshow setting form elements to given container.
+ *
+ * @param array $container
+ *   The container to append the form elements to.
+ * @param array $defaults
+ *   The default values.
+ */
+function scribble_add_slideshow_settings_elements(&$container, $defaults) {
+
+  $container['scribble_slideshow_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Slideshow settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#tree' => TRUE,
+    '#weight' => 35,
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_image_style'] = array(
+    '#title'          => t('Image style'),
+    '#type'           => 'select',
+    '#default_value'  => $defaults['slideshow_image_style'],
+    '#empty_option'   => t('None (original image)'),
+    '#options'        => image_style_options(FALSE),
+  );
+
+  if (module_exists('colorbox')) {
+    $container['scribble_slideshow_settings']['slideshow_colorbox_image_style'] = array(
+      '#title'          => t('Colorbox image style'),
+      '#type'           => 'select',
+      '#default_value'  => $defaults['slideshow_colorbox_image_style'],
+      '#empty_option'   => t('None (original image)'),
+      '#options'        => image_style_options(FALSE),
+      '#states' => array(
+        'visible' => array(
+          ':input[name$="[slideshow_link]"]' => array('value' => 'colorbox'),
+        ),
+      ),
+    );
+    $colorbox_slideshow = array(
+      'automatic' => t('Automatic'),
+      'manual'    => t('Manual'),
+    );
+    $container['scribble_slideshow_settings']['slideshow_colorbox_slideshow'] = array(
+      '#title'          => t('Colorbox slideshow'),
+      '#type'           => 'select',
+      '#default_value'  => $defaults['slideshow_colorbox_slideshow'],
+      '#empty_option'   => t('No slideshow'),
+      '#options'        => $colorbox_slideshow,
+      '#states' => array(
+        'visible' => array(
+          ':input[name$="[slideshow_link]"]' => array('value' => 'colorbox'),
+        ),
+      ),
+    );
+    $container['scribble_slideshow_settings']['slideshow_colorbox_slideshow_speed'] = array(
+      '#title'          => t('Colorbox slideshow speed'),
+      '#type'           => 'textfield',
+      '#size'           => 5,
+      '#default_value'  => $defaults['slideshow_colorbox_slideshow_speed'],
+      '#description'    => t('Time between transitions (ms).'),
+      '#states' => array(
+        'invisible' => array(
+          ':input[name$="[slideshow_colorbox_slideshow]"]' => array('value' => ''),
+        ),
+      ),
+    );
+    $colorbox_transitions = array(
+      'none'    => t('None'),
+      'elastic' => t('Elastic'),
+      'fade'    => t('Fade'),
+    );
+    $container['scribble_slideshow_settings']['slideshow_colorbox_transition'] = array(
+      '#title'          => t('Colorbox transition'),
+      '#type'           => 'select',
+      '#default_value'  => $defaults['slideshow_colorbox_transition'],
+      '#options'        => $colorbox_transitions,
+      '#states' => array(
+        'visible' => array(
+          ':input[name$="[slideshow_link]"]' => array('value' => 'colorbox'),
+        ),
+      ),
+    );
+    $container['scribble_slideshow_settings']['slideshow_colorbox_speed'] = array(
+      '#title'          => t('Colorbox transition speed'),
+      '#type'           => 'textfield',
+      '#size'           => 5,
+      '#default_value'  => $defaults['slideshow_colorbox_speed'],
+      '#description'    => t('Duration of transition (ms).'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name$="[slideshow_link]"]' => array('value' => 'colorbox'),
+        ),
+      ),
+    );
+  }
+
+  $container['scribble_slideshow_settings']['slideshow_fx'] = array(
+    '#title'          => t('Transition effect'),
+    '#type'           => 'select',
+    '#default_value'  => $defaults['slideshow_fx'],
+    '#options'        => array(
+      'blindX'      => t('blindX'),
+      'blindY'      => t('blindY'),
+      'blindZ'      => t('blindZ'),
+      'cover'       => t('cover'),
+      'curtainX'    => t('curtainX'),
+      'curtainY'    => t('curtainY'),
+      'fade'        => t('fade'),
+      'fadeZoom'    => t('fadeZoom'),
+      'growX'       => t('growX'),
+      'growY'       => t('growY'),
+      'scrollUp'    => t('scrollUp'),
+      'scrollDown'  => t('scrollDown'),
+      'scrollLeft'  => t('scrollLeft'),
+      'scrollRight' => t('scrollRight'),
+      'scrollHorz'  => t('scrollHorz'),
+      'scrollVert'  => t('scrollVert'),
+      'shuffle'     => t('shuffle'),
+      'slideX'      => t('slideX'),
+      'slideY'      => t('slideY'),
+      'toss'        => t('toss'),
+      'turnUp'      => t('turnUp'),
+      'turnDown'    => t('turnDown'),
+      'turnLeft'    => t('turnLeft'),
+      'turnRight'   => t('turnRight'),
+      'uncover'     => t('uncover'),
+      'wipe'        => t('wipe'),
+      'zoom'        => t('zoom'),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_speed'] = array(
+    '#title'          => t('Transition speed'),
+    '#type'           => 'textfield',
+    '#size'           => 5,
+    '#default_value'  => $defaults['slideshow_speed'],
+    '#description'    => t('Duration of transition (ms).'),
+    '#required'       => TRUE,
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_timeout'] = array(
+    '#title'          => t('Timeout'),
+    '#type'           => 'textfield',
+    '#size'           => 5,
+    '#default_value'  => $defaults['slideshow_timeout'],
+    '#description'    => t('Time between transitions (ms). Enter 0 to disable automatic transitions (then, enable pager and/or controls).'),
+    '#required'       => TRUE,
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_order'] = array(
+    '#title'          => t('Order'),
+    '#type'           => 'select',
+    '#default_value'  => $defaults['slideshow_order'],
+    '#empty_option'   => t('Normal'),
+    '#options'        => array(
+      'reverse' => t('Reverse'),
+      'random'  => t('Random'),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_controls'] = array(
+    '#title'          => t('Create prev/next controls'),
+    '#type'           => 'checkbox',
+    '#default_value'  => $defaults['slideshow_controls'],
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_controls_pause'] = array(
+    '#title'          => t('Create play/pause button'),
+    '#type'           => 'checkbox',
+    '#default_value'  => $defaults['slideshow_controls_pause'],
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_controls]"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_controls_position'] = array(
+    '#title'          => t('Prev/next controls position'),
+    '#type'           => 'select',
+    '#options'        => array('before' => 'Before', 'after' => 'After'),
+    '#default_value'  => $defaults['slideshow_controls_position'],
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_controls]"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_pause'] = array(
+    '#title'          => t('Pause on hover'),
+    '#type'           => 'checkbox',
+    '#default_value'  => $defaults['slideshow_pause'],
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_start_on_hover'] = array(
+    '#title'          => t('Activate on hover'),
+    '#type'           => 'checkbox',
+    '#default_value'  => $defaults['slideshow_start_on_hover'],
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_pager'] = array(
+    '#title'          => t('Pager'),
+    '#type'           => 'select',
+    '#options'        => array('number' => 'Slide number', 'image' => 'Image', 'carousel' => 'Carousel'),
+    '#empty_option'   => t('None'),
+    '#default_value'  => $defaults['slideshow_pager'],
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_pager_position'] = array(
+    '#title'          => t('Pager position'),
+    '#type'           => 'select',
+    '#options'        => array('before' => 'Before', 'after' => 'After'),
+    '#default_value'  => $defaults['slideshow_pager_position'],
+    '#states' => array(
+      'invisible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => ''),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_pager_image_style'] = array(
+    '#title'          => t('Pager image style'),
+    '#type'           => 'select',
+    '#default_value'  => $defaults['slideshow_pager_image_style'],
+    '#empty_option'   => t('None (original image)'),
+    '#options'        => image_style_options(FALSE),
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'image'),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_carousel_image_style'] = array(
+    '#title'          => t('Carousel: Image style'),
+    '#type'           => 'select',
+    '#default_value'  => $defaults['slideshow_carousel_image_style'],
+    '#empty_option'   => t('None (original image)'),
+    '#options'        => image_style_options(FALSE),
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_carousel_visible'] = array(
+    '#title'          => t('Carousel: Number of visible images'),
+    '#type'           => 'textfield',
+    '#size'           => 2,
+    '#default_value'  => $defaults['slideshow_carousel_visible'],
+    '#description'    => t('The number of images that are visible in the pager. Defaults to 3.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_carousel_scroll'] = array(
+    '#title'          => t('Carousel: Number of images to scroll by'),
+    '#type'           => 'textfield',
+    '#size'           => 2,
+    '#default_value'  => $defaults['slideshow_carousel_scroll'],
+    '#description'    => t('The number of images scrolled with each click. Defaults to 1.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_carousel_speed'] = array(
+    '#title'          => t('Carousel: Transition speed'),
+    '#type'           => 'textfield',
+    '#size'           => 5,
+    '#default_value'  => $defaults['slideshow_carousel_speed'],
+    '#description'    => t('Speed of the Carousel scroll. Defaults to 500.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+      ),
+    ),
+  );
+
+  $skin_options = array();
+  $path = libraries_get_path('jquery.jcarousel') . '/skins';
+  if (file_exists($path)) {
+    $dirnames = scandir($path);
+    foreach ($dirnames as $dirname) {
+      $dirname = check_plain($dirname);
+      if (is_dir($path . '/' . $dirname) && file_exists($path . '/' . $dirname . '/skin.css')) {
+        $skin_options[$dirname] = $dirname;
+      }
+    }
+    $container['scribble_slideshow_settings']['slideshow_carousel_skin'] = array(
+      '#title'         => t('Carousel Skin'),
+      '#type'          => 'select',
+      '#default_value' => $defaults['slideshow_carousel_skin'],
+      '#options'       => $skin_options,
+      '#empty_option'  => t('None'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+        ),
+      ),
+    );
+  }
+
+  $container['scribble_slideshow_settings']['slideshow_carousel_follow'] = array(
+    '#title'          => t('Follow active slide'),
+    '#type'           => 'checkbox',
+    '#default_value'  => $defaults['slideshow_carousel_follow'],
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_carousel_vertical'] = array(
+    '#title'          => t('Vertical Carousel'),
+    '#type'           => 'checkbox',
+    '#default_value'  => $defaults['slideshow_carousel_vertical'],
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+      ),
+    ),
+  );
+
+  $container['scribble_slideshow_settings']['slideshow_carousel_circular'] = array(
+    '#title'          => t('Circular Carousel'),
+    '#type'           => 'checkbox',
+    '#default_value'  => $defaults['slideshow_carousel_circular'],
+    '#states' => array(
+      'visible' => array(
+        ':input[name$="[slideshow_pager]"]' => array('value' => 'carousel'),
+      ),
+    ),
+  );
+
+}
+
+/**
+ * Theme function for the brush options on the blackboard toolbar.
+ */
+function theme_scribble_brush_options($variables) {
+  $first = TRUE;
+  $markup = '';
+  foreach ($variables['brushes'] as $brush_id => $label) {
+    $markup .= '<input type="radio" id="' . $brush_id . '" name="brushes-btns" ';
+    if ($first) {
+      $markup .= 'checked="checked"';
+      $first = FALSE;
+    }
+    $markup .= ' /><label for="' . $brush_id . '">'  . $label . '</label>';
+  }
+  return $markup;
 }
