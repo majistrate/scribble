@@ -289,8 +289,6 @@ function scribble_remove_image_form_submit($form, &$form_state) {
  *
  * @return array
  *   Renderable array of the scribble_image field.
- *
- * @todo make this configurable per entity.
  */
 function scribble_snapshot_slideshow_page($scribble) {
   // Check if there are any images drawn on the scribble yet.

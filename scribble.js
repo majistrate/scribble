@@ -1,5 +1,4 @@
 (function($) {
-//@todo make the canvas class configurable in the UI and it add as var to JS settings
   /**
    * Behavior for scribble module.
    */
