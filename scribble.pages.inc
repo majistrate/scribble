@@ -23,6 +23,9 @@ function scribble_configuration_form($form, &$form_state) {
 
 /**
  * Page callback for the blackboard.
+ *
+ * @param object $scribble
+ *   The loaded scribble entity.
  */
 function scribble_blackboard_page($scribble) {
   return entity_view('scribble', array($scribble));
