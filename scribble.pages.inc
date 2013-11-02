@@ -15,11 +15,14 @@ function scribble_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('scribble_allow_image_injection', 0),
   );
 
+  // Include slideshow settings.
+  scribble_add_slideshow_settings_elements($form, variable_get('scribble_slideshow_settings'));
+
   return system_settings_form($form);
 }
 
 /**
- * Form callback that contains the blackboard.
+ * Page callback for the blackboard.
  */
 function scribble_blackboard_page($scribble) {
   return entity_view('scribble', array($scribble));
@@ -293,50 +296,21 @@ function scribble_snapshot_slideshow_page($scribble) {
   // Check if there are any images drawn on the scribble yet.
   $items = field_get_items('scribble', $scribble, 'scribble_image');
   if (!$items) {
-    return array(
-      '#markup' => t('No images were drawn on this scribble yet.'),
-    );
+    return array('#markup' => t('No images were drawn on this scribble yet.'));
   }
 
-  $display = array(
+  $display_settings = array(
     'label' => 'hidden',
     'type' => 'slideshow',
     'weight' => '-1',
-    'settings' => array(
-      'slideshow_image_style' => '',
-      'slideshow_link' => '',
-      'slideshow_caption' => '',
-      'slideshow_caption_link' => '',
-      'slideshow_fx' => 'fade',
-      'slideshow_speed' => 11,
-      'slideshow_timeout' => 20,
-      'slideshow_order' => '',
-      'slideshow_controls' => 0,
-      'slideshow_controls_pause' => 1,
-      'slideshow_controls_position' => 'after',
-      'slideshow_pause' => 1,
-      'slideshow_start_on_hover' => 0,
-      'slideshow_pager' => 'image',
-      'slideshow_pager_position' => 'after',
-      'slideshow_pager_image_style' => 'thumbnail',
-      'slideshow_carousel_image_style' => '',
-      'slideshow_carousel_visible' => '3',
-      'slideshow_carousel_scroll' => '1',
-      'slideshow_carousel_speed' => '500',
-      'slideshow_carousel_skin' => '',
-      'slideshow_carousel_follow' => 0,
-      'slideshow_carousel_vertical' => 0,
-      'slideshow_carousel_circular' => 0,
-      'slideshow_colorbox_image_style' => '',
-      'slideshow_colorbox_slideshow' => '',
-      'slideshow_colorbox_slideshow_speed' => '4000',
-      'slideshow_colorbox_transition' => 'elastic',
-      'slideshow_colorbox_speed' => '350',
-      'slideshow_field_collection_image' => '',
-    ),
+    'settings' => $scribble->scribble_slideshow_settings,
     'module' => 'field_slideshow',
   );
-  return field_view_field('scribble', $scribble, 'scribble_image', $display);
+
+  return theme('scribble_slideshow', array(
+    'scribble' => $scribble,
+    'slideshow' => field_view_field('scribble', $scribble, 'scribble_image', $display_settings),
+  ));
 }
 
 /**
