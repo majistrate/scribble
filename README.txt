@@ -1,11 +1,11 @@
 
 -- SUMMARY --
 
-This module provides a entity based blackboards using HTML canvas elements.
+This module provides entity based blackboards using HTML canvas elements.
 Visitors that have the permission can draw onto those blackboards and save their
-changes to an image field on the scribble entity.
+changes to an image field on a scribble entity.
 
-Besides that the images can be displayed as slideshows, managed and also down-
+Besides that, the images can be displayed as slideshows, managed and also down-
 loaded by administrators.
 
 Think of it as a plaster on which people write their message when you broke your
