@@ -1,3 +1,8 @@
+/**
+ * @file
+ * Contains javascript code for the scribble module.
+ */
+
 (function($) {
   /**
    * Behavior for scribble module.

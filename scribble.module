@@ -520,7 +520,7 @@ function scribble_create_blank_image_filled($scribble) {
 function scribble_convert_hex_to_rgb($hex) {
   $hex = str_replace("#", "", $hex);
 
-  if(strlen($hex) == 3) {
+  if (strlen($hex) == 3) {
     $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
     $g = hexdec(str_repeat(substr($hex, 0, 1), 2));
     $b = hexdec(str_repeat(substr($hex, 0, 1), 2));
@@ -893,7 +893,7 @@ function theme_scribble_brush_options($variables) {
       $markup .= 'checked="checked"';
       $first = FALSE;
     }
-    $markup .= ' /><label for="' . $brush_id . '">'  . $label . '</label>';
+    $markup .= ' /><label for="' . $brush_id . '">' . $label . '</label>';
   }
   return $markup;
 }
