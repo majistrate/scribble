@@ -158,7 +158,7 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
   // Add info text and snapshot that will be removed.
   $info_text = t('The snapshot below will be removed from all following scribble images of the images created after the deleted will be recreated.');
   $backup_text = t('You can backup your images by downloading them !link before you delete the images.', array(
-    '!link' => l('here', 'scribble/' . $scribble->sid . '/download'),
+    '!link' => l(t('here'), 'scribble/' . $scribble->sid . '/download'),
   ));
   $form['info_wrapper'] = array(
     '#type' => 'container',
@@ -181,7 +181,7 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
   ));
   // Redirect to image list if action get cancelled by the user.
   $path = 'admin/config/media/scribble/' . $scribble->sid . '/image-list';
-  return confirm_form($form, $question, $path);
+  return confirm_form($form, check_plain($question), $path);
 }
 
 /**
@@ -249,8 +249,8 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         imagecopy($merge_base_resource, $merge_snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
         // imagepng can't deal with stream wrapper uris, create a path.
-        $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] .  '_' . date('d-m-Y_H-i-s') . '.png';
-        $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') .  DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
+        $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.png';
+        $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
         imagepng($merge_base_resource, $file_path);
 
         // Get rid of the resources in order to use the variables again.

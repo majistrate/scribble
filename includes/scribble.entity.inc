@@ -87,7 +87,7 @@ class Scribble extends Entity {
 
       // @todo add pager.
       $content = array(
-        '#theme' =>'table',
+        '#theme' => 'table',
         '#header' => $headers,
         '#rows' => $rows,
         '#empty' => t('No images were drawn on this scribble yet.'),
