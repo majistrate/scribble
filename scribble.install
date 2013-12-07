@@ -66,6 +66,12 @@ function scribble_schema() {
         'size' => 'tiny',
         'description' => 'The exportable status of the entity.',
       ),
+      'module' => array(
+        'description' => 'The name of the providing module if the entity has been defined in code.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
       'changed' => array(
         'type' => 'int',
         'not null' => TRUE,
