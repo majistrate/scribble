@@ -10,24 +10,24 @@
  */
 function scribble_menu() {
   $items['scribble/%scribble/blackboard'] = array(
-    'title' => 'Scribble blackboard',
-    // @todo 'title callback' => '',
+    'title callback' => 'scribble_page_title',
+    'title arguments' => array(1),
     'page callback' => 'scribble_blackboard_page',
     'page arguments' => array(1),
     'access arguments' => array('access scribbles'),
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/%scribble/slideshow'] = array(
-    'title' => 'Scribble slideshow',
-    // @todo 'title callback' => '',
+    'title callback' => 'scribble_page_title',
+    'title arguments' => array(1, t('Slideshow')),
     'page callback' => 'scribble_snapshot_slideshow_page',
     'page arguments' => array(1),
     'access arguments' => array('access scribbles'),
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/%scribble/download'] = array(
-    'title' => 'Scribble download',
-    // @todo 'title callback' => '',
+    'title callback' => 'scribble_page_title',
+    'title arguments' => array(1, t('Download images')),
     'page callback' => 'scribble_get_images_archive',
     'page arguments' => array(1),
     'access arguments' => array('administer scribbles'),
@@ -52,16 +52,16 @@ function scribble_menu() {
     'type' => MENU_LOCAL_TASK,
   );
   $items['admin/config/media/scribble/%scribble/image-list'] = array(
-    'title' => 'Manage scribble images',
-    // @todo 'title callback' => '',
+    'title callback' => 'scribble_page_title',
+    'title arguments' => array(4, t('Manage images')),
     'page callback' => 'scribble_image_list_page',
     'page arguments' => array(4),
     'access arguments' => array('administer scribbles'),
     'file' => 'scribble.pages.inc',
   );
   $items['admin/config/media/scribble/%scribble/remove-image/%'] = array(
-    'title' => 'Remove image',
-    // @todo 'title callback' => '',
+    'title callback' => 'scribble_page_title',
+    'title arguments' => array(4, t('Remove image')),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('scribble_remove_image_form', 4, 6),
     'access arguments' => array('administer scribbles'),
@@ -197,6 +197,23 @@ function scribble_permission() {
       'title' => t('Administer Scribbles and settings.'),
     ),
   );
+}
+
+/**
+ * Title callback for scribble pages.
+ *
+ * @param object $scribble
+ *   The loaded scribble entity object.
+ * @param string $title
+ *
+ */
+function scribble_page_title($scribble, $title = NULL) {
+  $items = field_get_items('scribble', $scribble, 'scribble_title');
+  $return = $items[0]['value'];
+  if ($title) {
+    $return .= ' | ' . $title;
+  }
+  return $return;
 }
 
 /**
