@@ -1,6 +1,8 @@
 <?php
 /**
- * Template for the scribble blackboard.
+ * @file
+ * Template for the scribble slideshow.
+ *
  * @todo document available variables.
  */
 

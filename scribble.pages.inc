@@ -175,7 +175,7 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
 
   // Load the file to display its name in the question.
   $file = file_load($fid);
-  $question =  t('Are you sure to remove image !image from scribble !scribble?', array(
+  $question = t('Are you sure to remove image !image from scribble !scribble?', array(
     '!image' => $file->filename,
     '!scribble' => $scribble->label,
   ));
@@ -200,7 +200,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
   // Delete the image and the transparent snapshot files and field items.
   foreach (array('scribble_image', 'scribble_image_snapshots') as $field_name) {
     $items = field_get_items('scribble', $scribble, $field_name);
-    // Loop field values to find the file
+    // Loop field values to find the file.
     foreach ($items as $delta => $item) {
       if ($item['fid'] == $fid) {
         // Save the id of the last clean file for later.
@@ -248,7 +248,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         $merge_snapshot_resource = imagecreatefrompng($item['uri']);
         imagecopy($merge_base_resource, $merge_snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
-        // imagepng can't deal with stream wrapper uris, create a path.
+        // Imagepng() can't deal with stream wrapper uris, create a path.
         $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.png';
         $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
         imagepng($merge_base_resource, $file_path);
@@ -259,7 +259,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
 
         // Update the image file also in the db.
         $file = file_load($item['fid'] + 1);
-        // Delete the old file
+        // Delete the old file.
         unlink($file->uri);
         // Save the file with the updated image name and uri.
         $file->uri = 'public://scribble' . DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;

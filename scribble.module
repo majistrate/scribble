@@ -73,15 +73,14 @@ function scribble_menu() {
 
 /*
  * Implements hook_library().
- * variable_get('scribble_save_dropped_img', FALSE),
  */
 function scribble_library() {
   $settings = array(
     'scribble' => array(
       'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
-      'addURL' =>  url('scribble/add', array('absolute' => TRUE)),
-     ),
+      'addURL' => url('scribble/add', array('absolute' => TRUE)),
+    ),
   );
   $libraries['jqscribble'] = array(
     'title' => t('JQScribble'),
@@ -205,7 +204,7 @@ function scribble_permission() {
  * @param object $scribble
  *   The loaded scribble entity object.
  * @param string $title
- *
+ *   The title of the page.
  */
 function scribble_page_title($scribble, $title = NULL) {
   $items = field_get_items('scribble', $scribble, 'scribble_title');
@@ -223,15 +222,17 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
   switch ($op) {
     case 'view':
       return user_access('access scribbles', $account);
+
     default:
       return user_access('administer scribbles', $account);
+
   }
 }
 
 /**
  * Getter for the latest scribble image.
  *
- * @return
+ * @return string
  *   Filename of the newest file or NULL if none was found.
  */
 function scribble_get_newest($sid) {
@@ -386,7 +387,7 @@ function scribble_load_multiple($sids = array(), $conditions = array(), $reset =
 }
 
 /**
- * View callback for scribble entities
+ * View callback for scribble entities.
  */
 function scribble_view($entities, $view_mode, $langcode, $entity_type) {
   $output = '';
@@ -402,9 +403,9 @@ function scribble_view($entities, $view_mode, $langcode, $entity_type) {
  *
  * @param string $file_path
  *   The filepath of the image to save.
- * @param $scribble
+ * @param object $scribble
  *   The scribble entity to save the image into.
- * @param $field_name
+ * @param string $field_name
  *   The field on the entity that the image gets saved into.
  */
 function scribble_add_image_to_scribble_field($file_path, $scribble, $field_name) {
@@ -461,7 +462,13 @@ function scribble_prepare_folders($scribble_id) {
   if (!file_exists($snapshot_path)) {
     drupal_mkdir($snapshot_path, 0777);
   }
-  return array($scribble, $path, $snapshot_path, $file_name, $snapshot_file_name);
+  return array(
+    $scribble,
+    $path,
+    $snapshot_path,
+    $file_name,
+    $snapshot_file_name
+  );
 }
 
 /**
@@ -478,7 +485,7 @@ function scribble_prepare_folders($scribble_id) {
  *   The path of the scribble entity image folder.
  * @param string $file_name
  *   The file name of the scribble image.
- * @param $snapshot_file_name
+ * @param string $snapshot_file_name
  *   The file name of the scribble snapshot.
  */
 function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path, $file_name, $snapshot_file_name) {
@@ -528,7 +535,7 @@ function scribble_create_blank_image_filled($scribble) {
 /**
  * Converts a hexadecimal color code into RGB values.
  *
- * @param $hex
+ * @param string $hex
  *   The hexadecimal color code with or without leading #.
  *
  * @return array
@@ -733,7 +740,7 @@ function scribble_add_slideshow_settings_elements(&$container, $defaults) {
   $container['scribble_slideshow_settings']['slideshow_controls_position'] = array(
     '#title'          => t('Prev/next controls position'),
     '#type'           => 'select',
-    '#options'        => array('before' => 'Before', 'after' => 'After'),
+    '#options'        => array('before' => t('Before'), 'after' => t('After')),
     '#default_value'  => $defaults['slideshow_controls_position'],
     '#states' => array(
       'visible' => array(
@@ -757,7 +764,11 @@ function scribble_add_slideshow_settings_elements(&$container, $defaults) {
   $container['scribble_slideshow_settings']['slideshow_pager'] = array(
     '#title'          => t('Pager'),
     '#type'           => 'select',
-    '#options'        => array('number' => 'Slide number', 'image' => 'Image', 'carousel' => 'Carousel'),
+    '#options'        => array(
+      'number' => t('Slide number'),
+      'image' => t('Image'),
+      'carousel' => t('Carousel')
+    ),
     '#empty_option'   => t('None'),
     '#default_value'  => $defaults['slideshow_pager'],
   );
@@ -765,7 +776,7 @@ function scribble_add_slideshow_settings_elements(&$container, $defaults) {
   $container['scribble_slideshow_settings']['slideshow_pager_position'] = array(
     '#title'          => t('Pager position'),
     '#type'           => 'select',
-    '#options'        => array('before' => 'Before', 'after' => 'After'),
+    '#options'        => array('before' => t('Before'), 'after' => t('After')),
     '#default_value'  => $defaults['slideshow_pager_position'],
     '#states' => array(
       'invisible' => array(

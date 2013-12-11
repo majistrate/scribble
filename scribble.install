@@ -9,10 +9,6 @@
  * Implements hook_requirements().
  *
  * Checks if the jqscribble library is in the libraries folder.
- *
- * @param $phase
- *   The phase in which requirements are checked.
- * @return array
  */
 function scribble_requirements($phase) {
   $requirements = array();
@@ -20,7 +16,7 @@ function scribble_requirements($phase) {
   $t = get_t();
 
   if (in_array($phase, array('install', 'runtime')) && !file_exists(libraries_get_path('jqscribble') . '/jquery.jqscribble.js')) {
-  // Check if the jqscribble library is available.
+    // Check if the jqscribble library is available.
     $requirements['jqscribble'] = array(
       'title' => $t('JQScribble Library'),
       'severity' => REQUIREMENT_ERROR,

@@ -1,5 +1,6 @@
 <?php
 /**
+ * @file
  * Template for the scribble blackboard.
  * @todo document available variables.
  */

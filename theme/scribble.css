@@ -1,4 +1,3 @@
-
 /**
  * @file
  * Default styles for scribble toolbar.
@@ -43,7 +42,7 @@ hr.scribble-separator {
   height: 20px;
   width: 32px;
   display: inline-block;
-  background-color: #FFF;
+  background-color: #fff;
   vertical-align: middle;
   margin-bottom: 5px;
   margin-left: 13px;
