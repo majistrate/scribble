@@ -1,9 +1,16 @@
 <?php
-
 /**
  * @file
  * Provides an integration for the JQScribble library for Drupal.
  */
+
+/*
+ * Constants for the scribble title callback.
+ */
+define('SCRIBBLE_TITLE_SLIDESHOW', 1);
+define('SCRIBBLE_TITLE_DOWNLOAD', 2);
+define('SCRIBBLE_TITLE_IMAGE_LIST', 3);
+define('SCRIBBLE_TITLE_REMOVE_IMAGE', 4);
 
 /**
  * Implements hook_menu().
@@ -19,7 +26,7 @@ function scribble_menu() {
   );
   $items['scribble/%scribble/slideshow'] = array(
     'title callback' => 'scribble_page_title',
-    'title arguments' => array(1, t('Slideshow')),
+    'title arguments' => array(1, SCRIBBLE_TITLE_SLIDESHOW),
     'page callback' => 'scribble_snapshot_slideshow_page',
     'page arguments' => array(1),
     'access arguments' => array('access scribbles'),
@@ -27,7 +34,7 @@ function scribble_menu() {
   );
   $items['scribble/%scribble/download'] = array(
     'title callback' => 'scribble_page_title',
-    'title arguments' => array(1, t('Download images')),
+    'title arguments' => array(1, SCRIBBLE_TITLE_DOWNLOAD),
     'page callback' => 'scribble_get_images_archive',
     'page arguments' => array(1),
     'access arguments' => array('administer scribbles'),
@@ -53,7 +60,7 @@ function scribble_menu() {
   );
   $items['admin/config/media/scribble/%scribble/image-list'] = array(
     'title callback' => 'scribble_page_title',
-    'title arguments' => array(4, t('Manage images')),
+    'title arguments' => array(4, SCRIBBLE_TITLE_IMAGE_LIST),
     'page callback' => 'scribble_image_list_page',
     'page arguments' => array(4),
     'access arguments' => array('administer scribbles'),
@@ -61,7 +68,7 @@ function scribble_menu() {
   );
   $items['admin/config/media/scribble/%scribble/remove-image/%'] = array(
     'title callback' => 'scribble_page_title',
-    'title arguments' => array(4, t('Remove image')),
+    'title arguments' => array(4, SCRIBBLE_TITLE_REMOVE_IMAGE),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('scribble_remove_image_form', 4, 6),
     'access arguments' => array('administer scribbles'),
@@ -206,11 +213,12 @@ function scribble_permission() {
  * @param string $title
  *   The title of the page.
  */
-function scribble_page_title($scribble, $title = NULL) {
+function scribble_page_title($scribble, $title_part_key = NULL) {
   $items = field_get_items('scribble', $scribble, 'scribble_title');
   $return = $items[0]['value'];
-  if ($title) {
-    $return .= ' | ' . $title;
+  $title_parts = scribble_get_menu_title_parts();
+  if ($title_part_key && array_key_exists($title_part_key, $title_parts)) {
+    $return .= ' | ' . $title_parts[$title_part_key];
   }
   return $return;
 }
@@ -907,6 +915,20 @@ function scribble_add_slideshow_settings_elements(&$container, $defaults) {
     ),
   );
 
+}
+
+/**
+ * Getter for the mapping menu titles.
+ *
+ * Maps constants to translatable parts of menu titles.
+ */
+function scribble_get_menu_title_parts() {
+  return array(
+    SCRIBBLE_TITLE_SLIDESHOW => t('Slideshow'),
+    SCRIBBLE_TITLE_DOWNLOAD => t('Download images'),
+    SCRIBBLE_TITLE_IMAGE_LIST => t('Manage images'),
+    SCRIBBLE_TITLE_REMOVE_IMAGE => t('Remove image'),
+  );
 }
 
 /**
