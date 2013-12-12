@@ -319,7 +319,7 @@ function scribble_snapshot_slideshow_page($scribble) {
  *
  * Sends the archive with the images to the browser for downloading.
  *
- * @param $scribble
+ * @param object $scribble
  *   The loaded scribble entity.
  */
 function scribble_get_images_archive($scribble) {

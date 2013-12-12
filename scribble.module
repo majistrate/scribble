@@ -78,7 +78,7 @@ function scribble_menu() {
   return $items;
 }
 
-/*
+/**
  * Implements hook_library().
  */
 function scribble_library() {
@@ -210,7 +210,7 @@ function scribble_permission() {
  *
  * @param object $scribble
  *   The loaded scribble entity object.
- * @param string $title
+ * @param int $title_part_key
  *   The title of the page.
  */
 function scribble_page_title($scribble, $title_part_key = NULL) {
@@ -440,7 +440,7 @@ function scribble_add_image_to_scribble_field($file_path, $scribble, $field_name
  * in the public file files folder. If none exists, the directories will get
  * created.
  *
- * @param $scribble_id
+ * @param int $scribble_id
  *   The id of the scribble entity.
  *
  * @return array
@@ -475,7 +475,7 @@ function scribble_prepare_folders($scribble_id) {
     $path,
     $snapshot_path,
     $file_name,
-    $snapshot_file_name
+    $snapshot_file_name,
   );
 }
 
@@ -775,7 +775,7 @@ function scribble_add_slideshow_settings_elements(&$container, $defaults) {
     '#options'        => array(
       'number' => t('Slide number'),
       'image' => t('Image'),
-      'carousel' => t('Carousel')
+      'carousel' => t('Carousel'),
     ),
     '#empty_option'   => t('None'),
     '#default_value'  => $defaults['slideshow_pager'],
