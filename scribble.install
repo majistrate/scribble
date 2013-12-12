@@ -299,12 +299,12 @@ function scribble_uninstall() {
   field_delete_field('scribble_image_snapshots');
   field_delete_field('scribble_background_color');
 
-  // @todo
-  // field_delete_instance();
-
   // Delete module variables.
   variable_del('scribble_files_directory');
   variable_del('scribble_slideshow_settings');
   variable_del('scribble_allow_image_injection');
   variable_del('scribble_image_list_image_style');
+
+  // @todo
+  // field_delete_instance();
 }
