@@ -340,7 +340,12 @@ function scribble_form($form, &$form_state, $scribble) {
  * Returns whether a machine name already exists.
  */
 function scribble_check_existing_machine_name($value) {
-  return db_query_range('SELECT 1 FROM {scribble} WHERE name = :name', 0, 1, array(':name' => $value))->fetchField();
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', 'scribble')
+    ->propertyCondition('name', $value)
+    ->execute();
+
+  return !empty($result['scribble']);
 }
 
 /**
