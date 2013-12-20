@@ -250,7 +250,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
 
         // Imagepng() can't deal with stream wrapper uris, create a path.
         $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.png';
-        $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
+        $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $scribble->sid . '/' . $file_name;
         imagepng($merge_base_resource, $file_path);
 
         // Get rid of the resources in order to use the variables again.
@@ -262,7 +262,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         // Delete the old file.
         unlink($file->uri);
         // Save the file with the updated image name and uri.
-        $file->uri = 'public://scribble' . DIRECTORY_SEPARATOR . $scribble->sid . DIRECTORY_SEPARATOR . $file_name;
+        $file->uri = 'public://scribble' . '/' . $scribble->sid . '/' . $file_name;
         $file->filename = $file_name;
         file_save($file);
 
