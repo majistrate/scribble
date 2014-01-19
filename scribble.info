@@ -4,6 +4,7 @@ package = Other
 core = 7.x
 configure = admin/config/user-interface/scribble
 
+dependencies[] = entity
 dependencies[] = field_slideshow
 dependencies[] = jquery_colorpicker
 
