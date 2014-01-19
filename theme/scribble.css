@@ -26,6 +26,10 @@
   float: right;
 }
 
+.scribble-brushes * {
+  float: left;
+}
+
 .scribble-brush-size {
   width: 56%;
   display: inline-block;
@@ -33,7 +37,7 @@
   vertical-align: middle;
 }
 
-hr.scribble-separator {
+.scribble-separator {
   height: auto;
   border: 1px inset;
 }
