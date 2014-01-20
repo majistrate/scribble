@@ -7,10 +7,9 @@
 /*
  * Constants for the scribble title callback.
  */
-define('SCRIBBLE_TITLE_SLIDESHOW', 1);
-define('SCRIBBLE_TITLE_DOWNLOAD', 2);
-define('SCRIBBLE_TITLE_IMAGE_LIST', 3);
-define('SCRIBBLE_TITLE_REMOVE_IMAGE', 4);
+define('SCRIBBLE_TITLE_SLIDESHOW', 'slideshow');
+define('SCRIBBLE_TITLE_IMAGE_LIST', 'image_list');
+define('SCRIBBLE_TITLE_REMOVE_IMAGE', 'remove_image');
 
 /**
  * Implements hook_menu().
@@ -33,8 +32,6 @@ function scribble_menu() {
     'file' => 'scribble.pages.inc',
   );
   $items['scribble/%scribble/download'] = array(
-    'title callback' => 'scribble_page_title',
-    'title arguments' => array(1, SCRIBBLE_TITLE_DOWNLOAD),
     'page callback' => 'scribble_get_images_archive',
     'page arguments' => array(1),
     'access arguments' => array('administer scribbles'),
@@ -930,7 +927,6 @@ function scribble_add_slideshow_settings_elements(&$container, $defaults) {
 function scribble_get_menu_title_parts() {
   return array(
     SCRIBBLE_TITLE_SLIDESHOW => t('Slideshow'),
-    SCRIBBLE_TITLE_DOWNLOAD => t('Download images'),
     SCRIBBLE_TITLE_IMAGE_LIST => t('Manage images'),
     SCRIBBLE_TITLE_REMOVE_IMAGE => t('Remove image'),
   );
