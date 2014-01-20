@@ -468,7 +468,7 @@ function scribble_prepare_folders($scribble_id) {
   if (!file_exists($path)) {
     drupal_mkdir($path, 0777);
   }
-  $snapshot_path = $path . 'snapshots' . '/';
+  $snapshot_path = $path . 'snapshots/';
   if (!file_exists($snapshot_path)) {
     drupal_mkdir($snapshot_path, 0777);
   }
