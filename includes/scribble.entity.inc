@@ -34,7 +34,6 @@ class Scribble extends Entity {
           '#attached' => array(
             'library' => array(
               array('system', 'ui.draggable'),
-              array('system', 'farbtastic'),
               array('system', 'ui.slider'),
               array('system', 'ui.button'),
               array('system', 'ui.dialog'),

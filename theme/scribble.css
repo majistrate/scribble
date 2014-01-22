@@ -21,6 +21,10 @@
   margin-right: 10px;
 }
 
+.ui-dialog .scribble-color-picker.ui-dialog-content {
+  padding: 0.5em 0;
+}
+
 .scribble-brushes {
   display: inline-block;
   float: right;

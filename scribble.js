@@ -66,7 +66,6 @@
     $('.scribble-brushes').buttonset();
 
     if (current_file != '' && current_file !== undefined && current_file !== null) {
-      console.log('BLABLA');
       // Load the newest image as background in the wrapper element of canvas.
       $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
     }
@@ -75,16 +74,20 @@
 
     // Add the color picker.
     $('.scribble-color-picker')
-      .farbtastic(function (color) {
-        $draw_canvas.data("jqScribble").update({brushColor: color});
-        $('.scribble-color-display').css('background-color', color);
-      }, '.scribble-color-display')
+      .ColorPicker({
+        flat: true,
+        onChange: function(hsb, hex, rgb) {
+          var html_color = '#' + hex;
+          $draw_canvas.data("jqScribble").update({brushColor: html_color});
+          $('.scribble-color-display').css('background-color', html_color);
+        }
+      })
       .dialog({
         draggable: true,
         title: Drupal.t('Choose your color'),
         autoOpen: false,
         resizable: false,
-        width: 220,
+        width: 356,
         hide: "explode"
       });
 
