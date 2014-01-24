@@ -138,9 +138,9 @@ function scribble_theme($existing, $type, $theme, $path) {
       'path' => drupal_get_path('module', 'scribble') . '/theme',
     ),
     'scribble_brush_options' => array(
-      'variables' => array(
-        'brushes' => array(),
-      ),
+      'variables' => array('brushes' => array()),
+      'template' => 'scribble-brush-options',
+      'path' => drupal_get_path('module', 'scribble') . '/theme',
     ),
     'scribble_slideshow' => array(
       'variables' => array(
@@ -937,21 +937,4 @@ function scribble_get_menu_title_parts() {
     SCRIBBLE_TITLE_IMAGE_LIST => t('Manage images'),
     SCRIBBLE_TITLE_REMOVE_IMAGE => t('Remove image'),
   );
-}
-
-/**
- * Theme function for the brush options on the blackboard toolbar.
- */
-function theme_scribble_brush_options($variables) {
-  $first = TRUE;
-  $markup = '';
-  foreach ($variables['brushes'] as $brush_id => $label) {
-    $markup .= '<input type="radio" id="' . $brush_id . '" name="brushes-btns" ';
-    if ($first) {
-      $markup .= 'checked="checked"';
-      $first = FALSE;
-    }
-    $markup .= ' /><label for="' . $brush_id . '">' . $label . '</label>';
-  }
-  return $markup;
 }
