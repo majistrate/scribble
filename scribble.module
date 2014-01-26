@@ -464,21 +464,19 @@ function scribble_prepare_folders($scribble_id) {
   $snapshot_file_name = 'scribble_snapshot_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
 
   // Create directory on runtime if it doesn't exists.
-  $path = variable_get('file_public_path', 'sites/default/files') . '/scribble';
-  if (!file_exists($path)) {
-    drupal_mkdir($path, 0777);
+  $base_path = variable_get('file_public_path', 'sites/default/files') . '/scribble';
+  $path = $base_path;
+  file_prepare_directory($path, FILE_CREATE_DIRECTORY);
+  if (variable_get('scribble_files_directory', FALSE)) {
     variable_set('scribble_files_directory', $path);
   }
 
   // Create a separate folder for the entity if it doesn't exist.
-  $path = $path . '/' . $scribble_id . '/';
-  if (!file_exists($path)) {
-    drupal_mkdir($path, 0777);
-  }
-  $snapshot_path = $path . 'snapshots/';
-  if (!file_exists($snapshot_path)) {
-    drupal_mkdir($snapshot_path, 0777);
-  }
+  $path = $base_path . '/' . $scribble_id;
+  file_prepare_directory($path, FILE_CREATE_DIRECTORY);
+  $snapshot_path = $base_path . '/' . $scribble_id . '/snapshots';
+  file_prepare_directory($snapshot_path, FILE_CREATE_DIRECTORY);
+
   return array(
     $scribble,
     $path,
@@ -520,7 +518,7 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   imagecopy($background_resource, $snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
   // Write the new scribble image file and destroy resources.
-  imagepng($background_resource, $path . $file_name, 0);
+  imagepng($background_resource, $path . '/' . $file_name, 0);
   imagedestroy($background_resource);
   imagedestroy($snapshot_resource);
 

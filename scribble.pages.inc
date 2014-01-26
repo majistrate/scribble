@@ -72,12 +72,12 @@ function scribble_save_ajax() {
     // Make the background transparent.
     imagesavealpha($snapshot_resource, TRUE);
     // Write the snapshot file.
-    imagepng($snapshot_resource, $snapshot_path . $snapshot_file_name);
+    imagepng($snapshot_resource, $snapshot_path . '/' . $snapshot_file_name);
 
     // Merge the created snapshot with the latest image. This is necessary
     // because there might be a newer image saved than the loaded background
     // on the scribble. That way, overwriting the latest image is prevented.
-    $snapshot_resource = imagecreatefrompng($snapshot_path . $snapshot_file_name);
+    $snapshot_resource = imagecreatefrompng($snapshot_path . '/' . $snapshot_file_name);
     scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path, $file_name, $snapshot_file_name);
 
     // Print new filename as JSON to update the div behind the canvas.
@@ -123,7 +123,7 @@ function scribble_add_ajax() {
 
     // Merge the image that gets added to the transparent background.
     imagecopy($snapshot_resource, $add_img_resource, $_POST['dst_x'], $_POST['dst_y'], 0, 0, $_POST['img_width'], $_POST['img_height']);
-    imagepng($snapshot_resource, $snapshot_path . $snapshot_file_name);
+    imagepng($snapshot_resource, $snapshot_path . '/' . $snapshot_file_name);
 
     // Merge the snapshot file with the newest or a blank image.
     scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path, $file_name, $snapshot_file_name);
