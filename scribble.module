@@ -507,7 +507,7 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   // If there is already an existing image on the scribble, use this as base
   // for the merge.
   if ($latest_file_name = scribble_get_newest($scribble->sid)) {
-    $background_resource = imagecreatefrompng($path . $latest_file_name);
+    $background_resource = imagecreatefrompng($path . '/' . $latest_file_name);
   }
   // No image exists yet on the scribble, create a plain image with background
   // color as configured and use it that as base for the merge.
