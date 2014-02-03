@@ -331,6 +331,11 @@ function scribble_form($form, &$form_state, $scribble) {
   $form['scribble_image']['#access'] = FALSE;
   $form['scribble_image_snapshots']['#access'] = FALSE;
 
+  // Background color is only intended to be set when creating a new scribble.
+  if (!empty($sid)) {
+    $form['scribble_background_color']['#access'] = FALSE;
+  }
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save scribble'),
