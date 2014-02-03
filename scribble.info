@@ -2,7 +2,7 @@ name = Scribble
 description = "Provides scribble pages on html canvas using the JQScribble library."
 package = Other
 core = 7.x
-configure = admin/config/user-interface/scribble
+configure = admin/config/media/scribble
 
 dependencies[] = entity
 dependencies[] = field_slideshow
