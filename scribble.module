@@ -465,7 +465,7 @@ function scribble_prepare_folders($scribble_id) {
   $scribble = entity_load_single('scribble', $scribble_id);
 
   // Create filenames.
-  $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
+  $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.jpg';
   $snapshot_file_name = 'scribble_snapshot_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
 
   // Create directory on runtime if it doesn't exists.
@@ -523,7 +523,7 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   imagecopy($background_resource, $snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
   // Write the new scribble image file and destroy resources.
-  imagepng($background_resource, $path . '/' . $file_name, 0);
+  imagejpeg($background_resource, $path . '/' . $file_name, 0);
   imagedestroy($background_resource);
   imagedestroy($snapshot_resource);
 

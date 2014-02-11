@@ -219,7 +219,8 @@ function scribble_remove_image_form_submit($form, &$form_state) {
           else {
             // The deleted image isn't the first nor the last image of the
             // scribble, so the base image is the one before the deleted image.
-            $merge_base_resource = imagecreatefrompng($items[$delta - 1]['uri']);
+            $function = $field_name == 'scribble_image' ? 'imagecreatefromjpeg' : 'imagecreatefrompng';
+            $merge_base_resource = $function($items[$delta - 1]['uri']);
             $merge_base_fid = $items[$delta - 1]['fid'];
           }
         }
@@ -249,9 +250,10 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         imagecopy($merge_base_resource, $merge_snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
         // Imagepng() can't deal with stream wrapper uris, create a path.
-        $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.png';
+        $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.jpg';
         $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $scribble->sid . '/' . $file_name;
-        imagepng($merge_base_resource, $file_path);
+        // Write the new merged image to the concatenated path.
+        imagejpeg($merge_base_resource, $file_path);
 
         // Get rid of the resources in order to use the variables again.
         imagedestroy($merge_base_resource);
