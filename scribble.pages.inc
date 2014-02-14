@@ -253,7 +253,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.jpg';
         $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $scribble->sid . '/' . $file_name;
         // Write the new merged image to the concatenated path.
-        imagejpeg($merge_base_resource, $file_path);
+        imagejpeg($merge_base_resource, $file_path, variable_get('scribble_image_jpeg_quality', 100));
 
         // Get rid of the resources in order to use the variables again.
         imagedestroy($merge_base_resource);

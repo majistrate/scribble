@@ -512,7 +512,7 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   // If there is already an existing image on the scribble, use this as base
   // for the merge.
   if ($latest_file_name = scribble_get_newest($scribble->sid)) {
-    $background_resource = imagecreatefrompng($path . '/' . $latest_file_name);
+    $background_resource = imagecreatefromjpeg($path . '/' . $latest_file_name);
   }
   // No image exists yet on the scribble, create a plain image with background
   // color as configured and use it that as base for the merge.
@@ -523,7 +523,12 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   imagecopy($background_resource, $snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
   // Write the new scribble image file and destroy resources.
-  imagejpeg($background_resource, $path . '/' . $file_name, 0);
+  //if (variable_get('scribble_image_file_type', 'jpeg') == 'jpg') {
+    imagejpeg($background_resource, $path . '/' . $file_name, variable_get('scribble_image_jpeg_quality', 100));
+  /*}
+  elseif (variable_get('scribble_image_file_type', 'jpeg') == 'png') {
+    imagepng($background_resource, $path . '/' . $file_name, 9);
+  }*/
   imagedestroy($background_resource);
   imagedestroy($snapshot_resource);
 
