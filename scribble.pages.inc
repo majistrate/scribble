@@ -8,10 +8,46 @@
  * System configuration form for the scribble module.
  */
 function scribble_configuration_form($form, &$form_state) {
+  $form['scribble_image_file_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Scribble image file type'),
+    '#options' => array('jpeg' => t('JPEG'), 'png' => t('PNG')),
+    '#default_value' => variable_get('scribble_image_file_type', 'png'),
+    '#description' => t('The image type (file extension) of the merged snapshots. Please note that using PNG with low or compression level 0 results in larger filesize of the merged images, which will lead to long loading times on slideshow pages. The lowest file sizes at best qualities can be achieved by using PNG at compression level 9.'),
+  );
+
+  $form['scribble_image_jpeg_quality'] = array(
+    '#type' => 'textfield',
+    '#title' => t('JPEG quality'),
+    '#size' => 3,
+    '#default_value' => variable_get('scribble_image_jpeg_quality', 100),
+    '#description' => t('Image quality of merged images when using JPEG image type. Use a value between 0 and 100 where 100 is best quality and results in larger filesize. Low quality results in ugly pixels after saving a drawing, recommended value is 100.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="scribble_image_file_type"]' => array('value' => 'jpeg'),
+      ),
+    ),
+    '#element_validate' => array('scribble_settings_validate_jpeg_quality'),
+  );
+
+  $form['scribble_image_png_quality'] = array(
+    '#type' => 'textfield',
+    '#title' => t('PNG compression level'),
+    '#size' => 3,
+    '#default_value' => variable_get('scribble_image_png_quality', 9),
+    '#description' => t('Image quality of merged images when using PNG image type. Use a value between 0 and 9 where 0 stands for no compression. No compression leads to large file sizes when using a background color other than white. Compression level 9 is recommended.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="scribble_image_file_type"]' => array('value' => 'png'),
+      ),
+    ),
+    '#element_validate' => array('scribble_settings_validate_png_quality'),
+  );
+
   $form['scribble_allow_image_injection'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow adding images'),
-    '#description' => t("Do only allow this if your scribbles aren't public accessible. <b>This might cause legal issues if images with copyrights get added.</b>"),
+    '#description' => t("Do only allow this if your scribbles aren't public accessible. <b>Enabling this option might cause legal issues if images with copyrights get added.</b>"),
     '#default_value' => variable_get('scribble_allow_image_injection', 0),
   );
 
@@ -19,6 +55,30 @@ function scribble_configuration_form($form, &$form_state) {
   scribble_add_slideshow_settings_elements($form, variable_get('scribble_slideshow_settings'));
 
   return system_settings_form($form);
+}
+
+/**
+ * Form element validation handler for the jpeg quality fields.
+ */
+function scribble_settings_validate_jpeg_quality($element, &$form_state) {
+  $value = $element['#value'];
+  if ($form_state['values']['scribble_image_file_type'] == 'jpeg') {
+    if ((!empty($value) && !is_numeric($value)) || $value > 100 || $value < 0) {
+      form_error($element, t('%name must be between 0 and 100.', array('%name' => $element['#title'])));
+    }
+  }
+}
+
+/**
+ * Form element validation handler for the png quality field.
+ */
+function scribble_settings_validate_png_quality($element, &$form_state) {
+  $value = $element['#value'];
+  if ($form_state['values']['scribble_image_file_type'] == 'png') {
+    if ((!empty($value) && !is_numeric($value)) || $value > 9 || $value < 0) {
+      form_error($element, t('%name must be between 0 and 9.', array('%name' => $element['#title'])));
+    }
+  }
 }
 
 /**
@@ -219,7 +279,7 @@ function scribble_remove_image_form_submit($form, &$form_state) {
           else {
             // The deleted image isn't the first nor the last image of the
             // scribble, so the base image is the one before the deleted image.
-            $function = $field_name == 'scribble_image' ? 'imagecreatefromjpeg' : 'imagecreatefrompng';
+            $function = $field_name == 'scribble_image' ? 'imagecreatefrom' . variable_get('scribble_image_file_type', 'png') : 'imagecreatefrompng';
             $merge_base_resource = $function($items[$delta - 1]['uri']);
             $merge_base_fid = $items[$delta - 1]['fid'];
           }
@@ -249,11 +309,11 @@ function scribble_remove_image_form_submit($form, &$form_state) {
         $merge_snapshot_resource = imagecreatefrompng($item['uri']);
         imagecopy($merge_base_resource, $merge_snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
-        // Imagepng() can't deal with stream wrapper uris, create a path.
-        $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.jpg';
+        // Imagepng() isn't able to handle stream wrapper uris, create a path.
+        $file_name = 'scribble_' . $scribble->sid . '_' . $item['fid'] . '_' . date('d-m-Y_H-i-s') . '.' . variable_get('scribble_image_file_type', 'png');
         $file_path = variable_get('scribble_files_directory', 'sites/default/files/scribble') . '/' . $scribble->sid . '/' . $file_name;
         // Write the new merged image to the concatenated path.
-        imagejpeg($merge_base_resource, $file_path, variable_get('scribble_image_jpeg_quality', 100));
+        scribble_write_image_file($file_path, $merge_base_resource);
 
         // Get rid of the resources in order to use the variables again.
         imagedestroy($merge_base_resource);

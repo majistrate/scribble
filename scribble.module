@@ -465,7 +465,7 @@ function scribble_prepare_folders($scribble_id) {
   $scribble = entity_load_single('scribble', $scribble_id);
 
   // Create filenames.
-  $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.jpg';
+  $file_name = 'scribble_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.' . variable_get('scribble_image_file_type', 'png');
   $snapshot_file_name = 'scribble_snapshot_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
 
   // Create directory on runtime if it doesn't exists.
@@ -512,7 +512,8 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   // If there is already an existing image on the scribble, use this as base
   // for the merge.
   if ($latest_file_name = scribble_get_newest($scribble->sid)) {
-    $background_resource = imagecreatefromjpeg($path . '/' . $latest_file_name);
+    $function = 'imagecreatefrom' . variable_get('scribble_image_file_type', 'png');
+    $background_resource = $function($path . '/' . $latest_file_name);
   }
   // No image exists yet on the scribble, create a plain image with background
   // color as configured and use it that as base for the merge.
@@ -523,12 +524,7 @@ function scribble_merge_snapshot_to_newest($scribble, $snapshot_resource, $path,
   imagecopy($background_resource, $snapshot_resource, 0, 0, 0, 0, $scribble->width, $scribble->height);
 
   // Write the new scribble image file and destroy resources.
-  //if (variable_get('scribble_image_file_type', 'jpeg') == 'jpg') {
-    imagejpeg($background_resource, $path . '/' . $file_name, variable_get('scribble_image_jpeg_quality', 100));
-  /*}
-  elseif (variable_get('scribble_image_file_type', 'jpeg') == 'png') {
-    imagepng($background_resource, $path . '/' . $file_name, 9);
-  }*/
+  scribble_write_image_file($path . '/' . $file_name, $background_resource);
   imagedestroy($background_resource);
   imagedestroy($snapshot_resource);
 
@@ -945,4 +941,21 @@ function scribble_get_menu_title_parts() {
     SCRIBBLE_TITLE_IMAGE_LIST => t('Manage images'),
     SCRIBBLE_TITLE_REMOVE_IMAGE => t('Remove image'),
   );
+}
+
+/**
+ * Writes an image file from a given resource.
+ *
+ * @param $file_path
+ *   The path of the image that will be saved including filename..
+ * @param $image_resource
+ *   The image resource of the image data that gets written.
+ */
+function scribble_write_image_file($file_path, $image_resource) {
+  if (variable_get('scribble_image_file_type', 'png') == 'jpeg') {
+    imagejpeg($image_resource, $file_path, variable_get('scribble_image_jpeg_quality', 100));
+  }
+  elseif (variable_get('scribble_image_file_type', 'png') == 'png') {
+    imagepng($image_resource, $file_path, variable_get('scribble_image_png_quality', 9));
+  }
 }
