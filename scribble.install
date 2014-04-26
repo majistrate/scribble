@@ -293,11 +293,11 @@ function scribble_install() {
  * Implements hook_uninstall().
  */
 function scribble_uninstall() {
-  field_delete_field('scribble_title');
-  field_delete_field('scribble_image');
-  field_delete_field('scribble_brushes');
-  field_delete_field('scribble_image_snapshots');
-  field_delete_field('scribble_background_color');
+  field_delete_instance('scribble_title');
+  field_delete_instance('scribble_image');
+  field_delete_instance('scribble_brushes');
+  field_delete_instance('scribble_image_snapshots');
+  field_delete_instance('scribble_background_color');
 
   // Delete module variables.
   variable_del('scribble_files_directory');
