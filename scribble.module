@@ -222,7 +222,7 @@ function scribble_permission() {
  */
 function scribble_page_title($scribble, $title_part_key = NULL) {
   $items = field_get_items('scribble', $scribble, 'scribble_title');
-  $return = $items[0]['value'];
+  $return = $items[0]['safe_value'];
   $title_parts = scribble_get_menu_title_parts();
   if ($title_part_key && array_key_exists($title_part_key, $title_parts)) {
     $return .= ' | ' . $title_parts[$title_part_key];
