@@ -113,7 +113,7 @@
     $save_btn.click(function () {
       if (!unchanged) {
         $draw_canvas.data("jqScribble").save(function (imageData) {
-          if(confirm(Drupal.t('You\'re about to save ur changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
+          if(confirm(Drupal.t('You\'re about to save your changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
             var post_data = {
               imagedata: imageData,
               scribble_id: Drupal.settings.scribble_info.scribbleId

@@ -235,7 +235,7 @@ function scribble_remove_image_form($form, &$form_state, $scribble, $fid) {
 
   // Load the file to display its name in the question.
   $file = file_load($fid);
-  $question = t('Are you sure to remove image !image from scribble !scribble?', array(
+  $question = t('Are you sure you want to remove image !image from scribble !scribble?', array(
     '!image' => $file->filename,
     '!scribble' => $scribble->label,
   ));
