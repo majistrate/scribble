@@ -78,7 +78,7 @@ If your problem isn't covered by an existing issue please create a new one.
 -- ROADMAP --
 
 - Fix toolbar width
-- fix @todos
-- Replace the farbtastic color picker on blackboards by jquery_colorpicker
+- Add mobile support
+- Add possibility for drawing message
 
 Current maintainer: s_leu
