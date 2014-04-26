@@ -114,7 +114,7 @@ function scribble_schema() {
  */
 function scribble_install() {
   // This module renders the field values in it's own theme function, fields do
-  // not to be displayed.
+  // not need to be displayed.
   $display_hidden = array(
     'display' => array(
       'default' => array(
