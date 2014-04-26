@@ -118,6 +118,13 @@ function scribble_library() {
         'media' => 'screen',
       ),
     ),
+    'dependencies' => array(
+      // Require some jQuery UI libraries.
+      array('system', 'ui.draggable'),
+      array('system', 'ui.slider'),
+      array('system', 'ui.button'),
+      array('system', 'ui.dialog'),
+    )
   );
   return $libraries;
 }

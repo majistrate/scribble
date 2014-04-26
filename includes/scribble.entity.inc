@@ -33,10 +33,6 @@ class Scribble extends Entity {
         'scribble_libraries' => array(
           '#attached' => array(
             'library' => array(
-              array('system', 'ui.draggable'),
-              array('system', 'ui.slider'),
-              array('system', 'ui.button'),
-              array('system', 'ui.dialog'),
               array('scribble', 'jqscribble'),
             ),
             'js' => array(
