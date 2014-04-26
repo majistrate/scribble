@@ -7,6 +7,7 @@ configure = admin/config/media/scribble
 dependencies[] = entity
 dependencies[] = field_slideshow
 dependencies[] = jquery_colorpicker
+dependencies[] = libraries
 
 files[] = includes/scribble.entity.inc
 files[] = includes/scribble.info.inc
