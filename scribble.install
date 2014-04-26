@@ -293,6 +293,8 @@ function scribble_install() {
  * Implements hook_uninstall().
  */
 function scribble_uninstall() {
+  // Delete instances of the field and field itself if there aren't any other
+  // instances.
   field_delete_instance('scribble_title');
   field_delete_instance('scribble_image');
   field_delete_instance('scribble_brushes');
@@ -304,7 +306,7 @@ function scribble_uninstall() {
   variable_del('scribble_slideshow_settings');
   variable_del('scribble_allow_image_injection');
   variable_del('scribble_image_list_image_style');
-
-  // @todo
-  // field_delete_instance();
+  variable_del('scribble_image_file_type');
+  variable_del('scribble_image_jpeg_quality');
+  variable_del('scribble_image_png_quality');
 }
