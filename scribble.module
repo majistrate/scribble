@@ -152,8 +152,6 @@ function scribble_theme($existing, $type, $theme, $path) {
         'scribble' => NULL,
         'slideshow' => '',
       ),
-      'template' => 'scribble-slideshow',
-      'path' => drupal_get_path('module', 'scribble') . '/theme',
     ),
   );
 }
@@ -966,7 +964,7 @@ function scribble_write_image_file($file_path, $image_resource) {
 }
 
 /**
- * Theme function for the scribble brush options on the blackboard toolbar..
+ * Theme function for the scribble brush options on the blackboard toolbar.
  */
 function theme_scribble_brush_options($variables) {
   $first = TRUE;
@@ -983,4 +981,11 @@ function theme_scribble_brush_options($variables) {
     $output .= '<label for="' . $brush_id . '">' . $label . '</label>';
   }
   return $output;
+}
+
+/**
+ * Theme function for the slideshow output.
+ */
+function theme_scribble_slideshow($variables) {
+  return '<div class="scribble-slideshow-wrapper">' . render($variables['slideshow']) . '</div>';
 }
