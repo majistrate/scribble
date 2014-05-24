@@ -56,16 +56,15 @@
   margin-left: 13px;
   border: 1px solid #d2d2d2;
   padding: 3px 5px;
-  padding-left: 5px;
   text-align: center;
 }
 
 .scribble-brush-settings {
-  padding: 0px 7px 7px 7px;
+  padding: 0 7px 7px 7px;
 }
 
 .scribble-actions {
-  padding: 7px 7px 0px 7px;
+  padding: 7px 7px 0 7px;
 }
 
 #img-src-txt {
@@ -73,5 +72,5 @@
 }
 
 .scribble-add-img-container.ui-dialog-content.ui-widget-content {
-  padding: 0px;
+  padding: 0;
 }

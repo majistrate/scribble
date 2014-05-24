@@ -219,6 +219,9 @@ function scribble_permission() {
  *   The loaded scribble entity object.
  * @param int $title_part_key
  *   The title of the page.
+ *
+ * @return string
+ *   The page title.
  */
 function scribble_page_title($scribble, $title_part_key = NULL) {
   $items = field_get_items('scribble', $scribble, 'scribble_title');
@@ -237,13 +240,18 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
   switch ($op) {
     case 'view':
       return user_access('access scribbles', $account);
+
     default:
       return user_access('administer scribbles', $account);
+
   }
 }
 
 /**
  * Getter for the latest scribble image.
+ *
+ * @param int $sid
+ *   The id of the scribble to get the latest image for.
  *
  * @return string
  *   Filename of the newest file or NULL if none was found.

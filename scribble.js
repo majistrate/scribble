@@ -34,7 +34,7 @@
     });
 
     // Initialize the toolbar
-    $('.scribble-save').button({
+    $save_btn.button({
       icons: {
         primary: "ui-icon-disk"
       }
@@ -92,7 +92,7 @@
       });
 
     // Initialize brush size slider.
-    options = {
+    var options = {
       stop: function (event, ui) {
         $draw_canvas.data("jqScribble").update({brushSize: ui.value});
       },
@@ -156,7 +156,6 @@
       var $load_img = $(new Image());
       $load_img.error(function() {
         $('#img-src-txt').addClass('ui-state-error');
-        success = false;
       })
       .load(function() {
         loadAddImageDialog($(this));
@@ -230,15 +229,12 @@
 
     // Helper function to check if image was dropped within the canvas.
     function droppedOnCanvas(x, y) {
-      $canvas = $draw_canvas;
+      var $canvas = $draw_canvas;
       var border_left = $canvas.offset().left;
       var border_top = $canvas.offset().top;
       var border_right = $canvas.offset().left + $canvas.width();
       var border_bottom = $canvas.offset().top + $canvas.height();
-      if (x > border_left && x < border_right && y > border_top && y < border_bottom) {
-        return true;
-      }
-      return false;
+      return x > border_left && x < border_right && y > border_top && y < border_bottom;
     }
   }
 

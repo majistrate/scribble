@@ -86,6 +86,9 @@ function scribble_settings_validate_png_quality($element, &$form_state) {
  *
  * @param object $scribble
  *   The loaded scribble entity.
+ *
+ * @return array
+ *   The render array for the given entity.
  */
 function scribble_blackboard_page($scribble) {
   return entity_view('scribble', array($scribble));
@@ -383,6 +386,9 @@ function scribble_snapshot_slideshow_page($scribble) {
  *
  * @param object $scribble
  *   The loaded scribble entity.
+ *
+ * @return mixed
+ *   Markup containing message or nothing.
  */
 function scribble_get_images_archive($scribble) {
   // Check if there are any images.

@@ -99,11 +99,12 @@ class Scribble extends Entity {
    *   Brush labels indexed by brush JS class name.
    */
   protected function prepareBrushes() {
-    $items = field_get_items('scribble', $this, 'scribble_brushes');
     $brushes = scribble_get_brushes();
     $return = array();
-    foreach ($items as $item) {
-      $return[$item['value']] = $brushes[$item['value']];
+    if ($items = field_get_items('scribble', $this, 'scribble_brushes')) {
+      foreach ($items as $item) {
+        $return[$item['value']] = $brushes[$item['value']];
+      }
     }
     return $return;
   }
