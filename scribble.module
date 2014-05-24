@@ -237,10 +237,8 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
   switch ($op) {
     case 'view':
       return user_access('access scribbles', $account);
-
     default:
       return user_access('administer scribbles', $account);
-
   }
 }
 
@@ -949,9 +947,9 @@ function scribble_get_menu_title_parts() {
 /**
  * Writes an image file from a given resource.
  *
- * @param $file_path
+ * @param string $file_path
  *   The path of the image that will be saved including filename..
- * @param $image_resource
+ * @param resource $image_resource
  *   The image resource of the image data that gets written.
  */
 function scribble_write_image_file($file_path, $image_resource) {
