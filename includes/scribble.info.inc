@@ -5,7 +5,6 @@
  * Definition of ScribbleMetadataController class.
  */
 
-
 /**
  * Metadata Controller class for the Scribble entity.
  */

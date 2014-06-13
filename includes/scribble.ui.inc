@@ -5,7 +5,6 @@
  * Definition of ShareMessageController and ShareMessageUIController classes.
  */
 
-
 /**
  * Controller class for the ShareMessage entity.
  */
