@@ -3,7 +3,10 @@
  * Contains javascript code for the scribble module.
  */
 
+Drupal.scribble = Drupal.scribble || {};
+
 (function($) {
+
   /**
    * Behavior for scribble module.
    */
@@ -236,5 +239,18 @@
       return x > border_left && x < border_right && y > border_top && y < border_bottom;
     }
   }
+
+  /**
+   * AJAX command callback.
+   *
+   * @todo describe code.
+   */
+  Drupal.scribble.scribbleAddImage = function (ajax, response, status) {
+    console.log('BLABLA');
+  }
+
+  // Register new AJAX command that is used in the server callback specified in
+  // the image upload submit button within the blackboard form.
+  Drupal.ajax.prototype.commands.scribbleAddImage = Drupal.scribble.scribbleAddImage;
 
 })(jQuery);
