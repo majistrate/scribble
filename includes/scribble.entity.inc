@@ -22,14 +22,15 @@ class Scribble extends Entity {
         '#attributes' => array(
           'class' => array('scribble-blackboard-wrapper'),
         ),
-        'blackboard' => array(
+        'blackboard' => drupal_get_form('scribble_blackboard_form', $this),
+        /*array(
           '#markup' => theme('scribble_blackboard', array(
             'width' => $this->width,
             'height' => $this->height,
             'brushes' => $this->prepareBrushes(),
             'background_color' => $items[0]['jquery_colorpicker'],
           )),
-        ),
+        ),*/
         'scribble_libraries' => array(
           '#attached' => array(
             'library' => array(

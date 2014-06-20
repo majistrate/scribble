@@ -99,6 +99,7 @@ function scribble_library() {
       ),
       drupal_get_path('module', 'scribble') . '/scribble.js' => array(
         'type' => 'file',
+        'weight' => 999,
       ),
       libraries_get_path('colorpicker') . '/js/colorpicker.js' => array(
         'type' => 'file',
@@ -135,23 +136,25 @@ function scribble_library() {
 function scribble_theme($existing, $type, $theme, $path) {
   return array(
     'scribble_blackboard' => array(
-      'variables' => array(
+      /*'variables' => array(
         'width' => 900,
         'height' => 300,
         'brushes' => array(),
         'background_color' => 'FFFFFF',
-      ),
-      'template' => 'scribble-blackboard',
-      'path' => drupal_get_path('module', 'scribble') . '/theme',
+      ),*/
+      'render element' => 'form',
+      'path' => drupal_get_path('module', 'scribble') . '/scribble.theme.inc',
     ),
     'scribble_brush_options' => array(
       'variables' => array('brushes' => array()),
+      'path' => drupal_get_path('module', 'scribble') . '/scribble.theme.inc',
     ),
     'scribble_slideshow' => array(
       'variables' => array(
         'scribble' => NULL,
         'slideshow' => '',
       ),
+      'path' => drupal_get_path('module', 'scribble') . '/scribble.theme.inc',
     ),
   );
 }
@@ -245,6 +248,85 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
       return user_access('administer scribbles', $account);
 
   }
+}
+
+/**
+ * Form containing elements of the blackboard toolbar.
+ */
+function scribble_blackboard_form($form, &$form_state, $scribble) {
+  $form['#theme'] = 'scribble_blackboard';
+  $form['#scribble'] = $scribble;
+
+  $form['scribble-img-src'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Add an image from a URL'),
+    '#title_display' => 'invisible',
+    '#attributes' => array(
+      'id' => 'img-src-txt',
+      'placeholder' => t('Enter the URL of the image to add'),
+    ),
+  );
+
+  $form['scribble_img_upload'] = array(
+    '#type' => 'file',
+    '#title' => t('Choose a local file to upload'),
+    '#title_display' => 'invisible',
+    '#size' => 22,
+    '#theme_wrappers' => array(),
+    '#weight' => -10,
+  );
+
+  $form['upload'] = array(
+    '#type' => 'submit',
+    '#value' => 'upload',
+    '#submit' => array('scribble_image_upload'),//array('scribble_image_upload_submit'),
+    '#ajax' => array(
+      'callback' => 'scribble_image_upload',
+      /*'wrapper' => 'im-area',
+      'method' => 'replace',
+      'effect' => 'fade',*/
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ *
+ */
+function scribble_image_upload($form, &$form_state) {
+  $commands[] = array(
+    'command' => 'scribbleAddImage',
+    'data' => array(
+      'file_name' => 'BLA',
+    ),
+  );
+  $response = array('#type' => 'ajax', '#commands' => $commands);
+  return $response;
+/*
+  $file = file_save_upload(
+    'scribble_img_upload',
+    array('file_validate_extensions' => array('png gif jpg jpeg')),
+    'public://',
+    FILE_EXISTS_REPLACE
+  );
+  $commands = array();
+  if ($file) {
+    $file->status = FILE_STATUS_PERMANENT;
+    file_save($file);
+    $command = array(
+      'command' => 'scribbleImageAdd',
+      'data' => array(
+        'file_name' => $file->filename,
+      ),
+    );
+  }
+  else {
+    // @todo show a message in global messages container.
+    //$commands[] = drupal_set_message('No file uploaded.');
+  }
+
+  return $command;*/
 }
 
 /**
@@ -967,31 +1049,4 @@ function scribble_write_image_file($file_path, $image_resource) {
   elseif (variable_get('scribble_image_file_type', 'png') == 'png') {
     imagepng($image_resource, $file_path, variable_get('scribble_image_png_quality', 9));
   }
-}
-
-/**
- * Theme function for the scribble brush options on the blackboard toolbar.
- */
-function theme_scribble_brush_options($variables) {
-  $first = TRUE;
-  $output = '';
-  foreach ($variables['brushes'] as $brush_id => $label) {
-    if ($first) {
-      $checked = ' checked="checked"';
-      $first = FALSE;
-    }
-    else {
-      $checked = '';
-    }
-    $output .= '<input type="radio" id="' . $brush_id . '" name="brushes-btns"' . $checked . '/>';
-    $output .= '<label for="' . $brush_id . '">' . $label . '</label>';
-  }
-  return $output;
-}
-
-/**
- * Theme function for the slideshow output.
- */
-function theme_scribble_slideshow($variables) {
-  return '<div class="scribble-slideshow-wrapper">' . render($variables['slideshow']) . '</div>';
 }
