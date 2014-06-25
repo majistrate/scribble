@@ -246,7 +246,7 @@ Drupal.scribble = Drupal.scribble || {};
    * @todo describe code.
    */
   Drupal.scribble.scribbleAddImage = function (ajax, response, status) {
-    console.log('BLABLA');
+    console.log(response);
   }
 
   // Register new AJAX command that is used in the server callback specified in
