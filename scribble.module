@@ -255,7 +255,11 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
  */
 function scribble_blackboard_form($form, &$form_state, $scribble) {
   $form['#theme'] = 'scribble_blackboard';
-  $form['#scribble'] = $scribble;
+  $form_state['scribble'] = $scribble;
+
+  $form['scribble-messages'] = array(
+    '#markup' => '<div class="scribble-messages"></div>',
+  );
 
   $form['scribble-img-src'] = array(
     '#type' => 'textfield',
@@ -273,7 +277,6 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
     '#title_display' => 'invisible',
     '#size' => 22,
     '#theme_wrappers' => array(),
-    '#weight' => -10,
   );
 
   $form['upload'] = array(
@@ -292,41 +295,39 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
 }
 
 /**
+ * AJAX callback that uploads a file.
  *
+ * Displays an error message in case the file wasn't uploaded.
  */
 function scribble_image_upload($form, &$form_state) {
-  $commands[] = array(
-    'command' => 'scribbleAddImage',
-    'data' => array(
-      'file_name' => 'BLA',
-    ),
-  );
-  $response = array('#type' => 'ajax', '#commands' => $commands);
-  return $response;
-/*
+  $commands[] = array();
+  scribble_prepare_folders($form_state['scribble']->sid);
+  $destination = 'public://' . variable_get('scribble_public_files_folder', 'scribble');
+  $destination .= '/' . $form_state['scribble']->sid . '/uploads';
+
   $file = file_save_upload(
     'scribble_img_upload',
     array('file_validate_extensions' => array('png gif jpg jpeg')),
-    'public://',
+    $destination,
     FILE_EXISTS_REPLACE
   );
-  $commands = array();
+
   if ($file) {
     $file->status = FILE_STATUS_PERMANENT;
     file_save($file);
-    $command = array(
-      'command' => 'scribbleImageAdd',
-      'data' => array(
-        'file_name' => $file->filename,
-      ),
+    $commands[] = array(
+      'command' => 'scribbleAddImage',
+      'data' => array('file_name' => file_create_url($file->uri)),
     );
   }
   else {
-    // @todo show a message in global messages container.
-    //$commands[] = drupal_set_message('No file uploaded.');
+    // Display an error message in the corresponding container of the form.
+    drupal_set_message('Unable to upload the file. Allowed file formats are png gif jpg jpeg.', 'error');
+    $test = theme('status_messages');
+    $commands[] = ajax_command_html('.scribble-messages', $test);
   }
 
-  return $command;*/
+  return array('#type' => 'ajax', '#commands' => $commands);
 }
 
 /**
@@ -560,18 +561,21 @@ function scribble_prepare_folders($scribble_id) {
   $snapshot_file_name = 'scribble_snapshot_' . $scribble_id . '_' . date('d-m-Y_H-i-s') . '.png';
 
   // Create directory on runtime if it doesn't exists.
-  $base_path = variable_get('file_public_path', 'sites/default/files') . '/scribble';
+  $base_path = variable_get('file_public_path', 'sites/default/files') . '/';
+  $base_path .= variable_get('scribble_public_files_folder', 'scribble');
   $path = $base_path;
   file_prepare_directory($path, FILE_CREATE_DIRECTORY);
-  if (variable_get('scribble_files_directory', FALSE)) {
+  if (!variable_get('scribble_files_directory', FALSE)) {
     variable_set('scribble_files_directory', $path);
   }
 
-  // Create a separate folder for the entity if it doesn't exist.
+  // Create a separate folder and sub dirs for the entity if not existing yet.
   $path = $base_path . '/' . $scribble_id;
   file_prepare_directory($path, FILE_CREATE_DIRECTORY);
   $snapshot_path = $base_path . '/' . $scribble_id . '/snapshots';
   file_prepare_directory($snapshot_path, FILE_CREATE_DIRECTORY);
+  $upload_path = $base_path . '/' . $scribble_id . '/uploads';
+  file_prepare_directory($upload_path, FILE_CREATE_DIRECTORY);
 
   return array(
     $scribble,
