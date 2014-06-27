@@ -257,6 +257,22 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
   $form['#theme'] = 'scribble_blackboard';
   $form_state['scribble'] = $scribble;
 
+  // Get background color.
+  $items = field_get_items('scribble', $form_state['scribble'], 'scribble_background_color');
+
+  // Add the necessary JS and CSS as well as some settings.
+  $form['#attached']['library'][] = array('scribble', 'jqscribble');
+  $form['#attached']['js'][] = array(
+    'data' => array(
+      'scribble_info' => array(
+        'scribbleId' => $form_state['scribble']->sid,
+        'newestScribble' => scribble_get_newest($form_state['scribble']->sid),
+        'backgroundColor' => $items[0]['jquery_colorpicker'],
+      ),
+    ),
+    'type' => 'setting',
+  );
+
   $form['scribble-messages'] = array(
     '#markup' => '<div class="scribble-messages"></div>',
   );
@@ -282,13 +298,21 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
   $form['upload'] = array(
     '#type' => 'submit',
     '#value' => 'upload',
-    '#submit' => array('scribble_image_upload'),//array('scribble_image_upload_submit'),
+    '#submit' => array('scribble_image_upload'),
     '#ajax' => array(
       'callback' => 'scribble_image_upload',
-      /*'wrapper' => 'im-area',
-      'method' => 'replace',
-      'effect' => 'fade',*/
     ),
+  );
+
+  // Get enabled brushes.
+  $enabled_brushes = scribble_get_enabled_brushes($form_state['scribble']);
+  $form['brushes'] = array(
+    '#type' => 'radios',
+    '#title' => t('Brush'),
+    '#title_display' => 'invisible',
+    '#default_value' => key($enabled_brushes),
+    '#options' => $enabled_brushes,
+    '#description' => t('When a poll is closed, visitors can no longer vote for it.'),
   );
 
   return $form;
@@ -350,10 +374,10 @@ function scribble_get_newest($sid) {
 }
 
 /**
- * Getter for brushes.
+ * Allowed value function for brush field.
  *
  * @return array
- *   The list of available brushes.
+ *   The list of brushes as available in the jqscribble library.
  */
 function scribble_get_brushes() {
   return array(
@@ -361,6 +385,26 @@ function scribble_get_brushes() {
     'LineBrush' => 'Line',
     'CrossBrush' => 'Cross',
   );
+}
+
+/**
+ * Returns the enabled brushes.
+ *
+ * @param object $scribble
+ *   The scribble entity from which the brushes are returned.
+ *
+ * @return array
+ *   Brush labels indexed by the brush's JS class name.
+ */
+function scribble_get_enabled_brushes($scribble) {
+  $brushes = scribble_get_brushes();
+  $return = array();
+  if ($items = field_get_items('scribble', $scribble, 'scribble_brushes')) {
+    foreach ($items as $item) {
+      $return[$item['value']] = $brushes[$item['value']];
+    }
+  }
+  return $return;
 }
 
 /**
