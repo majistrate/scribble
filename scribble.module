@@ -143,11 +143,8 @@ function scribble_theme($existing, $type, $theme, $path) {
         'background_color' => 'FFFFFF',
       ),*/
       'render element' => 'form',
-      'path' => drupal_get_path('module', 'scribble') . '/scribble.theme.inc',
-    ),
-    'scribble_brush_options' => array(
-      'variables' => array('brushes' => array()),
-      'path' => drupal_get_path('module', 'scribble') . '/scribble.theme.inc',
+      'template' => 'scribble-blackboard',
+      'path' => drupal_get_path('module', 'scribble') . '/theme',
     ),
     'scribble_slideshow' => array(
       'variables' => array(
@@ -255,29 +252,33 @@ function scribble_access($op, $sharemessage, $account = NULL, $entity_type = NUL
  */
 function scribble_blackboard_form($form, &$form_state, $scribble) {
   $form['#theme'] = 'scribble_blackboard';
+  // Store the entity for the theme function.
+  $form['#scribble'] = $scribble;
+  // Also store in form state for the AJAX callback.
   $form_state['scribble'] = $scribble;
 
   // Get background color.
-  $items = field_get_items('scribble', $form_state['scribble'], 'scribble_background_color');
+  $items = field_get_items('scribble', $scribble, 'scribble_background_color');
 
   // Add the necessary JS and CSS as well as some settings.
   $form['#attached']['library'][] = array('scribble', 'jqscribble');
   $form['#attached']['js'][] = array(
     'data' => array(
       'scribble_info' => array(
-        'scribbleId' => $form_state['scribble']->sid,
-        'newestScribble' => scribble_get_newest($form_state['scribble']->sid),
+        'scribbleId' => $scribble->sid,
+        'newestScribble' => scribble_get_newest($scribble->sid),
         'backgroundColor' => $items[0]['jquery_colorpicker'],
       ),
     ),
     'type' => 'setting',
   );
 
-  $form['scribble-messages'] = array(
+  $form['message_container'] = array(
     '#markup' => '<div class="scribble-messages"></div>',
   );
 
-  $form['scribble-img-src'] = array(
+  // Add fields for image loading from the web and ajax based image upload.
+  $form['image_fetch_txt'] = array(
     '#type' => 'textfield',
     '#title' => t('Add an image from a URL'),
     '#title_display' => 'invisible',
@@ -285,9 +286,10 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
       'id' => 'img-src-txt',
       'placeholder' => t('Enter the URL of the image to add'),
     ),
+    '#suffix' => '<div class="scribble-add">' . t('Add Image') . '</div>',
   );
 
-  $form['scribble_img_upload'] = array(
+  $form['image_file'] = array(
     '#type' => 'file',
     '#title' => t('Choose a local file to upload'),
     '#title_display' => 'invisible',
@@ -295,9 +297,9 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
     '#theme_wrappers' => array(),
   );
 
-  $form['upload'] = array(
+  $form['image_file_upload_submit'] = array(
     '#type' => 'submit',
-    '#value' => 'upload',
+    '#value' => t('Upload'),
     '#submit' => array('scribble_image_upload'),
     '#ajax' => array(
       'callback' => 'scribble_image_upload',
@@ -305,17 +307,41 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
   );
 
   // Get enabled brushes.
-  $enabled_brushes = scribble_get_enabled_brushes($form_state['scribble']);
+  $enabled_brushes = scribble_get_enabled_brushes($scribble);
   $form['brushes'] = array(
     '#type' => 'radios',
     '#title' => t('Brush'),
     '#title_display' => 'invisible',
-    '#default_value' => key($enabled_brushes),
     '#options' => $enabled_brushes,
-    '#description' => t('When a poll is closed, visitors can no longer vote for it.'),
   );
 
   return $form;
+}
+
+/**
+ * Preprocess for the blackboard form.
+ *
+ * Renders some fields and adds them as variables for the template.
+ */
+function template_preprocess_scribble_blackboard(&$variables) {
+  // Render form elements and add as variable.
+  $fields = array(
+    'message_container',
+    'image_fetch_txt',
+    'image_file',
+    'image_file_upload_submit',
+    'brushes',
+  );
+  foreach ($fields as $field) {
+    $variables[$field] = drupal_render($variables['form'][$field]);
+  }
+  // This needs to be explicitly enabled as it could cause legal issues.
+  $variables['allow_image_injection'] = variable_get('scribble_allow_image_injection', FALSE);
+  // Further variables for the canvas size and background color.
+  $variables['width'] = $variables['form']['#scribble']->width;
+  $variables['height'] = $variables['form']['#scribble']->height;
+  $items = field_get_items('scribble', $variables['form']['#scribble'], 'scribble_background_color');
+  $variables['background_color'] = $items[0]['jquery_colorpicker'];
 }
 
 /**
@@ -330,7 +356,7 @@ function scribble_image_upload($form, &$form_state) {
   $destination .= '/' . $form_state['scribble']->sid . '/uploads';
 
   $file = file_save_upload(
-    'scribble_img_upload',
+    'image_file',
     array('file_validate_extensions' => array('png gif jpg jpeg')),
     $destination,
     FILE_EXISTS_REPLACE
