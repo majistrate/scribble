@@ -6,7 +6,7 @@
 
 /**
  * Theming for the blackboard toolbar form.
- */
+ *
 function theme_scribble_blackboard($variables) {
   $form = $variables['render element'];
   $test = 1;
@@ -39,29 +39,9 @@ function theme_scribble_blackboard($variables) {
 <div class="scribble-canvas-wrapper" style="width: <?php print $width; ?>px;height: <?php print $height; ?>px; background-color:#<?php print $background_color; ?>">
   <canvas class="scribble-canvas"></canvas>
 </div>
-</div>*/
+</div>
 }
-
-
-/**
- * Theme function for the scribble brush options on the blackboard toolbar.
- */
-function theme_scribble_brush_options($variables) {
-  $first = TRUE;
-  $output = '';
-  foreach ($variables['brushes'] as $brush_id => $label) {
-    if ($first) {
-      $checked = ' checked="checked"';
-      $first = FALSE;
-    }
-    else {
-      $checked = '';
-    }
-    $output .= '<input type="radio" id="' . $brush_id . '" name="brushes-btns"' . $checked . '/>';
-    $output .= '<label for="' . $brush_id . '">' . $label . '</label>';
-  }
-  return $output;
-}
+*/
 
 /**
  * Theme function for the slideshow output.
