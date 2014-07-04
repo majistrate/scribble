@@ -134,24 +134,21 @@ function scribble_library() {
  * Implements hook_theme().
  */
 function scribble_theme($existing, $type, $theme, $path) {
+  $path = drupal_get_path('module', 'scribble') . '/theme/';
+  $theme_include = drupal_get_path('module', 'scribble') . '/theme/scribble.theme.inc';
   return array(
     'scribble_blackboard' => array(
-      /*'variables' => array(
-        'width' => 900,
-        'height' => 300,
-        'brushes' => array(),
-        'background_color' => 'FFFFFF',
-      ),*/
       'render element' => 'form',
-      'template' => 'scribble-blackboard',
-      'path' => drupal_get_path('module', 'scribble') . '/theme',
+      'path' => $path,
+      'file' => 'scribble.theme.inc',
     ),
     'scribble_slideshow' => array(
       'variables' => array(
         'scribble' => NULL,
         'slideshow' => '',
       ),
-      'path' => drupal_get_path('module', 'scribble') . '/scribble.theme.inc',
+      'path' => $path,
+      'file' => 'scribble.theme.inc',
     ),
   );
 }
@@ -316,32 +313,6 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
   );
 
   return $form;
-}
-
-/**
- * Preprocess for the blackboard form.
- *
- * Renders some fields and adds them as variables for the template.
- */
-function template_preprocess_scribble_blackboard(&$variables) {
-  // Render form elements and add as variable.
-  $fields = array(
-    'message_container',
-    'image_fetch_txt',
-    'image_file',
-    'image_file_upload_submit',
-    'brushes',
-  );
-  foreach ($fields as $field) {
-    $variables[$field] = drupal_render($variables['form'][$field]);
-  }
-  // This needs to be explicitly enabled as it could cause legal issues.
-  $variables['allow_image_injection'] = variable_get('scribble_allow_image_injection', FALSE);
-  // Further variables for the canvas size and background color.
-  $variables['width'] = $variables['form']['#scribble']->width;
-  $variables['height'] = $variables['form']['#scribble']->height;
-  $items = field_get_items('scribble', $variables['form']['#scribble'], 'scribble_background_color');
-  $variables['background_color'] = $items[0]['jquery_colorpicker'];
 }
 
 /**
