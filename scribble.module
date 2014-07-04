@@ -321,7 +321,7 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
  * Displays an error message in case the file wasn't uploaded.
  */
 function scribble_image_upload($form, &$form_state) {
-  $commands[] = array();
+  $commands = array();
   scribble_prepare_folders($form_state['scribble']->sid);
   $destination = 'public://' . variable_get('scribble_public_files_folder', 'scribble');
   $destination .= '/' . $form_state['scribble']->sid . '/uploads';
@@ -1108,4 +1108,26 @@ function scribble_write_image_file($file_path, $image_resource) {
  */
 function scribble_ajax_action_access($sid) {
   return !empty($sid) && entity_load_single('scribble', $sid) && user_access('access scribbles');
+}
+
+/**
+ * Preprocess for the blackboard form.
+ *
+ * Renders some fields and adds them as variables for the template.
+ */
+function template_preprocess_scribble_blackboard(&$variables) {
+  // Render form elements and add as variable.
+  $fields = array(
+    'message_container',
+    'image_fetch_txt',
+    'image_file',
+    'image_file_upload_submit',
+    'brushes',
+  );
+  foreach ($fields as $field) {
+    $variables[$field] = drupal_render($variables['form'][$field]);
+  }
+  // Background color of the canvas.
+  $items = field_get_items('scribble', $variables['form']['#scribble'], 'scribble_background_color');
+  $variables['background_color'] = $items[0]['jquery_colorpicker'];
 }

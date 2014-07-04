@@ -10,14 +10,13 @@
 function theme_scribble_blackboard($variables) {
   $form = $variables['form'];
   $scribble = $form['#scribble'];
-  // This needs to be explicitly enabled as it could cause legal issues.
-  $variables['allow_image_injection'] = variable_get('scribble_allow_image_injection', FALSE);
+
   // Pull the configured background color.
   $items = field_get_items('scribble', $variables['form']['#scribble'], 'scribble_background_color');
   $background_color = $items[0]['jquery_colorpicker'];
 
   // Action buttons.
-  $output = drupal_render($variables['form']['message_container']);
+  $output = $variables['message_container'];
   $output .= '<div class="scribble-toolbar ui-widget-header ui-corner-all">';
   $output .= '<div class="scribble-actions">';
   $output .= '<div class="scribble-save">' . t('Save') . '</div>';
@@ -27,9 +26,9 @@ function theme_scribble_blackboard($variables) {
   // Render add image fields only if this was explicitly enabled globbally.
   if (variable_get('scribble_allow_image_injection', FALSE)) {
     $output .= '<div class="scribble-actions">';
-    $output .= drupal_render($variables['form']['image_fetch_txt']);
-    $output .= drupal_render($variables['form']['image_file']);
-    $output .= drupal_render($variables['form']['image_file_upload_submit']);
+    $output .= $variables['image_fetch_txt'];
+    $output .= $variables['image_file'];
+    $output .= $variables['image_file_upload_submit'];
     $output .= '</div>';
   }
 
@@ -44,7 +43,7 @@ function theme_scribble_blackboard($variables) {
   $output .= '<div class="scribble-brushes"></div>';
   $output .= '</div>';
   // Add brush radios.
-  $output .= drupal_render($variables['form']['brushes']);
+  $output .= $variables['brushes'];
 
   // The container used to drag images from into the canvas.
   $output .= '<div class="scribble-add-img-container"></div>';
@@ -56,6 +55,7 @@ function theme_scribble_blackboard($variables) {
 
   // Render remaining form elements.
   $output .= drupal_render_children($form);
+
   return $output;
 }
 
