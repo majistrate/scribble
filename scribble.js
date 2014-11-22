@@ -8,33 +8,14 @@ Drupal.scribble = Drupal.scribble || {};
 (function($) {
 
   /**
-   * Behavior for scribble module.
+   * Behavior for the toolbar buttons and modals.
    */
-  Drupal.behaviors.createBlackboard = {};
-  Drupal.behaviors.createBlackboard.attach = function (context, settings) {
-
-    var drag_img_offset_x;
-    var drag_img_offset_y;
-    // @todo get this from the server
-    var canvas_height = 199;
-    var canvas_width = 930;
-    var current_file = Drupal.settings.scribble_info.newestScribble;
-    var dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
-    var $draw_canvas = $('.scribble-canvas');
-    var $add_img_container = $('.scribble-add-img-container');
+  Drupal.behaviors.blackboardToolbar = {};
+  Drupal.behaviors.blackboardToolbar.attach = function (context, settings) {
+    var $modal_content = $('.scribble-toolbar-modal-content');
     var $save_btn = $('.scribble-save');
-    var $size_display = $('.scribble-brush-size-display');
-    var $add_img;
-    var unchanged = true;
-    var img_dialog_width = 0;
-    var add_img_height;
-    var add_img_width;
-
-    $('.scribble-blackboard-wrapper').mousedown(function () {
-      if ($('.scribble-color-picker').dialog('isOpen')) {
-        $('.scribble-color-picker').dialog('close');
-      }
-    });
+    var $image_btn = $('.scribble-add');
+    var $clear_btn = $('.scribble-clear');
 
     // Initialize the toolbar
     $save_btn.button({
@@ -42,12 +23,12 @@ Drupal.scribble = Drupal.scribble || {};
         primary: "ui-icon-disk"
       }
     });
-    $('.scribble-add').button({
+    $image_btn.button({
       icons: {
         primary: "ui-icon-image"
       }
     });
-    $('.scribble-clear').button({
+    $clear_btn.button({
       icons: {
         primary: "ui-icon-trash"
       }
@@ -66,7 +47,37 @@ Drupal.scribble = Drupal.scribble || {};
       $('.scribble-color-picker').dialog('open');
       event.stopPropagation();
     });
-    $('.scribble-brushes').buttonset();
+    $('.form-item-brushes').button();
+  }
+
+  /**
+   * Behavior for scribble module.
+   */
+  Drupal.behaviors.createBlackboard = {};
+  Drupal.behaviors.createBlackboard.attach = function (context, settings) {
+
+    var drag_img_offset_x;
+    var drag_img_offset_y;
+    // @todo get this from the server
+    var canvas_height = 199;
+    var canvas_width = 930;
+    var current_file = Drupal.settings.scribble_info.newestScribble;
+    var dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
+    var $draw_canvas = $('.scribble-canvas');
+    var $add_img_container = $('.scribble-add-img-modal');
+    var $save_btn = $('.scribble-save');
+    var $size_display = $('.scribble-brush-size-display');
+    var $add_img;
+    var unchanged = true;
+    var img_dialog_width = 0;
+    var add_img_height;
+    var add_img_width;
+
+    $('.scribble-blackboard-wrapper').mousedown(function () {
+      if ($('.scribble-color-picker').dialog('isOpen')) {
+        $('.scribble-color-picker').dialog('close');
+      }
+    });
 
     if (current_file != '' && current_file !== undefined && current_file !== null) {
       // Load the newest image as background in the wrapper element of canvas.
@@ -166,41 +177,6 @@ Drupal.scribble = Drupal.scribble || {};
       $load_img.attr('src', URL);
     }
 
-    function loadAddImageDialog($img) {
-      $img.addClass('scribble-add-img');
-      $add_img_container.html($img);
-      $('#img-src-txt').removeClass('ui-state-error');
-      img_dialog_width = (img_dialog_width != 0) ? img_dialog_width: $img.width();
-      $add_img_container.dialog({
-        draggable: true,
-        title: Drupal.t('Drag the image on the blackboard in order to add it.'),
-        autoOpen: false,
-        resizable: false,
-        width: img_dialog_width,
-        hide: "explode"
-      });
-      var options = {
-        stop: addImgDropHandler,
-        start: function (event, ui) {
-          // Set the image to be added in var to use it in the drop handler.
-          $add_img = $('.scribble-add-img');
-          // Set vars for mouse offset left upper corner of the image.
-          drag_img_offset_x = event.pageX - $add_img.offset().left;
-          drag_img_offset_y = event.pageY - $add_img.offset().top;
-          add_img_width = $add_img.width();
-          add_img_height = $add_img.height();
-          $add_img_container.dialog('close');
-        },
-        revert: true,
-        helper: 'clone',
-        appendTo: 'body',
-        scroll: false,
-        zIndex: 1500
-      };
-      $img.draggable(options);
-      $add_img_container.dialog('open');
-    }
-
     // Fires once the dragged image is dropped on the draw canvas.
     function addImgDropHandler(event, ui) {
       if (droppedOnCanvas(event.pageX, event.pageY)) {
@@ -247,11 +223,53 @@ Drupal.scribble = Drupal.scribble || {};
    * @todo describe code.
    */
   Drupal.scribble.scribbleAddImage = function (ajax, response, status) {
-    console.log(response);
+    var $load_img = $(new Image());
+    $load_img.error(function() {
+      // @todo display error message in messages container
+    })
+    .load(function() {
+      loadAddImageDialog($(this));
+    });
+    $load_img.attr('src', URL);
   }
 
   // Register new AJAX command that is used in the server callback specified in
   // the image upload submit button within the blackboard form.
   Drupal.ajax.prototype.commands.scribbleAddImage = Drupal.scribble.scribbleAddImage;
+
+  function loadAddImageDialog($img) {
+    $img.addClass('scribble-add-img');
+    $add_img_container.html($img);
+    $('#img-src-txt').removeClass('ui-state-error');
+    img_dialog_width = (img_dialog_width != 0) ? img_dialog_width: $img.width();
+    $add_img_container.dialog({
+      draggable: true,
+      title: Drupal.t('Drag the image on the blackboard in order to add it.'),
+      autoOpen: false,
+      resizable: false,
+      width: img_dialog_width,
+      hide: "explode"
+    });
+    var options = {
+      stop: addImgDropHandler,
+      start: function (event, ui) {
+        // Set the image to be added in var to use it in the drop handler.
+        $add_img = $('.scribble-add-img');
+        // Set vars for mouse offset left upper corner of the image.
+        drag_img_offset_x = event.pageX - $add_img.offset().left;
+        drag_img_offset_y = event.pageY - $add_img.offset().top;
+        add_img_width = $add_img.width();
+        add_img_height = $add_img.height();
+        $add_img_container.dialog('close');
+      },
+      revert: true,
+      helper: 'clone',
+      appendTo: 'body',
+      scroll: false,
+      zIndex: 1500
+    };
+    $img.draggable(options);
+    $add_img_container.dialog('open');
+  }
 
 })(jQuery);
