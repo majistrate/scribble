@@ -143,10 +143,12 @@ function scribble_theme($existing, $type, $theme, $path) {
       'file' => 'scribble.theme.inc',
     ),
     'scribble_slideshow' => array(
-      'variables' => array(
-        'scribble' => NULL,
-        'slideshow' => '',
-      ),
+      'variables' => array('scribble' => NULL,'slideshow' => ''),
+      'path' => $path,
+      'file' => 'scribble.theme.inc',
+    ),
+    'scribble_brush_buttons' => array(
+      'variables' => array('brushes' => array()),
       'path' => $path,
       'file' => 'scribble.theme.inc',
     ),
@@ -303,15 +305,6 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
     ),
   );
 
-  // Get enabled brushes.
-  $enabled_brushes = scribble_get_enabled_brushes($scribble);
-  $form['brushes'] = array(
-    '#type' => 'radios',
-    '#title' => t('Brush'),
-    '#title_display' => 'invisible',
-    '#options' => $enabled_brushes,
-  );
-
   return $form;
 }
 
@@ -381,6 +374,10 @@ function scribble_get_brushes() {
     'BasicBrush' => 'Basic',
     'LineBrush' => 'Line',
     'CrossBrush' => 'Cross',
+    'DotBrush' => 'Dot',
+    'CircleBrush' => 'Circle',
+    'SemiCircleBrush' => 'SemiCircle',
+    'RectangleBrush' => 'Rectangle',
   );
 }
 
@@ -1122,7 +1119,6 @@ function template_preprocess_scribble_blackboard(&$variables) {
     'image_fetch_txt',
     'image_file',
     'image_file_upload_submit',
-    'brushes',
   );
   foreach ($fields as $field) {
     $variables[$field] = drupal_render($variables['form'][$field]);
