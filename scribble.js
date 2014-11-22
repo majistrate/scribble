@@ -7,6 +7,13 @@ Drupal.scribble = Drupal.scribble || {};
 
 (function($) {
 
+  Drupal.scribble.dialog_base_options = {
+    draggable: true,
+    autoOpen: false,
+    resizable: false,
+    hide: "explode"
+  };
+
   /**
    * Behavior for the toolbar buttons and modals.
    */
@@ -14,8 +21,17 @@ Drupal.scribble = Drupal.scribble || {};
   Drupal.behaviors.blackboardToolbar.attach = function (context, settings) {
     var $modal_content = $('.scribble-toolbar-modal-content');
     var $save_btn = $('.scribble-save');
-    var $image_btn = $('.scribble-add');
+    var $image_btn = $('.scribble-add-image');
     var $clear_btn = $('.scribble-clear');
+    var $brush_btn = $('.scribble-brushes');
+    var $color_btn = $('.scribble-color-btn');
+
+    var dialog_base_options = {
+      draggable: true,
+      autoOpen: false,
+      resizable: false,
+      hide: "explode"
+    };
 
     // Initialize the toolbar
     $save_btn.button({
@@ -33,7 +49,22 @@ Drupal.scribble = Drupal.scribble || {};
         primary: "ui-icon-trash"
       }
     });
-    $('.scribble-color-btn')
+
+    $('.scribble-brush-settings').dialog($.extend(Drupal.scribble.dialog_base_options, {
+      title: Drupal.t('Select brush and color'),
+      width: 450
+    }));
+    $brush_btn
+      .button({
+        icons: {
+          primary: "ui-icon-pencil"
+        }
+      })
+      .click(function () {
+        $('.scribble-brush-settings').dialog('open');
+      });
+
+    $color_btn
       .button({
         icons: {
           primary: "ui-icon-pencil"
@@ -58,9 +89,6 @@ Drupal.scribble = Drupal.scribble || {};
 
     var drag_img_offset_x;
     var drag_img_offset_y;
-    // @todo get this from the server
-    var canvas_height = 199;
-    var canvas_width = 930;
     var current_file = Drupal.settings.scribble_info.newestScribble;
     var dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
     var $draw_canvas = $('.scribble-canvas');
@@ -191,10 +219,6 @@ Drupal.scribble = Drupal.scribble || {};
           dst_y: y,
           scribble_id: Drupal.settings.scribble_info.scribbleId
         };
-        if (current_file == '') {
-          data.canvas_width = canvas_width;
-          data.canvas_height = canvas_height;
-        }
         // Do AJAX post that merges the images and saves a new image.
         $.post(Drupal.settings.scribble.addURL, data, function(response) {
           // Store the latest filename.

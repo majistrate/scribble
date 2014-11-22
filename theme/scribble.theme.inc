@@ -23,6 +23,8 @@ function theme_scribble_blackboard($variables) {
   $output .= '<div class="scribble-clear">' . t('Clear') . '</div>';
   $output .= '<div class="scribble-brushes">' . t('Brush') . '</div>';
   $output .= '<div class="scribble-add-image">' . t('Add image') . '</div>';
+  $output .= '<div class="scribble-brush-size"></div>';
+  $output .= '<div class="scribble-brush-size-display ui-corner-all"></div>';
   $output .= '</div>';
 
   $output .= '<div class="scribble-toolbar-modal-content">';
@@ -39,17 +41,18 @@ function theme_scribble_blackboard($variables) {
 
   // Brush settings and selection.
   $output .= '<div class="scribble-brush-settings">';
+  $output .= '<div class="scribble-color-options-wrapper">';
   $output .= '<div class="scribble-color-btn">' . t('Color') . '</div>';
   $output .= '<div class="scribble-color-display ui-corner-all"></div>';
-  $output .= '<div class="scribble-color-picker"></div>';
-  $output .= '<div class="scribble-brush-size"></div>';
-  $output .= '<div class="scribble-brush-size-display ui-corner-all"></div>';
-  $output .= '<div class="scribble-brushes"></div>';
   $output .= '</div>';
-  // Add brush radios.
+  $output .= '<div class="scribble-color-picker"></div>';
+  $output .= '<div class="scribble-brush-buttons-wrapper">';
+  // Add brush buttons.
   $output .= theme('scribble_brush_buttons', array(
     'brushes' => scribble_get_enabled_brushes($scribble))
   );
+  $output .= '</div>';
+  $output .= '</div>';
   $output .= '</div>';
 
   $output .= '</div>';
@@ -77,9 +80,10 @@ function theme_scribble_slideshow($variables) {
 function theme_scribble_brush_buttons($variables) {
   $output = '<div class="scribble-brush-buttons-wrapper">';
   foreach ($variables['brushes'] as $key => $label) {
-    $output .= '<div class="scribble-brush-button" data-brush="' . $key . '" title="' . $label . '>';
+    $output .= '<div class="scribble-brush-button"';
+    $output .= 'data-brush="' . $key . '" title="' . $label . '">';
     $output .= theme('image', array(
-      'path' => drupal_get_path('module', 'scribble') . '/img/' . $label,
+      'path' => drupal_get_path('module', 'scribble') . '/theme/img/' . strtolower($label) . '.png',
       'alt' => $label,
     ));
     $output .= '</div>';
