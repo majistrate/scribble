@@ -13,18 +13,18 @@ Drupal.scribble = Drupal.scribble || {};
     resizable: false,
     hide: "explode"
   };
+  Drupal.scribble.$draw_canvas = $('.scribble-canvas');
 
   /**
    * Behavior for the toolbar buttons and modals.
    */
-  Drupal.behaviors.blackboardToolbar = {};
-  Drupal.behaviors.blackboardToolbar.attach = function (context, settings) {
-    var $modal_content = $('.scribble-toolbar-modal-content');
+  Drupal.behaviors.ScribbleBlackboardToolbar = {};
+  Drupal.behaviors.ScribbleBlackboardToolbar.attach = function (context, settings) {
     var $save_btn = $('.scribble-save');
     var $image_btn = $('.scribble-add-image');
     var $clear_btn = $('.scribble-clear');
-    var $brush_btn = $('.scribble-brushes');
-    var $color_btn = $('.scribble-color-btn');
+    var $size_display = $('.scribble-brush-size-display');
+    var $brush_size = $('.scribble-brush-size');
 
     var dialog_base_options = {
       draggable: true,
@@ -50,18 +50,38 @@ Drupal.scribble = Drupal.scribble || {};
       }
     });
 
-    $('.scribble-brush-settings').dialog($.extend(Drupal.scribble.dialog_base_options, {
-      title: Drupal.t('Select brush and color'),
-      width: 450
-    }));
+    // Initialize brush size slider.
+    var options = {
+      stop: function (event, ui) {
+        Drupal.scribble.$draw_canvas.data("jqScribble").update({brushSize: ui.value});
+      },
+      slide: function (event, ui) {
+        $size_display.text(ui.value);
+      },
+      min: 1
+    };
+    $brush_size.slider(options);
+    $size_display.text('1');
+
+    // Enable saving after only after first click.
+    Drupal.scribble.$draw_canvas.click(function () {
+      unchanged = false;
+    });
+  }
+
+  /**
+   * Behavior for the brush color and style selection.
+   */
+  Drupal.behaviors.scribbleBrushOptions = {};
+  Drupal.behaviors.scribbleBrushOptions.attach = function (context, settings) {
+    var $brush_btn = $('.scribble-brushes');
+    var $color_btn = $('.scribble-color-btn');
+
     $brush_btn
       .button({
         icons: {
           primary: "ui-icon-pencil"
         }
-      })
-      .click(function () {
-        $('.scribble-brush-settings').dialog('open');
       });
 
     $color_btn
@@ -78,7 +98,13 @@ Drupal.scribble = Drupal.scribble || {};
       $('.scribble-color-picker').dialog('open');
       event.stopPropagation();
     });
-    $('.form-item-brushes').button();
+
+    // Register brush handlers
+    $('.scribble-brushes input').click(function () {
+      // Update the scribble to use the selected brush, the buttons id attribute
+      // is the JS brush class name.
+      Drupal.scribble.$draw_canvas.data("jqScribble").update({brush: eval($(this).attr('id'))});
+    });
   }
 
   /**
@@ -91,7 +117,6 @@ Drupal.scribble = Drupal.scribble || {};
     var drag_img_offset_y;
     var current_file = Drupal.settings.scribble_info.newestScribble;
     var dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
-    var $draw_canvas = $('.scribble-canvas');
     var $add_img_container = $('.scribble-add-img-modal');
     var $save_btn = $('.scribble-save');
     var $size_display = $('.scribble-brush-size-display');
@@ -107,12 +132,15 @@ Drupal.scribble = Drupal.scribble || {};
       }
     });
 
+    // Initialize the toolbar tabs.
+    $('.scribble-toolbar').tabs();
+
     if (current_file != '' && current_file !== undefined && current_file !== null) {
       // Load the newest image as background in the wrapper element of canvas.
       $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
     }
     // Initialize drawing canvas.
-    $draw_canvas.jqScribble({fillOnClear: false});
+    Drupal.scribble.$draw_canvas.jqScribble({fillOnClear: false});
 
     // Add the color picker.
     $('.scribble-color-picker')
@@ -120,7 +148,7 @@ Drupal.scribble = Drupal.scribble || {};
         flat: true,
         onChange: function(hsb, hex, rgb) {
           var html_color = '#' + hex;
-          $draw_canvas.data("jqScribble").update({brushColor: html_color});
+          Drupal.scribble.$draw_canvas.data("jqScribble").update({brushColor: html_color});
           $('.scribble-color-display').css('background-color', html_color);
         }
       })
@@ -133,28 +161,10 @@ Drupal.scribble = Drupal.scribble || {};
         hide: "explode"
       });
 
-    // Initialize brush size slider.
-    var options = {
-      stop: function (event, ui) {
-        $draw_canvas.data("jqScribble").update({brushSize: ui.value});
-      },
-      slide: function (event, ui) {
-        $size_display.text(ui.value);
-      },
-      min: 1
-    };
-    $('.scribble-brush-size').slider(options);
-    $size_display.text(1);
-
-    // Enable saving after only after first click.
-    $draw_canvas.click(function () {
-      unchanged = false;
-    });
-
     // Register the handler for the save action.
     $save_btn.click(function () {
       if (!unchanged) {
-        $draw_canvas.data("jqScribble").save(function (imageData) {
+        Drupal.scribble.$draw_canvas.data("jqScribble").save(function (imageData) {
           if(confirm(Drupal.t('You\'re about to save your changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
             var post_data = {
               imagedata: imageData,
@@ -163,23 +173,16 @@ Drupal.scribble = Drupal.scribble || {};
             $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
               current_file = response.file_name;
               $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
-              $draw_canvas.data("jqScribble").clear();
+              Drupal.scribble.$draw_canvas.data("jqScribble").clear();
             });
           }
         });
       }
     });
 
-    // Register brush handlers
-    $('.scribble-brushes input').click(function () {
-      // Update the scribble to use the selected brush, the buttons id attribute
-      // is the JS brush class name.
-      $draw_canvas.data("jqScribble").update({brush: eval($(this).attr('id'))});
-    });
-
     // Reset to last saved background image.
     $('.scribble-clear').click(function () {
-      $draw_canvas.data('jqScribble').clear();
+      Drupal.scribble.$draw_canvas.data('jqScribble').clear();
       unchanged = true;
     });
 
@@ -209,8 +212,8 @@ Drupal.scribble = Drupal.scribble || {};
     function addImgDropHandler(event, ui) {
       if (droppedOnCanvas(event.pageX, event.pageY)) {
         // Gather data for image merge.
-        var x = event.pageX - $draw_canvas.offset().left - drag_img_offset_x;
-        var y = event.pageY - $draw_canvas.offset().top - drag_img_offset_y;
+        var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - drag_img_offset_x;
+        var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - drag_img_offset_y;
         var data = {
           img_url: $add_img.attr('src'),
           img_width: add_img_width,
@@ -225,14 +228,14 @@ Drupal.scribble = Drupal.scribble || {};
           current_file = response.file_name;
           // Update the background of the canvas with the new image.
           $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
-          $draw_canvas.data("jqScribble").clear();
+          Drupal.scribble.$draw_canvas.data("jqScribble").clear();
         });
       }
     }
 
     // Helper function to check if image was dropped within the canvas.
     function droppedOnCanvas(x, y) {
-      var $canvas = $draw_canvas;
+      var $canvas = Drupal.scribble.$draw_canvas;
       var border_left = $canvas.offset().left;
       var border_top = $canvas.offset().top;
       var border_right = $canvas.offset().left + $canvas.width();

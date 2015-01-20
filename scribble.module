@@ -125,6 +125,7 @@ function scribble_library() {
       array('system', 'ui.slider'),
       array('system', 'ui.button'),
       array('system', 'ui.dialog'),
+      array('system', 'ui.tabs'),
     ),
   );
   return $libraries;
