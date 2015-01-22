@@ -110,7 +110,7 @@ function scribble_library() {
       ),
     ),
     'css' => array(
-      drupal_get_path('module', 'scribble') . '/theme/scribble.css' => array(
+      drupal_get_path('module', 'scribble') . '/theme/css/toolbar.css' => array(
         'type' => 'file',
         'media' => 'screen',
       ),
