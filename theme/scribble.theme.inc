@@ -17,13 +17,20 @@ function theme_scribble_blackboard($variables) {
 
   $output = $variables['message_container'];
   $output .= '<div class="scribble-toolbar ui-widget-header ui-corner-all">';
+
+  // Action buttons for saving and clearing the canvas.
+  $output .= '<div class="scribble-actions" id="scribble-tab-actions">';
+  $output .= '<div class="scribble-save">' . t('Save') . '</div>';
+  $output .= '<div class="scribble-clear">' . t('Clear') . '</div>';
+  $output .= '</div>';
+
   $output .= '<ul>';
   $output .= '<li><a href="#scribble-tab-brushes">' . t('Brush settings') . '</a></li>';
-  $output .= '<li><a href="#scribble-tab-actions">' . t('Actions') . '</a></li>';
   $output .= '<li><a href="#scribble-tab-injection">' . t('Add image') . '</a></li>';
+  $output .= '<li><a href="#scribble-tab-images">' . t('Image list') . '</a></li>';
   $output .= '</ul>';
 
-  // Action buttons tab.
+  // Brush settings tab content.
   $output .= '<div class="scribble-brush-settings" id="scribble-tab-brushes">';
   $output .= '<div class="scribble-color-options-wrapper">';
   $output .= '<div class="scribble-color-btn">' . t('Color') . '</div>';
@@ -31,29 +38,26 @@ function theme_scribble_blackboard($variables) {
   $output .= '</div>';
   $output .= '<div class="scribble-color-picker"></div>';
   $output .= '<div class="scribble-brush-size-display ui-corner-all"></div>';
-    // Add brush buttons.
+  // Add brush buttons.
   $output .= theme('scribble_brush_buttons', array(
       'brushes' => scribble_get_enabled_brushes($scribble))
   );
-  $output .= '</div>';
-
-  // Action buttons tab.
-  $output .= '<div class="scribble-actions" id="scribble-tab-actions">';
-  $output .= '<div class="scribble-save">' . t('Save') . '</div>';
-  $output .= '<div class="scribble-clear">' . t('Clear') . '</div>';
-  // @todo remove those buttons.
-  $output .= '<div class="scribble-brushes">' . t('Brush') . '</div>';
-  $output .= '<div class="scribble-add-image">' . t('Add image') . '</div>';
+  $output .= '<div class="clearfix"></div>';
   $output .= '</div>';
 
   // Render add image fields only if this was explicitly enabled globbally.
   if (variable_get('scribble_allow_image_injection', FALSE)) {
     $output .= '<div class="scribble-image-injection-wrapper" id="scribble-tab-injection">';
     $output .= $variables['image_fetch_txt'];
+    $output .= '<div class="scribble-add-image">' . t('Add image') . '</div>';
     $output .= $variables['image_file'];
     $output .= $variables['image_file_upload_submit'];
     // The container used to drag images from into the canvas.
     $output .= '<div class="scribble-add-img-modal"></div>';
+    $output .= '</div>';
+
+    $output .= '<div id="scribble-tab-images">';
+    $output .= '<div class="scribble-image-list-wrapper"></div>';
     $output .= '</div>';
   }
 

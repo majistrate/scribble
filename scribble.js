@@ -133,7 +133,7 @@ Drupal.scribble = Drupal.scribble || {};
     });
 
     // Initialize the toolbar tabs.
-    $('.scribble-toolbar').tabs();
+    $('.scribble-toolbar').tabs({selected: 0});
 
     if (current_file != '' && current_file !== undefined && current_file !== null) {
       // Load the newest image as background in the wrapper element of canvas.
