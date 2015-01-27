@@ -38,6 +38,7 @@ function theme_scribble_blackboard($variables) {
   $output .= '</div>';
   $output .= '<div class="scribble-color-picker"></div>';
   $output .= '<div class="scribble-brush-size-display ui-corner-all"></div>';
+  $output .= '<div class="scribble-brush-size"></div>';
   // Add brush buttons.
   $output .= theme('scribble_brush_buttons', array(
       'brushes' => scribble_get_enabled_brushes($scribble))
@@ -86,8 +87,11 @@ function theme_scribble_slideshow($variables) {
  */
 function theme_scribble_brush_buttons($variables) {
   $output = '<div class="scribble-brush-buttons-wrapper">';
+  $first = TRUE;
   foreach ($variables['brushes'] as $key => $label) {
-    $output .= '<div class="scribble-brush-button" ';
+    $classes = $first ? 'scribble-brush-button active-brush' : 'scribble-brush-button';
+    $first = FALSE;
+    $output .= '<div class="' . $classes . '" ';
     $output .= 'data-brush="' . $key . '" title="' . $label . '">';
     $output .= theme('image', array(
       'path' => drupal_get_path('module', 'scribble') . '/theme/img/' . strtolower($label) . '.png',

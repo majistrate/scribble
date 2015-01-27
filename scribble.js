@@ -13,18 +13,18 @@ Drupal.scribble = Drupal.scribble || {};
     resizable: false,
     hide: "explode"
   };
-  Drupal.scribble.$draw_canvas = $('.scribble-canvas');
+  Drupal.scribble.$draw_canvas = null;
 
   /**
    * Behavior for the toolbar buttons and modals.
    */
   Drupal.behaviors.ScribbleBlackboardToolbar = {};
   Drupal.behaviors.ScribbleBlackboardToolbar.attach = function (context, settings) {
+    Drupal.scribble.$draw_canvas = $('.scribble-canvas');
+
     var $save_btn = $('.scribble-save');
     var $image_btn = $('.scribble-add-image');
     var $clear_btn = $('.scribble-clear');
-    var $size_display = $('.scribble-brush-size-display');
-    var $brush_size = $('.scribble-brush-size');
 
     var dialog_base_options = {
       draggable: true,
@@ -50,19 +50,6 @@ Drupal.scribble = Drupal.scribble || {};
       }
     });
 
-    // Initialize brush size slider.
-    var options = {
-      stop: function (event, ui) {
-        Drupal.scribble.$draw_canvas.data("jqScribble").update({brushSize: ui.value});
-      },
-      slide: function (event, ui) {
-        $size_display.text(ui.value);
-      },
-      min: 1
-    };
-    $brush_size.slider(options);
-    $size_display.text('1');
-
     // Enable saving after only after first click.
     Drupal.scribble.$draw_canvas.click(function () {
       unchanged = false;
@@ -74,15 +61,10 @@ Drupal.scribble = Drupal.scribble || {};
    */
   Drupal.behaviors.scribbleBrushOptions = {};
   Drupal.behaviors.scribbleBrushOptions.attach = function (context, settings) {
-    var $brush_btn = $('.scribble-brushes');
+    var $brush_btns = $('.scribble-brush-button');
     var $color_btn = $('.scribble-color-btn');
-
-    $brush_btn
-      .button({
-        icons: {
-          primary: "ui-icon-pencil"
-        }
-      });
+    var $size_display = $('.scribble-brush-size-display');
+    var $brush_size = $('.scribble-brush-size');
 
     $color_btn
       .button({
@@ -100,12 +82,46 @@ Drupal.scribble = Drupal.scribble || {};
     });
 
     // Register brush handlers
-    $('.scribble-brushes input').click(function () {
+    $brush_btns.click(function () {
+      $brush_btns.removeClass('active-brush');
+      $(this).addClass('active-brush');
       // Update the scribble to use the selected brush, the buttons id attribute
       // is the JS brush class name.
-      Drupal.scribble.$draw_canvas.data("jqScribble").update({brush: eval($(this).attr('id'))});
+      Drupal.scribble.$draw_canvas.data("jqScribble").update({brush: eval($(this).data('brush'))});
     });
-  }
+
+    // Add the color picker.
+    $('.scribble-color-picker')
+      .ColorPicker({
+        flat: true,
+        onChange: function(hsb, hex, rgb) {
+          var html_color = '#' + hex;
+          Drupal.scribble.$draw_canvas.data("jqScribble").update({brushColor: html_color});
+          $('.scribble-color-display').css('background-color', html_color);
+        }
+      })
+      .dialog({
+        draggable: true,
+        title: Drupal.t('Choose your color'),
+        autoOpen: false,
+        resizable: false,
+        width: 356,
+        hide: "explode"
+      });
+
+    // Initialize brush size slider.
+    var options = {
+      stop: function (event, ui) {
+        Drupal.scribble.$draw_canvas.data("jqScribble").update({brushSize: ui.value});
+      },
+      slide: function (event, ui) {
+        $size_display.text(ui.value);
+      },
+      min: 1
+    };
+    $brush_size.slider(options);
+    $size_display.text('1');
+  };
 
   /**
    * Behavior for scribble module.
@@ -119,7 +135,6 @@ Drupal.scribble = Drupal.scribble || {};
     var dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
     var $add_img_container = $('.scribble-add-img-modal');
     var $save_btn = $('.scribble-save');
-    var $size_display = $('.scribble-brush-size-display');
     var $add_img;
     var unchanged = true;
     var img_dialog_width = 0;
@@ -141,25 +156,6 @@ Drupal.scribble = Drupal.scribble || {};
     }
     // Initialize drawing canvas.
     Drupal.scribble.$draw_canvas.jqScribble({fillOnClear: false});
-
-    // Add the color picker.
-    $('.scribble-color-picker')
-      .ColorPicker({
-        flat: true,
-        onChange: function(hsb, hex, rgb) {
-          var html_color = '#' + hex;
-          Drupal.scribble.$draw_canvas.data("jqScribble").update({brushColor: html_color});
-          $('.scribble-color-display').css('background-color', html_color);
-        }
-      })
-      .dialog({
-        draggable: true,
-        title: Drupal.t('Choose your color'),
-        autoOpen: false,
-        resizable: false,
-        width: 356,
-        hide: "explode"
-      });
 
     // Register the handler for the save action.
     $save_btn.click(function () {
