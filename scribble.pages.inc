@@ -147,6 +147,7 @@ function scribble_save_ajax() {
     drupal_json_output(array('file_name' => $file_name));
     drupal_exit();
   }
+  // @todo add some output for error display on clientside.
 }
 
 /**
@@ -195,6 +196,7 @@ function scribble_add_ajax() {
     drupal_json_output(array('file_name' => $file_name));
     drupal_exit();
   }
+  // @todo add some output for error display on clientside.
 }
 
 /**
