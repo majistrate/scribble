@@ -86,8 +86,8 @@ Drupal.scribble = Drupal.scribble || {};
     function validatedImageLoad(URL) {
       var $load_img = $(new Image());
       $load_img.error(function() {
-          $web_src_txt.addClass('ui-state-error');
-        })
+        $web_src_txt.addClass('ui-state-error');
+      })
         .load(function() {
           loadAddImageDialog($(this));
         });
