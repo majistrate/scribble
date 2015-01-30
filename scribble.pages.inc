@@ -115,7 +115,7 @@ function scribble_image_list_page($scribble) {
  */
 function scribble_save_ajax() {
   $scribble_id = $_POST['scribble_id'];
-  if (!empty($_POST['imagedata']) && !empty($scribble_id)) {
+  if (!empty($_POST['imagedata']) && scribble_ajax_action_access($scribble_id)) {
     $data = $_POST['imagedata'];
     list($scribble, $path, $snapshot_path, $file_name, $snapshot_file_name) = scribble_prepare_folders($scribble_id);
 
@@ -157,7 +157,7 @@ function scribble_save_ajax() {
 function scribble_add_ajax() {
   $scribble_id = $_POST['scribble_id'];
   // @todo check more post values
-  if (!empty($_POST['img_url']) && !empty($scribble_id)) {
+  if (!empty($_POST['img_url']) && scribble_ajax_action_access($scribble_id)) {
 
     // Create the folders  if they don't exist yet, get scribble and file names.
     list($scribble, $path, $snapshot_path, $file_name, $snapshot_file_name) = scribble_prepare_folders($scribble_id);

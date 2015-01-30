@@ -970,6 +970,20 @@ function scribble_write_image_file($file_path, $image_resource) {
 }
 
 /**
+ * Validates access to AJAX request actions.
+ *
+ * @param mixed $sid
+ *   Id of a scribble entity as found in $_POST upon AJAX request.
+ *
+ * @return bool
+ *   TRUE if scribble can be loaded from given id and user has view access on
+ *   the scribble, FALSE otherwise.
+ */
+function scribble_ajax_action_access($sid) {
+  return !empty($sid) && entity_load_single('scribble', $sid) && user_access('access scribbles');
+}
+
+/**
  * Theme function for the scribble brush options on the blackboard toolbar.
  */
 function theme_scribble_brush_options($variables) {
