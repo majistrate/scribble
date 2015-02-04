@@ -12,7 +12,6 @@
 
     var drag_img_offset_x;
     var drag_img_offset_y;
-    // @todo get this from the server
     var canvas_height = 199;
     var canvas_width = 930;
     var current_file = Drupal.settings.scribble_info.newestScribble;
