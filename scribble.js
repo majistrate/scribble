@@ -82,87 +82,87 @@ Drupal.scribble = Drupal.scribble || {};
         $web_src_txt.addClass('ui-state-error');
       }
     });
+  };
 
-    function validatedImageLoad(URL) {
-      var $load_img = $(new Image());
-      $load_img.error(function() {
-          $web_src_txt.addClass('ui-state-error');
-        })
-        .load(function() {
-          loadAddImageDialog($(this));
-        });
-      $load_img.attr('src', URL);
-    }
-
-    function loadAddImageDialog($img) {
-      $img.addClass('scribble-add-img');
-      $add_img_container.html($img);
-      $('#img-src-txt').removeClass('ui-state-error');
-      img_dialog_width = (img_dialog_width != 0) ? img_dialog_width: $img.width();
-      $add_img_container.dialog({
-        draggable: true,
-        title: Drupal.t('Drag the image on the blackboard in order to add it.'),
-        autoOpen: false,
-        resizable: false,
-        width: img_dialog_width,
-        hide: "explode"
+  function validatedImageLoad(URL) {
+    var $load_img = $(new Image());
+    $load_img.error(function() {
+      $web_src_txt.addClass('ui-state-error');
+    })
+      .load(function() {
+        Drupal.scribble.loadAddImageDialog($(this));
       });
-      var options = {
-        stop: addImgDropHandler,
-        start: function (event, ui) {
-          // Set the image to be added in var to use it in the drop handler.
-          $add_img = $('.scribble-add-img');
-          // Set vars for mouse offset left upper corner of the image.
-          drag_img_offset_x = event.pageX - $add_img.offset().left;
-          drag_img_offset_y = event.pageY - $add_img.offset().top;
-          add_img_width = $add_img.width();
-          add_img_height = $add_img.height();
-          $add_img_container.dialog('close');
-        },
-        revert: true,
-        helper: 'clone',
-        appendTo: 'body',
-        scroll: false,
-        zIndex: 1500
+    $load_img.attr('src', URL);
+  }
+
+  Drupal.scribble.loadAddImageDialog = function ($img) {
+    $img.addClass('scribble-add-img');
+    $add_img_container.html($img);
+    $('#img-src-txt').removeClass('ui-state-error');
+    img_dialog_width = (img_dialog_width != 0) ? img_dialog_width: $img.width();
+    $add_img_container.dialog({
+      draggable: true,
+      title: Drupal.t('Drag the image on the blackboard in order to add it.'),
+      autoOpen: false,
+      resizable: false,
+      width: img_dialog_width,
+      hide: "explode"
+    });
+    var options = {
+      stop: Drupal.scribble.addImgDropHandler,
+      start: function (event, ui) {
+        // Set the image to be added in var to use it in the drop handler.
+        $add_img = $('.scribble-add-img');
+        // Set vars for mouse offset left upper corner of the image.
+        drag_img_offset_x = event.pageX - $add_img.offset().left;
+        drag_img_offset_y = event.pageY - $add_img.offset().top;
+        add_img_width = $add_img.width();
+        add_img_height = $add_img.height();
+        $add_img_container.dialog('close');
+      },
+      revert: true,
+      helper: 'clone',
+      appendTo: 'body',
+      scroll: false,
+      zIndex: 1500
+    };
+    $img.draggable(options);
+    $add_img_container.dialog('open');
+  };
+
+  // Fires once the dragged image is dropped on the draw canvas.
+  Drupal.scribble.addImgDropHandler = function (event, ui) {
+    if (Drupal.scribble.droppedOnCanvas(event.pageX, event.pageY)) {
+      // Gather data for image merge.
+      var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - drag_img_offset_x;
+      var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - drag_img_offset_y;
+      var data = {
+        img_url: $add_img.attr('src'),
+        img_width: add_img_width,
+        img_height: add_img_height,
+        dst_x: x,
+        dst_y: y,
+        scribble_id: Drupal.settings.scribble_info.scribbleId
       };
-      $img.draggable(options);
-      $add_img_container.dialog('open');
+      // Do AJAX post that merges the images and saves a new image.
+      $.post(Drupal.settings.scribble.addURL, data, function(response) {
+        // Store the latest filename.
+        current_file = response.file_name;
+        // Update the background of the canvas with the new image.
+        $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
+        Drupal.scribble.$draw_canvas.data("jqScribble").clear();
+      });
     }
+  };
 
-    // Fires once the dragged image is dropped on the draw canvas.
-    function addImgDropHandler(event, ui) {
-      if (droppedOnCanvas(event.pageX, event.pageY)) {
-        // Gather data for image merge.
-        var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - drag_img_offset_x;
-        var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - drag_img_offset_y;
-        var data = {
-          img_url: $add_img.attr('src'),
-          img_width: add_img_width,
-          img_height: add_img_height,
-          dst_x: x,
-          dst_y: y,
-          scribble_id: Drupal.settings.scribble_info.scribbleId
-        };
-        // Do AJAX post that merges the images and saves a new image.
-        $.post(Drupal.settings.scribble.addURL, data, function(response) {
-          // Store the latest filename.
-          current_file = response.file_name;
-          // Update the background of the canvas with the new image.
-          $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
-          Drupal.scribble.$draw_canvas.data("jqScribble").clear();
-        });
-      }
-    }
-
-    // Helper function to check if image was dropped within the canvas.
-    function droppedOnCanvas(x, y) {
-      var $canvas = Drupal.scribble.$draw_canvas;
-      var border_left = $canvas.offset().left;
-      var border_top = $canvas.offset().top;
-      var border_right = $canvas.offset().left + $canvas.width();
-      var border_bottom = $canvas.offset().top + $canvas.height();
-      return x > border_left && x < border_right && y > border_top && y < border_bottom;
-    }
+  // Helper function to check if image was dropped within the canvas.
+  Drupal.scribble.droppedOnCanvas = function (x, y) {
+    var $canvas = Drupal.scribble.$draw_canvas;
+    var border_left = $canvas.offset().left;
+    var border_top = $canvas.offset().top;
+    var border_right = $canvas.offset().left + $canvas.width();
+    var border_bottom = $canvas.offset().top + $canvas.height();
+    return x > border_left && x < border_right && y > border_top && y < border_bottom;
   };
 
   // Register new AJAX command that is used in the server callback specified in
@@ -180,7 +180,7 @@ Drupal.scribble = Drupal.scribble || {};
       // @todo display error message in messages container
     })
       .load(function() {
-        loadAddImageDialog($(this));
+        Drupal.scribble.loadAddImageDialog($(this));
       });
     $load_img.attr('src', URL);
   }
