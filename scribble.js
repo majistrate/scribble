@@ -69,7 +69,7 @@ Drupal.scribble = Drupal.scribble || {};
     var img_dialog_width = 0;
     var add_img_height;
     var add_img_width;
-    var $scribble_add_btn = $('.scribble-add');
+    var $scribble_add_btn = $('.scribble-add-image');
     var $web_src_txt = $('#img-src-txt');
 
     // Handle image add action.
@@ -84,7 +84,7 @@ Drupal.scribble = Drupal.scribble || {};
     });
   };
 
-  function validatedImageLoad(URL) {
+  Drupal.scribble.validatedImageLoad = function(URL) {
     var $load_img = $(new Image());
     $load_img.error(function() {
       $web_src_txt.addClass('ui-state-error');
