@@ -26,8 +26,10 @@ function theme_scribble_blackboard($variables) {
 
   $output .= '<ul>';
   $output .= '<li><a href="#scribble-tab-brushes">' . t('Brush settings') . '</a></li>';
-  $output .= '<li><a href="#scribble-tab-injection">' . t('Add image') . '</a></li>';
-  $output .= '<li><a href="#scribble-tab-images">' . t('Image list') . '</a></li>';
+  if (variable_get('scribble_allow_image_injection', FALSE)) {
+    $output .= '<li><a href="#scribble-tab-injection">' . t('Add image') . '</a></li>';
+    $output .= '<li><a href="#scribble-tab-images">' . t('Image list') . '</a></li>';
+  }
   $output .= '</ul>';
 
   // Brush settings tab content.

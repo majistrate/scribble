@@ -3,17 +3,22 @@
  * Contains javascript code for the scribble module.
  */
 
-Drupal.scribble = Drupal.scribble || {};
-
-(function($) {
-
-  Drupal.scribble.dialog_base_options = {
+Drupal.scribble = Drupal.scribble || {
+  dialog_base_options: {
     draggable: true,
     autoOpen: false,
     resizable: false,
     hide: "explode"
-  };
-  Drupal.scribble.$draw_canvas = null;
+  },
+  $draw_canvas: null,
+  $web_src_txt: null,
+  $add_img_container: null,
+  img_dialog_width: 0,
+  scribble_dir_path: null,
+  current_file: null
+};
+
+(function($) {
 
   /**
    * Behavior for the toolbar buttons and modals.
@@ -22,6 +27,7 @@ Drupal.scribble = Drupal.scribble || {};
   Drupal.behaviors.scribbleBlackboardToolbar.attach = function (context, settings) {
     // Get the canvas into 'global' variable as used in other behaviors as well.
     Drupal.scribble.$draw_canvas = $('.scribble-canvas');
+    Drupal.scribble.scribble_dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
 
     var $save_btn = $('.scribble-save');
     var $image_btn = $('.scribble-add-image');
@@ -64,22 +70,22 @@ Drupal.scribble = Drupal.scribble || {};
   Drupal.behaviors.scribbleImageInjection.attach = function (context, settings) {
     var drag_img_offset_x;
     var drag_img_offset_y;
-    var $add_img_container = $('.scribble-add-img-modal');
     var $add_img;
     var img_dialog_width = 0;
     var add_img_height;
     var add_img_width;
     var $scribble_add_btn = $('.scribble-add-image');
-    var $web_src_txt = $('#img-src-txt');
+    Drupal.scribble.$web_src_txt = $('#img-src-txt');
+    Drupal.scribble.$add_img_container = $('.scribble-add-img-modal');
 
     // Handle image add action.
     $scribble_add_btn.click(function () {
-      var img_src = $web_src_txt.val();
+      var img_src = Drupal.scribble.$web_src_txt.val();
       if(img_src !== '') {
-        validatedImageLoad(img_src);
+        Drupal.scribble.validatedImageLoad(img_src);
       }
       else {
-        $web_src_txt.addClass('ui-state-error');
+        Drupal.scribble.$web_src_txt.addClass('ui-state-error');
       }
     });
   };
@@ -87,25 +93,25 @@ Drupal.scribble = Drupal.scribble || {};
   Drupal.scribble.validatedImageLoad = function(URL) {
     var $load_img = $(new Image());
     $load_img.error(function() {
-      $web_src_txt.addClass('ui-state-error');
+      Drupal.scribble.$web_src_txt.addClass('ui-state-error');
     })
-      .load(function() {
-        Drupal.scribble.loadAddImageDialog($(this));
-      });
+    .load(function() {
+      Drupal.scribble.loadAddImageDialog($(this));
+    });
     $load_img.attr('src', URL);
-  }
+  };
 
   Drupal.scribble.loadAddImageDialog = function ($img) {
     $img.addClass('scribble-add-img');
-    $add_img_container.html($img);
+    Drupal.scribble.$add_img_container.html($img);
     $('#img-src-txt').removeClass('ui-state-error');
-    img_dialog_width = (img_dialog_width != 0) ? img_dialog_width: $img.width();
-    $add_img_container.dialog({
+    Drupal.scribble.img_dialog_width = (Drupal.scribble.img_dialog_width != 0) ? Drupal.scribble.img_dialog_width: $img.width();
+    Drupal.scribble.$add_img_container.dialog({
       draggable: true,
       title: Drupal.t('Drag the image on the blackboard in order to add it.'),
       autoOpen: false,
       resizable: false,
-      width: img_dialog_width,
+      width: Drupal.scribble.img_dialog_width,
       hide: "explode"
     });
     var options = {
@@ -118,7 +124,7 @@ Drupal.scribble = Drupal.scribble || {};
         drag_img_offset_y = event.pageY - $add_img.offset().top;
         add_img_width = $add_img.width();
         add_img_height = $add_img.height();
-        $add_img_container.dialog('close');
+        Drupal.scribble.$add_img_container.dialog('close');
       },
       revert: true,
       helper: 'clone',
@@ -127,7 +133,7 @@ Drupal.scribble = Drupal.scribble || {};
       zIndex: 1500
     };
     $img.draggable(options);
-    $add_img_container.dialog('open');
+    Drupal.scribble.$add_img_container.dialog('open');
   };
 
   // Fires once the dragged image is dropped on the draw canvas.
@@ -147,9 +153,9 @@ Drupal.scribble = Drupal.scribble || {};
       // Do AJAX post that merges the images and saves a new image.
       $.post(Drupal.settings.scribble.addURL, data, function(response) {
         // Store the latest filename.
-        current_file = response.file_name;
+        Drupal.scribble.current_file = response.file_name;
         // Update the background of the canvas with the new image.
-        $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
+        $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
         Drupal.scribble.$draw_canvas.data("jqScribble").clear();
       });
     }
@@ -183,7 +189,7 @@ Drupal.scribble = Drupal.scribble || {};
         Drupal.scribble.loadAddImageDialog($(this));
       });
     $load_img.attr('src', URL);
-  }
+  };
 
   /**
    * Behavior for the brush color and style selection.
@@ -267,8 +273,6 @@ Drupal.scribble = Drupal.scribble || {};
 
     var drag_img_offset_x;
     var drag_img_offset_y;
-    var current_file = Drupal.settings.scribble_info.newestScribble;
-    var dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
     var $add_img_container = $('.scribble-add-img-modal');
     var $save_btn = $('.scribble-save');
     var $add_img;
@@ -276,10 +280,11 @@ Drupal.scribble = Drupal.scribble || {};
     var img_dialog_width = 0;
     var add_img_height;
     var add_img_width;
+    Drupal.scribble.current_file = Drupal.settings.scribble_info.newestScribble;
 
-    if (current_file != '' && current_file !== undefined && current_file !== null) {
+    if (Drupal.scribble.current_file != '' && Drupal.scribble.current_file !== undefined && Drupal.scribble.current_file !== null) {
       // Load the newest image as background in the wrapper element of canvas.
-      $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
+      $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
     }
     // Initialize drawing canvas.
     Drupal.scribble.$draw_canvas.jqScribble({fillOnClear: false});
@@ -294,8 +299,8 @@ Drupal.scribble = Drupal.scribble || {};
               scribble_id: Drupal.settings.scribble_info.scribbleId
             };
             $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
-              current_file = response.file_name;
-              $('.scribble-canvas-wrapper').css('background-image', 'url("' + dir_path + '/' + current_file + '")');
+              Drupal.scribble.current_file = response.file_name;
+              $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
               Drupal.scribble.$draw_canvas.data("jqScribble").clear();
             });
           }
