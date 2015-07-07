@@ -286,7 +286,6 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
       'id' => 'img-src-txt',
       'placeholder' => t('Enter the URL of the image to add'),
     ),
-    '#suffix' => '<div class="scribble-add">' . t('Add Image') . '</div>',
   );
 
   $form['image_file'] = array(
