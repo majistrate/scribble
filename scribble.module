@@ -137,22 +137,23 @@ function scribble_library() {
 function scribble_theme($existing, $type, $theme, $path) {
   $path = drupal_get_path('module', 'scribble') . '/theme/';
   $theme_include = drupal_get_path('module', 'scribble') . '/theme/scribble.theme.inc';
+  $base = array(
+    'path' => $path,
+    'file' => 'scribble.theme.inc',
+  );
   return array(
     'scribble_blackboard' => array(
       'render element' => 'form',
-      'path' => $path,
-      'file' => 'scribble.theme.inc',
-    ),
+    ) + $base,
     'scribble_slideshow' => array(
       'variables' => array('scribble' => NULL,'slideshow' => ''),
-      'path' => $path,
-      'file' => 'scribble.theme.inc',
-    ),
+    ) + $base,
     'scribble_brush_buttons' => array(
       'variables' => array('brushes' => array()),
-      'path' => $path,
-      'file' => 'scribble.theme.inc',
-    ),
+    ) + $base,
+    'scribble_get_scribble_added_image_list' => array(
+      'variables' => array('scribble' => NULL),
+    ) + $base,
   );
 }
 
@@ -299,10 +300,14 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
   $form['image_file_upload_submit'] = array(
     '#type' => 'submit',
     '#value' => t('Upload'),
-    '#submit' => array('scribble_image_upload'),
+    //'#submit' => array('scribble_image_upload'),
     '#ajax' => array(
       'callback' => 'scribble_image_upload',
     ),
+  );
+
+  $form['added_images'] = array(
+    '#markup' => theme('scribble_get_scribble_added_image_list', array('scribble' => $scribble)),
   );
 
   return $form;
@@ -329,6 +334,10 @@ function scribble_image_upload($form, &$form_state) {
   if ($file) {
     $file->status = FILE_STATUS_PERMANENT;
     file_save($file);
+
+    // Store the image on the scribble's uploads field.
+    scribble_add_image_to_scribble_field($file->uri, $form_state['scribble'], 'scribble_image_uploads');
+
     $commands[] = array(
       'command' => 'scribbleAddImage',
       'data' => array('file_name' => file_create_url($file->uri)),

@@ -227,6 +227,30 @@ function scribble_install() {
     field_create_instance($instance);
   }
 
+  // Check if field is not already created.
+  if (!field_info_field('scribble_image_uploads')) {
+    $field = array(
+      'field_name' => 'scribble_image_uploads',
+      'type' => 'image',
+      'locked' => TRUE,
+      'cardinality' => -1,
+    );
+    field_create_field($field);
+
+    // Create the instance on the bundle.
+    $instance = array(
+      'field_name' => 'scribble_image_uploads',
+      'entity_type' => 'scribble',
+      'label' => 'Image',
+      'description' => 'Stores images that get uploaded on a scribble.',
+      'bundle' => 'scribble',
+      'widget' => array(
+        'type' => 'image_image',
+      ),
+    ) + $display_hidden;
+    field_create_instance($instance);
+  }
+
   if (!field_info_field('scribble_background_color')) {
     $field = array(
       'field_name' => 'scribble_background_color',
