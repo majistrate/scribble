@@ -171,16 +171,17 @@ Drupal.scribble = Drupal.scribble || {
     return x > border_left && x < border_right && y > border_top && y < border_bottom;
   };
 
-  // Register new AJAX command that is used in the server callback specified in
-  // the image upload submit button within the blackboard form.
-  Drupal.ajax.prototype.commands.scribbleAddImage = Drupal.scribble.scribbleAddImage;
-
   /**
-   * AJAX command callback.
    *
-   * @todo describe code.
+   * Register new AJAX command that is used in the server callback specified in
+   * the image upload submit button within the blackboard form.
+   * @param ajax
+   * @param response
+   * @param status
    */
-  Drupal.scribble.scribbleAddImage = function (ajax, response, status) {
+  Drupal.ajax.prototype.commands.scribbleAddImage = function (ajax, response, status) {
+    console.log(response);
+    /*
     var $load_img = $(new Image());
     $load_img.error(function() {
       // @todo display error message in messages container
@@ -189,6 +190,7 @@ Drupal.scribble = Drupal.scribble || {
         Drupal.scribble.loadAddImageDialog($(this));
       });
     $load_img.attr('src', URL);
+    */
   };
 
   /**
