@@ -154,6 +154,9 @@ function scribble_theme($existing, $type, $theme, $path) {
     'scribble_get_scribble_added_image_list' => array(
       'variables' => array('scribble' => NULL),
     ) + $base,
+    'scribble_added_image_list_item' => array(
+      'variables' => array('image_url' => NULL),
+    ) + $base,
   );
 }
 
@@ -300,14 +303,10 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
   $form['image_file_upload_submit'] = array(
     '#type' => 'submit',
     '#value' => t('Upload'),
-    //'#submit' => array('scribble_image_upload'),
+    '#submit' => array('scribble_image_upload'),
     '#ajax' => array(
-      'callback' => 'scribble_image_upload',
+      'callback' => 'scribble_image_upload_ajax',
     ),
-  );
-
-  $form['added_images'] = array(
-    '#markup' => theme('scribble_get_scribble_added_image_list', array('scribble' => $scribble)),
   );
 
   return $form;
@@ -319,7 +318,6 @@ function scribble_blackboard_form($form, &$form_state, $scribble) {
  * Displays an error message in case the file wasn't uploaded.
  */
 function scribble_image_upload($form, &$form_state) {
-  $commands = array();
   scribble_prepare_folders($form_state['scribble']->sid);
   $destination = 'public://' . variable_get('scribble_public_files_folder', 'scribble');
   $destination .= '/' . $form_state['scribble']->sid . '/uploads';
@@ -338,18 +336,45 @@ function scribble_image_upload($form, &$form_state) {
     // Store the image on the scribble's uploads field.
     scribble_add_image_to_scribble_field($file->uri, $form_state['scribble'], 'scribble_image_uploads');
 
-    $commands[] = array(
-      'command' => 'scribbleAddImage',
-      'data' => array('file_name' => file_create_url($file->uri)),
-    );
+    // Store this for usage in AJAX callback function.
+    $form_state['scribble_added_image'] = file_create_url($file->uri);
   }
   else {
     // Display an error message in the corresponding container of the form.
-    drupal_set_message('Unable to upload the file. Allowed file formats are png gif jpg jpeg.', 'error');
-    $test = theme('status_messages');
-    $commands[] = ajax_command_html('.scribble-messages', $test);
+    drupal_set_message('File was not uploaded due to failed validation.', 'error');
   }
+}
 
+/**
+ * AJAX callback for image upload.
+ *
+ * Sends command to the client that will open a dialog containing the uploaded
+ * image and add it to the list of added images. Renders and displays error
+ * messages in case the upload failed.
+ *
+ * @return array
+ *   Array of AJAX commands.
+ */
+function scribble_image_upload_ajax($form, &$form_state) {
+  if (!empty($form_state['scribble_added_image'])) {
+    $commands[] = ajax_command_append(
+      '.scribble-image-list-wrapper',
+      theme('scribble_added_image_list_item', array(
+        'image_url' => $form_state['scribble_added_image'],
+      ))
+    );
+    $commands[] = array(
+      'command' => 'scribbleOpenImageDialog',
+      'data' => array('file_name' => $form_state['scribble_added_image']),
+    );
+    unset($form_state['scribble_added_image']);
+  }
+  else {
+    $commands[] = ajax_command_html(
+      '.scribble-messages',
+      theme('status_messages')
+    );
+  }
   return array('#type' => 'ajax', '#commands' => $commands);
 }
 

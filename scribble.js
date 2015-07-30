@@ -179,8 +179,7 @@ Drupal.scribble = Drupal.scribble || {
    * @param response
    * @param status
    */
-  Drupal.ajax.prototype.commands.scribbleAddImage = function (ajax, response, status) {
-    console.log(response);
+  Drupal.ajax.prototype.commands.scribbleOpenImageDialog = function (ajax, response, status) {
     /*
     var $load_img = $(new Image());
     $load_img.error(function() {
