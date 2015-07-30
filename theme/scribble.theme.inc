@@ -112,14 +112,24 @@ function theme_scribble_get_scribble_added_image_list($variables) {
   $output = '<div class="scribble-image-list-wrapper">';
   if ($items = field_get_items('scribble', $variables['scribble'], 'scribble_image_uploads')) {
     foreach ($items as $item) {
-      $output .= '<div class="scribble-added-image-wrapper">';
-      $output .= theme('image', array('path' => file_create_url($item['uri'])));
-      $output .= '</div>';
+      $output .= theme('scribble_added_image_list_item', array(
+        'image_url' => file_create_url($item['uri']),
+      ));
     }
   }
   else {
     $output .= '<span>' . t('No images added yet.') . '</span>';
   }
+  $output .= '</div>';
+  return $output;
+}
+
+/**
+ * Theme function for a single item in the added images list.
+ */
+function theme_scribble_added_image_list_item($variables) {
+  $output = '<div class="scribble-added-image-wrapper">';
+  $output .= theme('image', array('path' => $variables['image_url']));
   $output .= '</div>';
   return $output;
 }
