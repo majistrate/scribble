@@ -13,6 +13,7 @@ Drupal.scribble = Drupal.scribble || {
   $draw_canvas: null,
   $web_src_txt: null,
   $add_img_container: null,
+  $toolbar_tabs: null,
   img_dialog_width: 0,
   scribble_dir_path: null,
   current_file: null
@@ -28,6 +29,7 @@ Drupal.scribble = Drupal.scribble || {
     // Get the canvas into 'global' variable as used in other behaviors as well.
     Drupal.scribble.$draw_canvas = $('.scribble-canvas');
     Drupal.scribble.scribble_dir_path = Drupal.settings.scribble.bgImagePath + '/' + Drupal.settings.scribble_info.scribbleId;
+    Drupal.scribble.$toolbar_tabs = $('.scribble-toolbar');
 
     var $save_btn = $('.scribble-save');
     var $image_btn = $('.scribble-add-image');
@@ -63,7 +65,9 @@ Drupal.scribble = Drupal.scribble || {
     });
 
     // Initialize the toolbar tabs.
-    $('.scribble-toolbar').tabs({selected: 0});
+    Drupal.scribble.$toolbar_tabs.once('blackboard-tabs', function () {
+      Drupal.scribble.$toolbar_tabs.tabs({selected: 0});
+    });
   };
 
   Drupal.behaviors.scribbleImageInjection = {};
@@ -87,6 +91,12 @@ Drupal.scribble = Drupal.scribble || {
       else {
         Drupal.scribble.$web_src_txt.addClass('ui-state-error');
       }
+    });
+
+    $('.scribble-added-image-wrapper').each(function () {
+      $(this).click(function () {
+        Drupal.scribble.validatedImageLoad($(this).find('img').attr('src'));
+      });
     });
   };
 
@@ -173,23 +183,16 @@ Drupal.scribble = Drupal.scribble || {
 
   /**
    *
-   * Register new AJAX command that is used in the server callback specified in
-   * the image upload submit button within the blackboard form.
-   * @param ajax
-   * @param response
-   * @param status
+   * Custom Drupal AJAX command.
+   *
+   * Command gets invoked within the server AJAX callback for
+   * the image upload button on the blackboard form.
    */
   Drupal.ajax.prototype.commands.scribbleOpenImageDialog = function (ajax, response, status) {
-    /*
-    var $load_img = $(new Image());
-    $load_img.error(function() {
-      // @todo display error message in messages container
-    })
-      .load(function() {
-        Drupal.scribble.loadAddImageDialog($(this));
-      });
-    $load_img.attr('src', URL);
-    */
+    // Switch to the image list tab of the toolbar.
+    Drupal.scribble.$toolbar_tabs.tabs("select", 2);
+    // Open the image in a dialog for drag and drop.
+    Drupal.scribble.validatedImageLoad(response.data.file_name);
   };
 
   /**
