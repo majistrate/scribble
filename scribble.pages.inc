@@ -128,6 +128,11 @@ function scribble_save_ajax() {
 
     // If something went wrong return the old filename as background.
     if (empty($snapshot_resource)) {
+      watchdog(
+        'scribble',
+        "Saving new snapshot to scribble @scribble wasn't possible, creating snapshot failed.",
+        array('@scribble' => $scribble_id)
+      );
       drupal_json_output(array('file_name' => scribble_get_newest($scribble_id)));
       drupal_exit();
     }
@@ -169,6 +174,11 @@ function scribble_add_ajax() {
     $extension = str_replace('jpg', 'jpeg', $extension[1]);
     $function = 'imagecreatefrom' . $extension;
     if (!function_exists($function)) {
+      watchdog(
+        'scribble',
+        "Adding image to scribble @scribble wasn't possible due to unexpected file format of image: @src",
+        array('@src' => $_POST['imag_url'], '@scribble' => $scribble_id)
+      );
       return;
     }
     $add_img_resource = $function($_POST['img_url']);
@@ -180,6 +190,11 @@ function scribble_add_ajax() {
 
     // If something went wrong return the old filename as background.
     if (empty($snapshot_resource) || empty($add_img_resource)) {
+      watchdog(
+        'scribble',
+        "Adding image to scribble wasn't possible, creating snapshot from @src to scribble @scribble failed.",
+        array('@src' => $_POST['imag_url'], '@scribble' => $scribble_id)
+      );
       drupal_json_output(array('file_name' => scribble_get_newest($scribble_id)));
       drupal_exit();
     }
