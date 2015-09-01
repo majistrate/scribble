@@ -16,7 +16,8 @@ Drupal.scribble = Drupal.scribble || {
   $toolbar_tabs: null,
   img_dialog_width: 0,
   scribble_dir_path: null,
-  current_file: null
+  current_file: null,
+  unchanged: true
 };
 
 (function($) {
@@ -34,13 +35,6 @@ Drupal.scribble = Drupal.scribble || {
     var $save_btn = $('.scribble-save');
     var $image_btn = $('.scribble-add-image');
     var $clear_btn = $('.scribble-clear');
-
-    var dialog_base_options = {
-      draggable: true,
-      autoOpen: false,
-      resizable: false,
-      hide: "explode"
-    };
 
     // Initialize the toolbar buttons.
     $save_btn.button({
@@ -61,23 +55,51 @@ Drupal.scribble = Drupal.scribble || {
 
     // Enable saving after only after first click.
     Drupal.scribble.$draw_canvas.click(function () {
-      unchanged = false;
+      Drupal.scribble.unchanged = false;
     });
 
     // Initialize the toolbar tabs.
     Drupal.scribble.$toolbar_tabs.once('blackboard-tabs', function () {
       Drupal.scribble.$toolbar_tabs.tabs({selected: 0});
     });
+
+    Drupal.scribble.current_file = Drupal.settings.scribble_info.newestScribble;
+
+    if (Drupal.scribble.current_file != '' && Drupal.scribble.current_file !== undefined && Drupal.scribble.current_file !== null) {
+      // Load the newest image as background in the wrapper element of canvas.
+      $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
+    }
+    // Initialize drawing canvas.
+    Drupal.scribble.$draw_canvas.jqScribble({fillOnClear: false});
+
+    // Register the handler for the save action.
+    $save_btn.click(function () {
+      if (!Drupal.scribble.unchanged) {
+        Drupal.scribble.$draw_canvas.data("jqScribble").save(function (imageData) {
+          if(confirm(Drupal.t("You're about to save your changes. Is that cool with you?")) && !Drupal.scribble.$draw_canvas.data('jqScribble').blank) {
+            var post_data = {
+              imagedata: imageData,
+              scribble_id: Drupal.settings.scribble_info.scribbleId
+            };
+            $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
+              Drupal.scribble.current_file = response.file_name;
+              $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
+              Drupal.scribble.$draw_canvas.data("jqScribble").clear();
+            });
+          }
+        });
+      }
+    });
+
+    // Reset to last saved background image.
+    $clear_btn.click(function () {
+      Drupal.scribble.$draw_canvas.data('jqScribble').clear();
+      Drupal.scribble.unchanged = true;
+    });
   };
 
   Drupal.behaviors.scribbleImageInjection = {};
   Drupal.behaviors.scribbleImageInjection.attach = function (context, settings) {
-    var drag_img_offset_x;
-    var drag_img_offset_y;
-    var $add_img;
-    var img_dialog_width = 0;
-    var add_img_height;
-    var add_img_width;
     var $scribble_add_btn = $('.scribble-add-image');
     Drupal.scribble.$web_src_txt = $('#img-src-txt');
     Drupal.scribble.$add_img_container = $('.scribble-add-img-modal');
@@ -93,6 +115,7 @@ Drupal.scribble = Drupal.scribble || {
       }
     });
 
+    // Add click handler that opens dialog for uploaded images.
     $('.scribble-added-image-wrapper').each(function () {
       $(this).click(function () {
         Drupal.scribble.validatedImageLoad($(this).find('img').attr('src'));
@@ -101,6 +124,7 @@ Drupal.scribble = Drupal.scribble || {
   };
 
   Drupal.scribble.validatedImageLoad = function(URL) {
+    // @todo validate image extension right here.
     var $load_img = $(new Image());
     $load_img.error(function() {
       Drupal.scribble.$web_src_txt.addClass('ui-state-error');
@@ -171,7 +195,17 @@ Drupal.scribble = Drupal.scribble || {
     }
   };
 
-  // Helper function to check if image was dropped within the canvas.
+  /**
+   * Helper function to check if image was dropped within the canvas.
+   *
+   * @param x
+   *   The x coordinate from the very left of the view port..
+   * @param y
+   *   The y coordinate from the very top of the view port.
+   *
+   * @returns {boolean}
+   *   TRUE if dropped on canvas
+   */
   Drupal.scribble.droppedOnCanvas = function (x, y) {
     var $canvas = Drupal.scribble.$draw_canvas;
     var border_left = $canvas.offset().left;
@@ -268,55 +302,5 @@ Drupal.scribble = Drupal.scribble || {
     $brush_size.slider(options);
     $size_display.text('1');
   };
-
-  /**
-   * Behavior for scribble module.
-   */
-  Drupal.behaviors.createBlackboard = {};
-  Drupal.behaviors.createBlackboard.attach = function (context, settings) {
-
-    var drag_img_offset_x;
-    var drag_img_offset_y;
-    var $add_img_container = $('.scribble-add-img-modal');
-    var $save_btn = $('.scribble-save');
-    var $add_img;
-    var unchanged = true;
-    var img_dialog_width = 0;
-    var add_img_height;
-    var add_img_width;
-    Drupal.scribble.current_file = Drupal.settings.scribble_info.newestScribble;
-
-    if (Drupal.scribble.current_file != '' && Drupal.scribble.current_file !== undefined && Drupal.scribble.current_file !== null) {
-      // Load the newest image as background in the wrapper element of canvas.
-      $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
-    }
-    // Initialize drawing canvas.
-    Drupal.scribble.$draw_canvas.jqScribble({fillOnClear: false});
-
-    // Register the handler for the save action.
-    $save_btn.click(function () {
-      if (!unchanged) {
-        Drupal.scribble.$draw_canvas.data("jqScribble").save(function (imageData) {
-          if(confirm(Drupal.t('You\'re about to save your changes. Is that cool with you?')) && !$draw_canvas.data('jqScribble').blank) {
-            var post_data = {
-              imagedata: imageData,
-              scribble_id: Drupal.settings.scribble_info.scribbleId
-            };
-            $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
-              Drupal.scribble.current_file = response.file_name;
-              $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
-              Drupal.scribble.$draw_canvas.data("jqScribble").clear();
-            });
-          }
-        });
-      }
-    });
-
-    // Reset to last saved background image.
-    $('.scribble-clear').click(function () {
-      Drupal.scribble.$draw_canvas.data('jqScribble').clear();
-      unchanged = true;
-    });
-  }
 
 })(jQuery);
