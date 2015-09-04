@@ -52,7 +52,7 @@ function theme_scribble_blackboard($variables) {
   if (variable_get('scribble_allow_image_injection', FALSE)) {
     $output .= '<div class="scribble-image-injection-wrapper" id="scribble-tab-injection">';
     $output .= $variables['image_fetch_txt'];
-    $output .= '<div class="scribble-add-image">' . t('Add image') . '</div>';
+    $output .= '<div class="scribble-add-image">' . t('Fetch image') . '</div>';
     $output .= $variables['image_file'];
     $output .= $variables['image_file_upload_submit'];
     // The container used to drag images from into the canvas.
@@ -63,6 +63,7 @@ function theme_scribble_blackboard($variables) {
     $output .= '<div id="scribble-tab-images">';
     $output .= render($variables['uploaded_images']);
     $output .= '</div>';
+    $output .= '<div class="clearfix"></div>';
   }
 
   $output .= '</div>';
