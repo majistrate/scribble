@@ -143,7 +143,7 @@ function scribble_image_default_styles() {
       'effects' => array(
         array(
           'name' => 'image_scale',
-          'data' => array('width' => 100, 'upscale' => 0),
+          'data' => array('width' => 100, 'height' => NULL, 'upscale' => 0),
           'weight' => 0,
         ),
       ),
