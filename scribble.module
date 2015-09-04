@@ -132,6 +132,26 @@ function scribble_library() {
 }
 
 /**
+ * Implements hook_image_default_styles().
+ *
+ * Adding default image styles.
+ */
+function scribble_image_default_styles() {
+  return array(
+    'scribble_uploaded_image_style' => array(
+      'label' => 'Scribble uploaded image display',
+      'effects' => array(
+        array(
+          'name' => 'image_scale',
+          'data' => array('width' => 100, 'upscale' => 0),
+          'weight' => 0,
+        ),
+      ),
+    ),
+  );
+}
+
+/**
  * Implements hook_theme().
  */
 function scribble_theme($existing, $type, $theme, $path) {
@@ -150,12 +170,6 @@ function scribble_theme($existing, $type, $theme, $path) {
     ) + $base,
     'scribble_brush_buttons' => array(
       'variables' => array('brushes' => array()),
-    ) + $base,
-    'scribble_get_scribble_added_image_list' => array(
-      'variables' => array('scribble' => NULL),
-    ) + $base,
-    'scribble_added_image_list_item' => array(
-      'variables' => array('image_url' => NULL),
     ) + $base,
   );
 }
@@ -349,7 +363,7 @@ function scribble_image_upload($form, &$form_state) {
  * AJAX callback for image upload.
  *
  * Sends command to the client that will open a dialog containing the uploaded
- * image and add it to the list of added images. Renders and displays error
+ * image and update the list of added images. Renders and displays error
  * messages in case the upload failed.
  *
  * @return array
@@ -357,11 +371,10 @@ function scribble_image_upload($form, &$form_state) {
  */
 function scribble_image_upload_ajax($form, &$form_state) {
   if (!empty($form_state['scribble_added_image'])) {
-    $commands[] = ajax_command_append(
-      '.scribble-image-list-wrapper',
-      theme('scribble_added_image_list_item', array(
-        'image_url' => $form_state['scribble_added_image'],
-      ))
+    $uploaded_images_field_view = scribble_get_uploaded_images_field_view($form_state['scribble']);
+    $commands[] = ajax_command_replace(
+      '.field-name-scribble-image-uploads',
+      render($uploaded_images_field_view)
     );
     $commands[] = array(
       'command' => 'scribbleOpenImageDialog',
@@ -1157,7 +1170,51 @@ function template_preprocess_scribble_blackboard(&$variables) {
   foreach ($fields as $field) {
     $variables[$field] = drupal_render($variables['form'][$field]);
   }
+
+  // Prepare uploaded images for image list tab.
+  $scribble = $variables['form']['#scribble'];
+  $variables['uploaded_images'] = scribble_get_uploaded_images_field_view($scribble);
+
   // Background color of the canvas.
-  $items = field_get_items('scribble', $variables['form']['#scribble'], 'scribble_background_color');
+  $items = field_get_items('scribble', $scribble, 'scribble_background_color');
   $variables['background_color'] = $items[0]['jquery_colorpicker'];
+}
+
+/**
+ * Getter for output of scribble_uploaded_images field.
+ *
+ * @param object $scribble
+ *   The fully loaded scribble entity object.
+ *
+ * @return array
+ *   The field_view's render array.
+ */
+function scribble_get_uploaded_images_field_view($scribble) {
+  return field_view_field(
+    'scribble',
+    $scribble,
+    'scribble_image_uploads',
+    array(
+      'label' => 'hidden',
+      'type' => 'image',
+      'module' => 'image',
+      'settings' => array(
+        'image_style' => variable_get('scribble_uploaded_images_image_style', 'scribble_uploaded_image_style'),
+      ),
+    )
+  );
+}
+
+/**
+ * Implements hook_preprocess_field().
+ *
+ * Adds original file urls as data property to field item wrappers.
+ */
+function scribble_preprocess_field(&$variables) {
+  $element = $variables['element'];
+  if ($variables['element']['#field_name'] == 'scribble_image_uploads') {
+    foreach ($element['#items'] as $delta => $item) {
+      $variables['item_attributes_array'][$delta]['data-original-image'] = file_create_url($variables['items'][$delta]['#item']['uri']);
+    }
+  }
 }

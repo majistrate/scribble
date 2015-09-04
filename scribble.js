@@ -116,9 +116,9 @@ Drupal.scribble = Drupal.scribble || {
     });
 
     // Add click handler that opens dialog for uploaded images.
-    $('.scribble-added-image-wrapper').each(function () {
+    $('.field-name-scribble-image-uploads .field-item').each(function () {
       $(this).click(function () {
-        Drupal.scribble.validatedImageLoad($(this).find('img').attr('src'));
+        Drupal.scribble.validatedImageLoad($(this).attr('data-original-image'));
       });
     });
   };
@@ -216,7 +216,6 @@ Drupal.scribble = Drupal.scribble || {
   };
 
   /**
-   *
    * Custom Drupal AJAX command.
    *
    * Command gets invoked within the server AJAX callback for

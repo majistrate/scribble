@@ -59,8 +59,9 @@ function theme_scribble_blackboard($variables) {
     $output .= '<div class="scribble-add-img-modal"></div>';
     $output .= '</div>';
 
+    // List of images added to the scribble via upload.
     $output .= '<div id="scribble-tab-images">';
-    $output .= theme('scribble_get_scribble_added_image_list', array('scribble' => $scribble));
+    $output .= render($variables['uploaded_images']);
     $output .= '</div>';
   }
 
@@ -101,35 +102,6 @@ function theme_scribble_brush_buttons($variables) {
     ));
     $output .= '</div>';
   }
-  $output .= '</div>';
-  return $output;
-}
-
-/**
- * Theme function for the uploaded/added images of a scribble.
- */
-function theme_scribble_get_scribble_added_image_list($variables) {
-  $output = '<div class="scribble-image-list-wrapper">';
-  if ($items = field_get_items('scribble', $variables['scribble'], 'scribble_image_uploads')) {
-    foreach ($items as $item) {
-      $output .= theme('scribble_added_image_list_item', array(
-        'image_url' => file_create_url($item['uri']),
-      ));
-    }
-  }
-  else {
-    $output .= '<span>' . t('No images added yet.') . '</span>';
-  }
-  $output .= '</div>';
-  return $output;
-}
-
-/**
- * Theme function for a single item in the added images list.
- */
-function theme_scribble_added_image_list_item($variables) {
-  $output = '<div class="scribble-added-image-wrapper">';
-  $output .= theme('image', array('path' => $variables['image_url']));
   $output .= '</div>';
   return $output;
 }
