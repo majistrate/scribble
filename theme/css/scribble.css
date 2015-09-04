@@ -100,8 +100,8 @@
   float: left;
 }
 
-#img-src-txt {
-  width: 65%;
+.form-item-image-fetch-txt {
+  display: inline-block;
 }
 
 .scribble-add-img-modal.ui-dialog-content.ui-widget-content {
@@ -138,4 +138,10 @@
 .scribble-brush-buttons-wrapper {
   float: left;
   margin-left: 10px;
+}
+
+.field-name-scribble-image-uploads .field-item {
+  display: inline-block;
+  float: left;
+  margin: 10px;
 }
