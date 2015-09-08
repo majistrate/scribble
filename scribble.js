@@ -14,7 +14,6 @@ Drupal.scribble = Drupal.scribble || {
   $web_src_txt: null,
   $add_img_container: null,
   $toolbar_tabs: null,
-  img_dialog_width: 0,
   scribble_dir_path: null,
   current_file: null,
   unchanged: true
@@ -131,6 +130,7 @@ Drupal.scribble = Drupal.scribble || {
     })
     .load(function() {
       Drupal.scribble.loadAddImageDialog($(this));
+        Drupal.scribble.$add_img_container.css('width', $(this).width());
     });
     $load_img.attr('src', URL);
   };
@@ -139,14 +139,12 @@ Drupal.scribble = Drupal.scribble || {
     $img.addClass('scribble-add-img');
     Drupal.scribble.$add_img_container.html($img);
     $('#img-src-txt').removeClass('ui-state-error');
-    Drupal.scribble.img_dialog_width = (Drupal.scribble.img_dialog_width != 0) ? Drupal.scribble.img_dialog_width: $img.width();
     Drupal.scribble.$add_img_container.dialog({
       draggable: true,
-      title: Drupal.t('Drag the image on the blackboard in order to add it.'),
       autoOpen: false,
       resizable: false,
-      width: Drupal.scribble.img_dialog_width,
-      hide: "explode"
+      hide: "explode",
+      dialogClass: 'scribble-image-injection-dialog'
     });
     var options = {
       stop: Drupal.scribble.addImgDropHandler,
