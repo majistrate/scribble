@@ -75,12 +75,22 @@
   display: inline-block;
 }
 
-.scribble-add-img-modal.ui-dialog-content.ui-widget-content {
-  padding: 0;
-}
+.scribble-image-injection-dialog {
+  width: auto !important;
+  padding: 0 !important;
+  border: 1px dashed;
 
-.scribble-toolbar-modal-content {
-  display: none;
+  .ui-dialog-titlebar {
+    display: none;
+  }
+
+  .scribble-add-img-modal.ui-dialog-content.ui-widget-content {
+    padding: 0;
+    display: none;
+    line-height: 0;
+    min-height: initial !important;
+    overflow: hidden;
+  }
 }
 
 .scribble-brush-button {
