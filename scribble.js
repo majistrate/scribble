@@ -16,7 +16,11 @@ Drupal.scribble = Drupal.scribble || {
   $toolbar_tabs: null,
   scribble_dir_path: null,
   current_file: null,
-  unchanged: true
+  unchanged: true,
+  drag_img_offset_x: 0,
+  drag_img_offset_y: 0,
+  add_img_width: 0,
+  add_img_height: 0
 };
 
 (function($) {
@@ -134,6 +138,11 @@ Drupal.scribble = Drupal.scribble || {
     $load_img.attr('src', URL);
   };
 
+  /**
+   * @todo
+   *
+   * @param $img
+   */
   Drupal.scribble.loadAddImageDialog = function ($img) {
     $img.addClass('scribble-add-img');
     Drupal.scribble.$add_img_container.html($img);
@@ -155,10 +164,10 @@ Drupal.scribble = Drupal.scribble || {
       start: function (event, ui) {
         // Set the image to be added in var to use it in the drop handler.
         // Set vars for mouse offset left upper corner of the image.
-        drag_img_offset_x = event.pageX - $img.offset().left;
-        drag_img_offset_y = event.pageY - $img.offset().top;
-        add_img_width = $img.width();
-        add_img_height = $img.height();
+        Drupal.scribble.drag_img_offset_x = event.pageX - $img.offset().left;
+        Drupal.scribble.drag_img_offset_y = event.pageY - $img.offset().top;
+        Drupal.scribble.add_img_width = $img.width();
+        Drupal.scribble.add_img_height = $img.height();
         Drupal.scribble.$add_img_container.dialog('close');
       },
       revert: true,
@@ -175,12 +184,12 @@ Drupal.scribble = Drupal.scribble || {
   // Fires once the dragged image is dropped on the draw canvas.
   Drupal.scribble.addImgDropHandler = function (event, ui) {
     // Gather data for image merge.
-    var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - drag_img_offset_x;
-    var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - drag_img_offset_y;
+    var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - Drupal.scribble.drag_img_offset_x;
+    var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - Drupal.scribble.drag_img_offset_y;
     var data = {
       img_url: Drupal.scribble.$add_img_container.find('img').attr('src'),
-      img_width: add_img_width,
-      img_height: add_img_height,
+      img_width: Drupal.scribble.add_img_width,
+      img_height: Drupal.scribble.add_img_height,
       dst_x: x,
       dst_y: y,
       scribble_id: Drupal.settings.scribble_info.scribbleId
