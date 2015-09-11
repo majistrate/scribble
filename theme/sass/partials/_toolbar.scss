@@ -78,7 +78,6 @@
 .scribble-image-injection-dialog {
   width: auto !important;
   padding: 0 !important;
-  border: 1px dashed;
 
   .ui-dialog-titlebar {
     display: none;
@@ -91,6 +90,10 @@
     min-height: initial !important;
     overflow: hidden;
   }
+}
+
+.scribble-add-img {
+  border: 2px dashed;
 }
 
 .scribble-brush-button {
