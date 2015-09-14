@@ -84,6 +84,7 @@ Drupal.scribble = Drupal.scribble || {
               imagedata: imageData,
               scribble_id: Drupal.settings.scribble_info.scribbleId
             };
+            // @todo show throbber while AJAX request is in progress.
             $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
               Drupal.scribble.current_file = response.file_name;
               $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
@@ -133,17 +134,20 @@ Drupal.scribble = Drupal.scribble || {
       Drupal.scribble.$web_src_txt.addClass('ui-state-error');
     })
     .load(function() {
-      Drupal.scribble.loadAddImageDialog($(this));
+      Drupal.scribble.PlaceInjectedImage($(this));
     });
     $load_img.attr('src', URL);
   };
 
   /**
-   * @todo
+   * Places a given image on the canvas.
+   *
+   * Also turns the image into a draggable element using JQuery UI's draggable.
    *
    * @param $img
+   *   The image to inject into the canvas.
    */
-  Drupal.scribble.loadAddImageDialog = function ($img) {
+  Drupal.scribble.PlaceInjectedImage = function ($img) {
     $img.addClass('scribble-add-img');
     Drupal.scribble.$add_img_container.html($img);
     $('#img-src-txt').removeClass('ui-state-error');
@@ -183,6 +187,7 @@ Drupal.scribble = Drupal.scribble || {
 
   // Fires once the dragged image is dropped on the draw canvas.
   Drupal.scribble.addImgDropHandler = function (event, ui) {
+    // @todo add check with confirm dialog and remove image if confirm was cancelled.
     // Gather data for image merge.
     var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - Drupal.scribble.drag_img_offset_x;
     var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - Drupal.scribble.drag_img_offset_y;
@@ -194,6 +199,7 @@ Drupal.scribble = Drupal.scribble || {
       dst_y: y,
       scribble_id: Drupal.settings.scribble_info.scribbleId
     };
+    // @todo show throbber while AJAX request is in progress.
     // Do AJAX post that merges the images and saves a new image.
     $.post(Drupal.settings.scribble.addURL, data, function(response) {
       // Store the latest filename.
