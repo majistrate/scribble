@@ -133,6 +133,14 @@
   border-radius: 5px;
 }
 
+.scribble-throbber {
+  background: rgba(255, 255, 255, 0.7) url('../img/throbber.gif') no-repeat center center;
+  z-index: 99;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .scribble-brush-button img {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;

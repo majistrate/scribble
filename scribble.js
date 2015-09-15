@@ -4,23 +4,18 @@
  */
 
 Drupal.scribble = Drupal.scribble || {
-  dialog_base_options: {
-    draggable: true,
-    autoOpen: false,
-    resizable: false,
-    hide: "explode"
-  },
-  $draw_canvas: null,
-  $web_src_txt: null,
-  $add_img_container: null,
-  $toolbar_tabs: null,
   scribble_dir_path: null,
   current_file: null,
   unchanged: true,
   drag_img_offset_x: 0,
   drag_img_offset_y: 0,
   add_img_width: 0,
-  add_img_height: 0
+  add_img_height: 0,
+  $draw_canvas: null,
+  $web_src_txt: null,
+  $add_img_container: null,
+  $toolbar_tabs: null,
+  $ajax_overlay: null
 };
 
 (function($) {
@@ -187,6 +182,7 @@ Drupal.scribble = Drupal.scribble || {
 
   // Fires once the dragged image is dropped on the draw canvas.
   Drupal.scribble.addImgDropHandler = function (event, ui) {
+    Drupal.scribble.AjaxThrobberOverlay(true);
     // @todo add check with confirm dialog and remove image if confirm was cancelled.
     // Gather data for image merge.
     var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - Drupal.scribble.drag_img_offset_x;
@@ -207,7 +203,34 @@ Drupal.scribble = Drupal.scribble || {
       // Update the background of the canvas with the new image.
       $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
       Drupal.scribble.$draw_canvas.data("jqScribble").clear();
+      Drupal.scribble.AjaxThrobberOverlay(false);
     });
+  };
+
+  /**
+   * Shows/Hides the AJAX throbber.
+   *
+   * Shows the throbber in an overlay in order to prevent user from further
+   * editing of the current canvas.
+   *
+   * @param show
+   *   Whether to show or hide the throbber.
+   */
+  Drupal.scribble.AjaxThrobberOverlay = function (show) {
+    Drupal.scribble.$ajax_overlay = (Drupal.scribble.$ajax_overlay === null) ? $('<div class="scribble-throbber"></div>') : Drupal.scribble.$ajax_overlay;
+    Drupal.scribble.$ajax_overlay.css({
+      width: $(window).width(),
+      height: $(window).height()
+    });
+    console.log($(window).height());
+    if (show) {
+      //$('body').css('overflow-y', 'hidden');
+
+      Drupal.scribble.$ajax_overlay.appendTo('body').fadeIn();
+    }
+    else {
+      //Drupal.scribble.$ajax_overlay.fadeOut();
+    }
   };
 
   /**
