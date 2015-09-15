@@ -105,6 +105,14 @@
   @extend %brush-button;
 }
 
+.scribble-throbber {
+  @include background(rgba(255, 255, 255, 0.7) image-url('throbber.gif') no-repeat center center);
+  z-index: 99;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .scribble-brush-button img {
   @include border-radius(5px);
   width: 33px;
