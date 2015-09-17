@@ -218,18 +218,22 @@ Drupal.scribble = Drupal.scribble || {
    */
   Drupal.scribble.AjaxThrobberOverlay = function (show) {
     Drupal.scribble.$ajax_overlay = (Drupal.scribble.$ajax_overlay === null) ? $('<div class="scribble-throbber"></div>') : Drupal.scribble.$ajax_overlay;
-    Drupal.scribble.$ajax_overlay.css({
-      width: $(window).width(),
-      height: $(window).height()
-    });
-    console.log($(window).height());
-    if (show) {
-      //$('body').css('overflow-y', 'hidden');
+    $body = $('body');
 
-      Drupal.scribble.$ajax_overlay.appendTo('body').fadeIn();
+    if (show) {
+      $body.css({'overflow': 'hidden', 'height': '100%'});
+      Drupal.scribble.$ajax_overlay
+        .appendTo($body)
+        .css({
+          'top': $(window).scrollTop(),
+          'width': $(window).width(),
+          'height': $(window).height()
+        })
+        .fadeIn('slow');
     }
     else {
-      //Drupal.scribble.$ajax_overlay.fadeOut();
+      $body.css('overflow-y', 'visible');
+      Drupal.scribble.$ajax_overlay.fadeOut('slow');
     }
   };
 
