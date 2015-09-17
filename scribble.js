@@ -79,12 +79,14 @@ Drupal.scribble = Drupal.scribble || {
               imagedata: imageData,
               scribble_id: Drupal.settings.scribble_info.scribbleId
             };
-            // @todo show throbber while AJAX request is in progress.
-            $.post(Drupal.settings.scribble.saveURL, post_data, function(response) {
-              Drupal.scribble.current_file = response.file_name;
-              $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
-              Drupal.scribble.$draw_canvas.data("jqScribble").clear();
-            });
+            // Show throbber while AJAX request is in progress.
+            Drupal.scribble.AjaxThrobberOverlay(true);
+            // Attempt to save the new drawing screenshot.
+            $.post(
+              Drupal.settings.scribble.saveURL,
+              post_data,
+              Drupal.scribble.AjaxSuccessCallback
+            );
           }
         });
       }
@@ -182,7 +184,6 @@ Drupal.scribble = Drupal.scribble || {
 
   // Fires once the dragged image is dropped on the draw canvas.
   Drupal.scribble.addImgDropHandler = function (event, ui) {
-    Drupal.scribble.AjaxThrobberOverlay(true);
     // @todo add check with confirm dialog and remove image if confirm was cancelled.
     // Gather data for image merge.
     var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - Drupal.scribble.drag_img_offset_x;
@@ -195,17 +196,32 @@ Drupal.scribble = Drupal.scribble || {
       dst_y: y,
       scribble_id: Drupal.settings.scribble_info.scribbleId
     };
-    // @todo show throbber while AJAX request is in progress.
+    // Show throbber while AJAX request is in progress.
+    Drupal.scribble.AjaxThrobberOverlay(true);
     // Do AJAX post that merges the images and saves a new image.
-    $.post(Drupal.settings.scribble.addURL, data, function(response) {
-      // Store the latest filename.
-      Drupal.scribble.current_file = response.file_name;
-      // Update the background of the canvas with the new image.
-      $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
-      Drupal.scribble.$draw_canvas.data("jqScribble").clear();
-      Drupal.scribble.AjaxThrobberOverlay(false);
-    });
+    $.post(
+      Drupal.settings.scribble.addURL,
+      data,
+      Drupal.scribble.AjaxSuccessCallback
+    );
   };
+
+  /**
+   * Callback for successful AJAX calls where an image was added to a scribble.
+   *
+   * @param response
+   *   Response oject as received from $.post or $.get.
+   */
+  Drupal.scribble.AjaxSuccessCallback = function (response) {
+    // Store the latest filename.
+    Drupal.scribble.current_file = response.file_name;
+    // Update the background of the canvas with the new image.
+    $('.scribble-canvas-wrapper').css('background-image', 'url("' + Drupal.scribble.scribble_dir_path + '/' + Drupal.scribble.current_file + '")');
+    Drupal.scribble.$draw_canvas.data("jqScribble").clear();
+    // Remove throbber overlay.
+    Drupal.scribble.AjaxThrobberOverlay(false);
+  };
+
 
   /**
    * Shows/Hides the AJAX throbber.
