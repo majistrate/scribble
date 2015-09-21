@@ -172,7 +172,6 @@ Drupal.scribble = Drupal.scribble || {
         Drupal.scribble.add_img_height = $img.height();
         Drupal.scribble.$add_img_container.dialog('close');
       },
-      revert: true,
       helper: 'clone',
       appendTo: 'body',
       scroll: false,
