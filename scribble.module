@@ -84,6 +84,10 @@ function scribble_library() {
       'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
       'addURL' => url('scribble/add', array('absolute' => TRUE)),
+      'confirm' => array(
+        'save' => variable_get('scribble_save_prompt', TRUE),
+        'inject' => variable_get('scribble_inject_prompt', TRUE),
+      ),
     ),
   );
   $libraries['jqscribble'] = array(
