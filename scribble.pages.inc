@@ -51,6 +51,20 @@ function scribble_configuration_form($form, &$form_state) {
     '#default_value' => variable_get('scribble_allow_image_injection', 0),
   );
 
+  $form['scribble_save_prompt'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show confirm dialog before saving.'),
+    '#description' => t('Display a JS confirm dialog each time a user attempts to save changes on a scribble.'),
+    '#default_value' => variable_get('scribble_save_prompt', TRUE),
+  );
+
+  $form['scribble_inject_prompt'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show confirm dialog when dropping an injected image.'),
+    '#description' => t('Display a JS confirm dialog each time a user attempts to inject and image into the scribble.'),
+    '#default_value' => variable_get('scribble_inject_prompt', TRUE),
+  );
+
   // Include slideshow settings.
   scribble_add_slideshow_settings_elements($form, variable_get('scribble_slideshow_settings'));
 

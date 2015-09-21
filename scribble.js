@@ -74,7 +74,8 @@ Drupal.scribble = Drupal.scribble || {
     $save_btn.click(function () {
       if (!Drupal.scribble.unchanged) {
         Drupal.scribble.$draw_canvas.data("jqScribble").save(function (imageData) {
-          if(confirm(Drupal.t("You're about to save your changes. Is that cool with you?")) && !Drupal.scribble.$draw_canvas.data('jqScribble').blank) {
+          var confirmed = !!Drupal.settings.scribble.confirm.save === true ? confirm(Drupal.t("Are you sure you want to save your changes?")) : true;
+          if(confirmed && !Drupal.scribble.$draw_canvas.data('jqScribble').blank) {
             var post_data = {
               imagedata: imageData,
               scribble_id: Drupal.settings.scribble_info.scribbleId
@@ -161,7 +162,7 @@ Drupal.scribble = Drupal.scribble || {
       }
     });
     var options = {
-      stop: Drupal.scribble.addImgDropHandler,
+      stop: Drupal.scribble.injectImgDropHandler,
       start: function (event, ui) {
         // Set the image to be added in var to use it in the drop handler.
         // Set vars for mouse offset left upper corner of the image.
@@ -183,27 +184,29 @@ Drupal.scribble = Drupal.scribble || {
   };
 
   // Fires once the dragged image is dropped on the draw canvas.
-  Drupal.scribble.addImgDropHandler = function (event, ui) {
-    // @todo add check with confirm dialog and remove image if confirm was cancelled.
-    // Gather data for image merge.
-    var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - Drupal.scribble.drag_img_offset_x;
-    var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - Drupal.scribble.drag_img_offset_y;
-    var data = {
-      img_url: Drupal.scribble.$add_img_container.find('img').attr('src'),
-      img_width: Drupal.scribble.add_img_width,
-      img_height: Drupal.scribble.add_img_height,
-      dst_x: x,
-      dst_y: y,
-      scribble_id: Drupal.settings.scribble_info.scribbleId
-    };
-    // Show throbber while AJAX request is in progress.
-    Drupal.scribble.AjaxThrobberOverlay(true);
-    // Do AJAX post that merges the images and saves a new image.
-    $.post(
-      Drupal.settings.scribble.addURL,
-      data,
-      Drupal.scribble.AjaxSuccessCallback
-    );
+  Drupal.scribble.injectImgDropHandler = function (event, ui) {
+    var confirmed = !!Drupal.settings.scribble.confirm.inject === true ? confirm(Drupal.t("Are you sure you want to save your changes?")) : true;
+    if (confirmed) {
+      // Gather data for image merge.
+      var x = event.pageX - Drupal.scribble.$draw_canvas.offset().left - Drupal.scribble.drag_img_offset_x;
+      var y = event.pageY - Drupal.scribble.$draw_canvas.offset().top - Drupal.scribble.drag_img_offset_y;
+      var data = {
+        img_url: Drupal.scribble.$add_img_container.find('img').attr('src'),
+        img_width: Drupal.scribble.add_img_width,
+        img_height: Drupal.scribble.add_img_height,
+        dst_x: x,
+        dst_y: y,
+        scribble_id: Drupal.settings.scribble_info.scribbleId
+      };
+      // Show throbber while AJAX request is in progress.
+      Drupal.scribble.AjaxThrobberOverlay(true);
+      // Do AJAX post that merges the images and saves a new image.
+      $.post(
+        Drupal.settings.scribble.addURL,
+        data,
+        Drupal.scribble.AjaxSuccessCallback
+      );
+    }
   };
 
   /**
