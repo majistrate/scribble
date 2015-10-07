@@ -61,7 +61,7 @@ class ScribbleUIController extends EntityDefaultUIController {
     $row[] = l(t('Image list'), $this->path . '/' . $id . '/image-list');
     $row[] = l(t('Slideshow'), 'scribble/' . $id . '/slideshow');
     $row[] = l(t('Download'), 'scribble/' . $id . '/download');
-    $row[] = l(t('Blackboard'), 'scribble/' . $id . '/blackboard');
+    $row[] = l(t('Blackboard'), 'scribble/' . $id);
     return $row;
   }
 

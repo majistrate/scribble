@@ -15,7 +15,7 @@ define('SCRIBBLE_TITLE_REMOVE_IMAGE', 'remove_image');
  * Implements hook_menu().
  */
 function scribble_menu() {
-  $items['scribble/%scribble/blackboard'] = array(
+  $items['scribble/%scribble'] = array(
     'title callback' => 'scribble_page_title',
     'title arguments' => array(1),
     'page callback' => 'scribble_blackboard_page',
@@ -23,19 +23,37 @@ function scribble_menu() {
     'access arguments' => array('access scribbles'),
     'file' => 'scribble.pages.inc',
   );
+  $items['scribble/%scribble/scribble'] = array(
+    'title' => 'Scribble',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+  );
   $items['scribble/%scribble/slideshow'] = array(
-    'title callback' => 'scribble_page_title',
-    'title arguments' => array(1, SCRIBBLE_TITLE_SLIDESHOW),
+    'title' => 'Slideshows',
     'page callback' => 'scribble_snapshot_slideshow_page',
     'page arguments' => array(1),
     'access arguments' => array('access scribbles'),
     'file' => 'scribble.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 5,
+  );
+  $items['scribble/%scribble/image-list'] = array(
+    'title' => 'Image list',
+    'page callback' => 'scribble_image_list_page',
+    'page arguments' => array(1),
+    'access arguments' => array('administer scribbles'),
+    'file' => 'scribble.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 10,
   );
   $items['scribble/%scribble/download'] = array(
+    'title' => 'Download Images',
     'page callback' => 'scribble_get_images_archive',
     'page arguments' => array(1),
     'access arguments' => array('administer scribbles'),
     'file' => 'scribble.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 15,
   );
   $items['scribble/save'] = array(
     'page callback' => 'scribble_save_ajax',

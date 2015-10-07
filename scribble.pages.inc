@@ -118,6 +118,7 @@ function scribble_blackboard_page($scribble) {
  *   The render content array of the snapshot administration.
  */
 function scribble_image_list_page($scribble) {
+  drupal_set_title(scribble_page_title($scribble, SCRIBBLE_TITLE_IMAGE_LIST));
   return entity_view('scribble', array($scribble), 'snapshot_administration');
 }
 
@@ -390,6 +391,8 @@ function scribble_remove_image_form_submit($form, &$form_state) {
  *   Renderable array of the scribble_image field.
  */
 function scribble_snapshot_slideshow_page($scribble) {
+  drupal_set_title(scribble_page_title($scribble, SCRIBBLE_TITLE_SLIDESHOW));
+
   // Check if there are any images drawn on the scribble yet.
   $items = field_get_items('scribble', $scribble, 'scribble_image');
   if (!$items) {
