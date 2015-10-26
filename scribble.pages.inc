@@ -431,10 +431,14 @@ function scribble_get_images_archive($scribble) {
     // Create filename, loop images and add them to the archive.
     $file_name = variable_get('file_temporary_path', '/tmp') . '/scribble_' . $scribble->name . '.zip';
     $archive = new ZipArchive();
-    $archive->open($file_name, ZIPARCHIVE::OVERWRITE);
+    $opened = $archive->open($file_name, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE);
+    if ($opened !== TRUE) {
+      throw new Exception('Error while opening zip archive');
+    }
     foreach ($items as $item) {
       $archive->addFile(drupal_realpath($item['uri']), $item['filename']);
     }
+    $archive->close();
 
     // Get file size, filename and send headers.
     $file_size = filesize($file_name);
@@ -444,10 +448,9 @@ function scribble_get_images_archive($scribble) {
     header('Content-Length: ' . $file_size);
     readfile($file_name);
 
-    // Delete file and destroy resource.
+    // Delete file again.
     unlink($file_name);
-    $archive->close();
-    return;
+    drupal_exit();
   }
   // In case there are no images yet go back to the image list.
   return array(
