@@ -32,7 +32,7 @@ function scribble_menu() {
     'title' => 'Slideshows',
     'page callback' => 'scribble_snapshot_slideshow_page',
     'page arguments' => array(1, 'scribble_image'),
-    'access arguments' => array('access scribbles'),
+    'access arguments' => array('view scribble slideshows'),
     'file' => 'scribble.pages.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
@@ -41,7 +41,7 @@ function scribble_menu() {
     'title' => 'Merged images',
     'page callback' => 'scribble_snapshot_slideshow_page',
     'page arguments' => array(1, 'scribble_image'),
-    'access arguments' => array('access scribbles'),
+    'access arguments' => array('view scribble slideshows'),
     'file' => 'scribble.pages.inc',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 5,
@@ -50,7 +50,7 @@ function scribble_menu() {
     'title' => 'Snapshots',
     'page callback' => 'scribble_snapshot_slideshow_page',
     'page arguments' => array(1, 'scribble_image_snapshots'),
-    'access arguments' => array('access scribbles'),
+    'access arguments' => array('view scribble slideshows'),
     'file' => 'scribble.pages.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 6,
@@ -68,7 +68,7 @@ function scribble_menu() {
     'title' => 'Download Images',
     'page callback' => 'scribble_get_images_archive',
     'page arguments' => array(1),
-    'access arguments' => array('administer scribbles'),
+    'access arguments' => array('download scribble images'),
     'file' => 'scribble.pages.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 15,
@@ -263,6 +263,12 @@ function scribble_permission() {
   return array(
     'access scribbles' => array(
       'title' => t('View Scribble blackboards.'),
+    ),
+    'view scribble slideshows' => array(
+      'title' => t('View Scribble slideshows.'),
+    ),
+    'download scribble images' => array(
+      'title' => t('Download Scribble images.'),
     ),
     'administer scribbles' => array(
       'title' => t('Administer Scribbles and settings.'),
