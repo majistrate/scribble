@@ -31,11 +31,29 @@ function scribble_menu() {
   $items['scribble/%scribble/slideshow'] = array(
     'title' => 'Slideshows',
     'page callback' => 'scribble_snapshot_slideshow_page',
-    'page arguments' => array(1),
+    'page arguments' => array(1, 'scribble_image'),
     'access arguments' => array('access scribbles'),
     'file' => 'scribble.pages.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
+  );
+  $items['scribble/%scribble/slideshow/images'] = array(
+    'title' => 'Merged images',
+    'page callback' => 'scribble_snapshot_slideshow_page',
+    'page arguments' => array(1, 'scribble_image'),
+    'access arguments' => array('access scribbles'),
+    'file' => 'scribble.pages.inc',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 5,
+  );
+  $items['scribble/%scribble/slideshow/snapshots'] = array(
+    'title' => 'Snapshots',
+    'page callback' => 'scribble_snapshot_slideshow_page',
+    'page arguments' => array(1, 'scribble_image_snapshots'),
+    'access arguments' => array('access scribbles'),
+    'file' => 'scribble.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 6,
   );
   $items['scribble/%scribble/image-list'] = array(
     'title' => 'Image list',

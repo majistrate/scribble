@@ -390,8 +390,12 @@ function scribble_remove_image_form_submit($form, &$form_state) {
  * @return array
  *   Renderable array of the scribble_image field.
  */
-function scribble_snapshot_slideshow_page($scribble) {
+function scribble_snapshot_slideshow_page($scribble, $field_name) {
   drupal_set_title(scribble_page_title($scribble, SCRIBBLE_TITLE_SLIDESHOW));
+
+  if (empty($field_name)) {
+    drupal_access_denied();
+  }
 
   // Check if there are any images drawn on the scribble yet.
   $items = field_get_items('scribble', $scribble, 'scribble_image');
@@ -409,7 +413,7 @@ function scribble_snapshot_slideshow_page($scribble) {
 
   return theme('scribble_slideshow', array(
     'scribble' => $scribble,
-    'slideshow' => field_view_field('scribble', $scribble, 'scribble_image', $display_settings),
+    'slideshow' => field_view_field('scribble', $scribble, $field_name, $display_settings),
   ));
 }
 
