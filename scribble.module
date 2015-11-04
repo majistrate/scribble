@@ -117,7 +117,14 @@ function scribble_menu() {
 function scribble_library() {
   $settings = array(
     'scribble' => array(
-      'bgImagePath' => url(variable_get('scribble_files_directory', 'sites/default/files/scribble'), array('absolute' => TRUE)),
+      'bgImagePath' => url(
+        variable_get('scribble_files_directory', 'sites/default/files/scribble'),
+        array(
+          'absolute' => TRUE,
+          // This is required in order to get a url without language prefix.
+          'language' => (object) array('language' => FALSE),
+        )
+      ),
       'saveURL' => url('scribble/save', array('absolute' => TRUE)),
       'addURL' => url('scribble/add', array('absolute' => TRUE)),
       'confirm' => array(
