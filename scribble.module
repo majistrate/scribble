@@ -55,8 +55,8 @@ function scribble_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 6,
   );
-  $items['scribble/%scribble/image-list'] = array(
-    'title' => 'Image list',
+  $items['scribble/%scribble/manage-images'] = array(
+    'title' => 'Manage Images',
     'page callback' => 'scribble_image_list_page',
     'page arguments' => array(1),
     'access arguments' => array('administer scribbles'),
@@ -91,7 +91,7 @@ function scribble_menu() {
     'file' => 'scribble.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
-  $items['admin/config/media/scribble/%scribble/image-list'] = array(
+  $items['admin/config/media/scribble/%scribble/manage-images'] = array(
     'title callback' => 'scribble_page_title',
     'title arguments' => array(4, SCRIBBLE_TITLE_IMAGE_LIST),
     'page callback' => 'scribble_image_list_page',
