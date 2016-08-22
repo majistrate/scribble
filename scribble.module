@@ -28,6 +28,14 @@ function scribble_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
   );
+  $items['scribble/%scribble/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'entity_ui_get_form',
+    'page arguments' => array('scribble', 1),
+    'access arguments' => array('view scribble slideshows'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3,
+  );
   $items['scribble/%scribble/slideshow'] = array(
     'title' => 'Slideshows',
     'page callback' => 'scribble_snapshot_slideshow_page',
