@@ -212,7 +212,7 @@ Drupal.scribble = Drupal.scribble || {
    * Callback for successful AJAX calls where an image was added to a scribble.
    *
    * @param response
-   *   Response oject as received from $.post or $.get.
+   *   Response object as received from $.post or $.get.
    */
   Drupal.scribble.AjaxSuccessCallback = function (response) {
     // Store the latest filename.
