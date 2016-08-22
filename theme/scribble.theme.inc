@@ -61,7 +61,9 @@ function theme_scribble_blackboard($variables) {
 
     // List of images added to the scribble via upload.
     $output .= '<div id="scribble-tab-images">';
+    $output .= '<div id="scribble-uploaded-images-wrapper">';
     $output .= render($variables['uploaded_images']);
+    $output .= '</div>';
     $output .= '</div>';
     $output .= '<div class="clearfix"></div>';
   }
