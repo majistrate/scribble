@@ -429,6 +429,15 @@ function scribble_snapshot_slideshow_page($scribble, $field_name) {
  *   Markup containing message or nothing.
  */
 function scribble_get_images_archive($scribble) {
+  // Make sur ZipArchive is available before doing anything further.
+  if (!class_exists('ZipArchive')) {
+    drupal_set_message(
+      t('ZipArchive class is not available in your version of PHP but is required to download images.'),
+      'warning'
+    );
+    return array();
+  }
+
   // Check if there are any images.
   if ($items = field_get_items('scribble', $scribble, 'scribble_image')) {
 
